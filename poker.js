@@ -36,10 +36,10 @@ function new_level() {
 	return container;
 }
 function new_break() {
-	var break_dom = new_level();
+	var break_dom = create('div');
+	$(break_dom).addClass('level');
 	$(break_dom).addClass( 'break' );
-	break_dom.childNodes[1].innerHTML = 'Break!';
-	break_dom.childNodes[2].innerHTML = '<button onclick="set_current()">Break&lsquo;s over</button>';
+	break_dom.innerHTML = '<div class="time">'+time_per_level+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode)">Break&rsquo;s over</button></div>';
 	return break_dom;
 }
 function add_break(	node_before ) {
@@ -54,6 +54,13 @@ function add_break(	node_before ) {
 	}// else {
 		$(break_dom).slideDown();
 	//}
+}
+function remove_break(break_dom) {
+	if( break_dom == current_level_dom ) {
+		$(break_dom).slideUp( function() { set_current(); container.removeChild( break_dom ) } );
+	} else {
+		$(break_dom).slideUp( function() { container.removeChild( break_dom ) } );
+	}
 }
 function set_current( new_dom ) {
 	if( new_dom == null ) {
@@ -81,6 +88,7 @@ function draw() {
 	blinds = id('blinds').value.split('\n');
 	games = id('games').value.split('\n');
 	level = container.firstChild;
+	var level_counter = 0
 	for( var i = 0,c=blinds.length; i < c; i++ ) {
 		if( blinds[i] ) {
 			if( !level ) {
@@ -89,9 +97,17 @@ function draw() {
 			}
 			level.childNodes[0].innerHTML = time_per_level;
 			level.childNodes[1].innerHTML = blinds[i];
-			level.childNodes[2].innerHTML = games[i%games.length]
+			level.childNodes[2].innerHTML = games[level_counter%games.length]
+			level_counter += 1;
 		} else {
-			level = new_break();
+			break_dom = new_break();
+			if( level ) {
+				container.replaceChild( break_dom, level );
+				level = break_dom;
+			} else {
+				container.appendChild( break_dom );
+				level = break_dom;
+			}
 		}
 		level = level.nextSibling;
 	}

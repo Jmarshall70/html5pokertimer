@@ -87,9 +87,8 @@ textarea.blinds {
 	height: 90%;
 }
 .level button {
-	position: absolute;
-	right: 4px;
-	bottom: 4px;
+	padding: .125em;
+	font-size: 50%;
 }
 .game a {
 	color: black;
@@ -100,6 +99,12 @@ textarea.blinds {
 }
 #settings {
 	opacity: 1;
+}
+#settings.level button {
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+	font-size: 16px;
 }
 input.time {
 	font-size: inherit;
