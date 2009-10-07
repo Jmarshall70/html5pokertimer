@@ -1,0 +1,105 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	margin: 0;
+	font-family: Helvetica, FreeSans, sans-serif;
+}
+#poker_container {
+	position: relative;
+	background-color: grey;
+	font-size: 72px;
+}
+.level {
+	border-bottom: 1px solid silver;
+	height: 90px;
+	position: relative;
+	text-align: center;
+	opacity: .3;
+	background-color: white;
+	margin: .0625em;
+	-moz-border-radius: .125em;
+	-webkit-border-radius: .125em;
+}
+.level.current {
+	opacity: 1;
+	border: .0625em solid black;
+	margin: -.0625em .03125em;
+	-moz-border-radius: .125em;
+	-webkit-border-radius: .125em;
+}
+.level div {
+	padding-top: 0.5%;
+}
+.time {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 80%;
+}
+.blinds {
+	position: absolute;
+	left: 20%;
+	right: 38%;
+	top: 0;
+	bottom: 0;
+	background-color: #eee;
+	white-space: nowrap;
+}
+.game {
+	position: absolute;
+	left: 62%;
+	right: 0;
+	top: 0;
+	bottom:0;
+	white-space: nowrap;
+}
+textarea {
+	border: 1px solid grey;
+	overflow: auto;
+}
+textarea.game {
+	width: 25%;
+	height: 90%;
+}
+textarea.blinds {
+	width: 40%;
+	right: 40%;
+	height: 90%;
+}
+.level button {
+	position: absolute;
+	right: 4px;
+	bottom: 4px;
+}
+.game a {
+	color: black;
+	text-decoration: none;
+}
+.game a:hover {
+	text-decoration: underline;
+}
+#settings {
+	opacity: 1;
+}
+input.time {
+	font-size: inherit;
+	font-family: inherit;
+	border: 0;
+	width: 100%;
+	height: 100%;
+}
+#poker_controls {
+	position: fixed;
+	border-left: 1px solid grey;
+	border-bottom: 1px solid grey;
+	background: white;
+	padding: 4px;
+	right: 0;
+	top: 0;
+	font-size: 16px;
+	-moz-border-radius-bottomleft: 8px;
+	-webkit-border-bottom-left-radius: 8px;
+}
