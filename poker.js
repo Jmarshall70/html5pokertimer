@@ -1,6 +1,6 @@
 var current_level_dom = null;
 var container = null;
-
+var time_per_level = null;
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	container = id('poker_levels');	
@@ -26,7 +26,34 @@ function count() {
 	}
 	time = minutes+':'+pad(seconds);
 	c[0].innerHTML = time
-	$('title').html( time + ' - ' + c[2].innerHTML + ' - ' + c[1].innerHTML );
+	$('title').html( time + ' - ' + c[1].innerHTML + ' - ' + c[2].innerHTML );
+}
+
+function new_level() {
+	var container = create('div');
+	$(container).addClass('level');
+	container.innerHTML = '<div class="time">'+time_per_level+'</div><div class="blinds"></div><div class="game"></div><a class="break" href="#" onclick="add_break(this.parentNode); return false">add break</a>';
+	return container;
+}
+function new_break() {
+	var break_dom = new_level();
+	$(break_dom).addClass( 'break' );
+	break_dom.childNodes[1].innerHTML = 'Break!';
+	break_dom.childNodes[2].innerHTML = '<button onclick="set_current()">Break&lsquo;s over</button>';
+	return break_dom;
+}
+function add_break(	node_before ) {
+	break_dom = new_break();
+	$(break_dom).css({ 'display': 'none' });
+	current_level_dom.parentNode.insertBefore( break_dom, node_before );
+	change_size();
+	if( node_before == current_level_dom ) {
+		$(current_level_dom).removeClass( 'current' );
+		current_level_dom = break_dom;
+		$(current_level_dom).addClass( 'current' );
+	}// else {
+		$(break_dom).slideDown();
+	//}
 }
 function set_current( new_dom ) {
 	if( new_dom == null ) {
@@ -49,45 +76,23 @@ function update_view(abrupt) {
 	//$(controls).css({ 'top': dom_top + dom_height });
 }
 
-function new_level() {
-	var divs = [ 'time', 'game', 'blinds' ];	
-	var p = {'container': create('div')};
-		
-	var container = p['container'];
-	$(container).addClass('level');
-	
-	for( var i=0,j=divs.length; i<j; i++ ){
-		var c = divs[i];
-		p[c] = create('div');
-		$(p[c]).addClass(c);
-		container.appendChild( p[c] );
-	}
-	
-	p['time'].innerHTML = time_per_level;
-	return p;
-}
-
-function add_break() {
-	var break_o = new_level();
-	break_o.blinds.innerHTML = 'Break!';
-	break_o.game.innerHTML = '<button onclick="set_current()">Break&lsquo;s over</button>';
-	current_level_dom.parentNode.insertBefore( break_o.container, current_level_dom );
-	change_size()	
-	set_current( break_o.container )
-}
 function draw() {
 	time_per_level = id('time').value
 	blinds = id('blinds').value.split('\n');
 	games = id('games').value.split('\n');
 	level = container.firstChild;
 	for( var i = 0,c=blinds.length; i < c; i++ ) {
-		if( !level ) {
-			level = new_level().container;
-			container.appendChild( level );
+		if( blinds[i] ) {
+			if( !level ) {
+				level = new_level();
+				container.appendChild( level );
+			}
+			level.childNodes[0].innerHTML = time_per_level;
+			level.childNodes[1].innerHTML = blinds[i];
+			level.childNodes[2].innerHTML = games[i%games.length]
+		} else {
+			level = new_break();
 		}
-		level.childNodes[0].innerHTML = time_per_level;
-		level.childNodes[2].innerHTML = blinds[i];
-		level.childNodes[1].innerHTML = games[i%games.length]
 		level = level.nextSibling;
 	}
 	while( level && level.nextSibling ) {
@@ -101,7 +106,7 @@ function change_size(scroll, animate){
 	var ratio = width / 1000;
 	$(container).css({'fontSize':ratio*72, 'lineHeight':(ratio*80)+'px'});
 	$('#settings').css({'fontSize':ratio*72, 'lineHeight':(ratio*80)+'px'});
-	$('.level').css({'height':ratio*90});
+	//$('.level').css({'height':ratio*90});
 	var half_height = Math.floor( window.innerHeight/2 );
 	$(container).css({ 'paddingTop': half_height, 'paddingBottom': half_height });
 	if( scroll ) {	
