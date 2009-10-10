@@ -66,6 +66,7 @@ function set_current( new_dom ) {
 	if( new_dom == null ) {
 		new_dom = current_level_dom.nextSibling
 	}
+	document.getElementById('bell').play();
 	$(current_level_dom).removeClass( 'current' );
 	current_level_dom = new_dom;
 	$(current_level_dom).addClass( 'current' );
