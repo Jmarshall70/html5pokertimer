@@ -1,9 +1,18 @@
 var current_level_dom = null;
 var container = null;
 var time_per_level = null;
+var bell = null;
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
-	container = id('poker_levels');	
+	bell = document.getElementById('bell');
+	if( !bell.canPlayType('audio/ogg') ) {
+		if( bell.canPlayType('audio/mpeg') ) {
+			bell.src = bell.src.substr(0, bell.src.length-3)+'mp3';
+		} else if( bell.canPlayType('audio/wav') ) {
+			bell.src = bell.src.substr(0, bell.src.length-3)+'wav';
+		}
+	}
+	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
 	
@@ -66,7 +75,7 @@ function set_current( new_dom ) {
 	if( new_dom == null ) {
 		new_dom = current_level_dom.nextSibling
 	}
-	document.getElementById('bell').play();
+	bell.play();
 	$(current_level_dom).removeClass( 'current' );
 	current_level_dom = new_dom;
 	$(current_level_dom).addClass( 'current' );
