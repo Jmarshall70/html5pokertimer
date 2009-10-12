@@ -94,7 +94,7 @@ function update_view(abrupt) {
 	var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
 	var dom_top = current_level_dom.offsetTop;
 	if( abrupt ) {
-		container.css({ 'top':-1*(dom_top-top_of_center) });
+		$(container).css({ 'top':-1*(dom_top-top_of_center) });
 	} else {
 		$(container).animate({ 'top': -1*(dom_top-top_of_center) });
 	}
