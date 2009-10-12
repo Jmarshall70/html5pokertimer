@@ -5,13 +5,20 @@ var bell = null;
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
-	if( !bell.canPlayType('audio/ogg') ) {
+	if( bell.duration == 0 || !bell.canPlayType('audio/ogg') ) {
 		if( bell.canPlayType('audio/mpeg') ) {
-			bell.src = bell.src.substr(0, bell.src.length-3)+'mp3';
+			new_src = bell.src.substr(0, bell.src.length-3)+'mp3';
+			bell.parentNode.removeChild(bell);
+			bell = new Audio();
+			bell.src = new_src;
 		} else if( bell.canPlayType('audio/wav') ) {
-			bell.src = bell.src.substr(0, bell.src.length-3)+'wav';
+			new_src = bell.src.substr(0, bell.src.length-3)+'wav';
+			bell.parentNode.removeChild(bell);
+			bell = new Audio();
+			bell.src = new_src;
 		}
 	}
+	console.log( bell.src )
 	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
@@ -60,9 +67,8 @@ function add_break(	node_before ) {
 		$(current_level_dom).removeClass( 'current' );
 		current_level_dom = break_dom;
 		$(current_level_dom).addClass( 'current' );
-	}// else {
-		$(break_dom).slideDown();
-	//}
+	}
+	$(break_dom).slideDown();
 }
 function remove_break(break_dom) {
 	if( break_dom == current_level_dom ) {
@@ -75,11 +81,11 @@ function set_current( new_dom ) {
 	if( new_dom == null ) {
 		new_dom = current_level_dom.nextSibling
 	}
-	bell.play();
 	$(current_level_dom).removeClass( 'current' );
 	current_level_dom = new_dom;
 	$(current_level_dom).addClass( 'current' );
 	update_view();
+	bell.play();
 }
 function update_view(abrupt) {
 	var dom_height = current_level_dom.offsetHeight;
@@ -143,8 +149,8 @@ function id(e){return document.getElementById(e)}
 function create(e){return document.createElement(e)}
 function pad(num, totalChars, padWith) {
 	num = num + "";
-	padWith = (padWith) ? padWith : "0";
-	totalChars = (totalChars) ? totalChars : 2;
+	padWith = padWith ? padWith : "0";
+	totalChars = totalChars ? totalChars : 2;
 	if (num.length < totalChars) {
 		while (num.length < totalChars) {
 			num = padWith + num;
