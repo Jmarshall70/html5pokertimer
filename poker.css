@@ -46,8 +46,8 @@ body {
 }
 .blinds {
 	position: absolute;
-	left: 23%;
-	right: 35%;
+	left: 22%;
+	right: 36%;
 	top: 0;
 	bottom: 0;
 	background-color: #050505;
@@ -55,7 +55,7 @@ body {
 }
 .game {
 	position: absolute;
-	left: 62%;
+	left: 64%;
 	right: 0;
 	top: 0;
 	bottom:0;
