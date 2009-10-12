@@ -2,6 +2,9 @@ var current_level_dom = null;
 var container = null;
 var time_per_level = null;
 var bell = null;
+
+var text_size = 80
+
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
@@ -135,9 +138,9 @@ function draw() {
 }
 function change_size(scroll, animate){
 	var width = container.offsetWidth;
-	var ratio = width / 1000;
-	$(container).css({'fontSize':ratio*72, 'lineHeight':(ratio*80)+'px'});
-	$('#settings').css({'fontSize':ratio*72, 'lineHeight':(ratio*80)+'px'});
+	var ratio_text_size = ( width / 1000 ) * text_size;
+	$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
+	$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
 	//$('.level').css({'height':ratio*90});
 	var half_height = Math.floor( window.innerHeight/2 );
 	$(container).css({ 'paddingTop': half_height, 'paddingBottom': half_height });

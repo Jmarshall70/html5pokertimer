@@ -8,29 +8,21 @@ body {
 }
 #poker_container {
 	position: relative;
-	background-color: grey;
+	background-color: #111;
 	font-size: 100px;
 	line-height: 1.2;
 }
 .level {
-	border-bottom: 1px solid silver;
-	height: 1.25em;
+	border-top: .25em solid #222;
+	height: 1.2em;
 	line-height: 1.2;
 	position: relative;
 	text-align: center;
-	opacity: .3;
-	background-color: white;
-	margin: .25em .0625em ;
-	-moz-border-radius: .125em;
-	-webkit-border-radius: .125em;
+	background-color: black;
+	color: #222;
 }
 .level.current {
-	opacity: 1;
-	border: .0625em solid black;
-	margin: -.0625em 0em;
-	height: 1.25em;
-	-moz-border-radius: .125em;
-	-webkit-border-radius: .125em;
+	color: white;
 }
 .time {
 	position: absolute;
@@ -41,11 +33,11 @@ body {
 }
 .blinds {
 	position: absolute;
-	left: 20%;
-	right: 38%;
+	left: 23%;
+	right: 35%;
 	top: 0;
 	bottom: 0;
-	background-color: #eee;
+	background-color: #050505;
 	white-space: nowrap;
 }
 .game {
@@ -55,6 +47,7 @@ body {
 	top: 0;
 	bottom:0;
 	white-space: nowrap;
+	text-align: right;
 }
 a.break {
 	position: absolute;
@@ -67,11 +60,9 @@ a.break {
 }
 a.break:hover {
 	text-decoration: underline;
-	-moz-border-radius-topleft: : 1em;
-	-webkit-border-top-left-radius: 1em;
+	color: #aaa;
 }
 .level.current a.break {
-	top: -1.3em;
 }
 textarea {
 	border: 1px solid grey;
