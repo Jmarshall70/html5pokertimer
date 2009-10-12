@@ -21,7 +21,6 @@ $(document).ready(function(){
 			bell.src = new_src;
 		}
 	}
-	console.log( bell.src )
 	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
@@ -95,9 +94,9 @@ function update_view(abrupt) {
 	var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
 	var dom_top = current_level_dom.offsetTop;
 	if( abrupt ) {
-		$('html,body').scrollTop(dom_top-top_of_center);
+		container.css({ 'top':-1*(dom_top-top_of_center) });
 	} else {
-		$('html,body').animate({ 'scrollTop': dom_top-top_of_center });
+		$(container).animate({ 'top': -1*(dom_top-top_of_center) });
 	}
 	//$(controls).css({ 'top': dom_top + dom_height });
 }
@@ -142,8 +141,8 @@ function change_size(scroll, animate){
 	$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
 	$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
 	//$('.level').css({'height':ratio*90});
-	var half_height = Math.floor( window.innerHeight/2 );
-	$(container).css({ 'paddingTop': half_height, 'paddingBottom': half_height });
+	var third_height = Math.floor( window.innerHeight/3 );
+	$(container).css({ 'paddingTop': third_height, 'paddingBottom': third_height, height: third_height });
 	if( scroll ) {	
 		update_view(animate);
 	}

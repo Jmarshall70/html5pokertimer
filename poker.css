@@ -11,6 +11,19 @@ body {
 	background-color: black;
 	font-size: 100px;
 	line-height: 1.2;
+	overflow: hidden;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	right: 0px;
+	width: 100%;
+}
+#poker_levels {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
 }
 .level {
 	border-top: .25em solid #222;
@@ -47,7 +60,6 @@ body {
 	top: 0;
 	bottom:0;
 	white-space: nowrap;
-	text-align: right;
 }
 a.break {
 	position: absolute;
@@ -73,7 +85,7 @@ textarea.game {
 	height: 90%;
 }
 textarea.blinds {
-	width: 40%;
+	width: 35%;
 	right: 40%;
 	height: 90%;
 }
@@ -89,9 +101,26 @@ textarea.blinds {
 	text-decoration: underline;
 }
 #settings {
-	opacity: 1;
+	position: fixed;
+	width: 100%;
+	z-index: 2;
 }
-#settings.level button {
+#settings .menu {
+	color: #333;
+	font-size: 0.125em;
+}
+#settings:hover .level {
+	display: block;
+}
+#settings .level {
+	display: none;
+	background-color: white;
+	border: 0;
+}
+#settings .level .blinds {
+	background-color: white;
+}
+#settings .level button {
 	position: absolute;
 	right: 4px;
 	bottom: 4px;

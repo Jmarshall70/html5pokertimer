@@ -10,9 +10,11 @@
 </head>
 <body>
 <div id="poker_container">
-	<div id="settings" class="level">
-		<input type="text" size="4" id="time" class="time" value="10:00">
-		<textarea class="blinds" id="blinds" rows="4" cols="55">25/50
+	<div id="settings">
+		<div class="menu">Settings</div>
+		<div class="level">
+			<input type="text" size="4" id="time" class="time" value="10:00">
+			<textarea class="blinds" id="blinds" rows="4" cols="55">25/50
 25/50
 50/100
 75/150
@@ -28,9 +30,10 @@
 2000/4000
 3000/6000
 4000/8000</textarea>
-	<textarea class="game" id="games" rows="4" cols="40">Hold 'Em
+			<textarea class="game" id="games" rows="4" cols="40">Hold 'Em
 Omaha</textarea>
 			<button onclick="draw()" >Start</button>
+		</div>
 	</div>
 	<div id="poker_levels"></div>
 	<audio id="bell" autoplay="false" src="Goblet_G_Medium.ogg"></audio>
