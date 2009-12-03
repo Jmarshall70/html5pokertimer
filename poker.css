@@ -11,13 +11,13 @@ body {
 	background-color: black;
 	font-size: 100px;
 	line-height: 1.2;
-	overflow: hidden;
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	bottom: 0px;
 	right: 0px;
 	width: 100%;
+	overflow: hidden;
 }
 #poker_levels {
 	position: absolute;
@@ -25,43 +25,41 @@ body {
 	left: 0px;
 	width: 100%;
 }
-.level {
+#poker_levels .game, #poker_levels .time {
+	font-size: 80%;
+}
+#poker_levels .level {
 	border-top: .25em solid #222;
-	height: 1.2em;
+	/*height: 1.7em;*/
 	line-height: 1.2;
 	position: relative;
-	text-align: center;
+	text-align: left;
 	background-color: black;
 	color: #222;
 }
-.level.current {
+#poker_levels .level.current {
 	color: white;
 }
-.time {
+#poker_levels .time {
 	position: absolute;
-	left: 0;
-	top: 0;
-	bottom: 0;
-	right: 80%;
+	left: .125em;
+	top: .125em;
 }
-.blinds {
+#poker_levels .blinds {
+	font-size: 190%;
+	line-height: 1;
+	height: 1em;
+	margin: 0;
+	text-align: right;
+}
+#poker_levels .game {
 	position: absolute;
-	left: 22%;
-	right: 36%;
-	top: 0;
-	bottom: 0;
-	background-color: #050505;
+	left: .125em;
+	bottom: .25em;
+	height: 1em;
 	white-space: nowrap;
 }
-.game {
-	position: absolute;
-	left: 64%;
-	right: 0;
-	top: 0;
-	bottom:0;
-	white-space: nowrap;
-}
-a.break {
+#poker_levels a.break {
 	position: absolute;
 	top: -1.2em;
 	left: 1em;
@@ -70,34 +68,34 @@ a.break {
 	text-decoration: none;
 	color: black;
 }
-a.break:hover {
+#poker_levels a.break:hover {
 	text-decoration: underline;
 	color: #aaa;
 }
-.level.current a.break {
+#poker_levels .level.current a.break {
 }
-textarea {
+#poker_levels textarea {
 	border: 1px solid grey;
 	overflow: auto;
 }
-textarea.game {
+#poker_levels textarea.game {
 	width: 25%;
 	height: 90%;
 }
-textarea.blinds {
+#poker_levels textarea.blinds {
 	width: 35%;
 	right: 40%;
 	height: 90%;
 }
-.level button {
+#poker_levels .level button {
 	padding: .125em;
 	font-size: 50%;
 }
-.game a {
+#poker_levels .game a {
 	color: black;
 	text-decoration: none;
 }
-.game a:hover {
+#poker_levels .game a:hover {
 	text-decoration: underline;
 }
 #settings {

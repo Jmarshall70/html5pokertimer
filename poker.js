@@ -8,7 +8,7 @@ var text_size = 80
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
-	if( bell.duration == 0 || !bell.canPlayType('audio/ogg') ) {
+	if( bell.canPlayType && ( bell.duration == 0 || !bell.canPlayType('audio/ogg') ) ) {
 		if( bell.canPlayType('audio/mpeg') ) {
 			new_src = bell.src.substr(0, bell.src.length-3)+'mp3';
 			bell.parentNode.removeChild(bell);
