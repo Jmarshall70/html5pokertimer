@@ -36,7 +36,11 @@ Omaha</textarea>
 		</div>
 	</div>
 	<div id="poker_levels"></div>
-	<audio id="bell" autoplay="false" src="Goblet_G_Medium.ogg"></audio>
+	<audio id="bell" autoplay="false" autobuffer="true">
+		<source src="Goblet_G_Medium.ogg" type="audio/ogg"/>
+		<source src="Goblet_G_Medium.mp3" type="audio/mp3"/>
+		<source src="Goblet_G_Medium.wav" type="audio/wav"/>
+	</audio>
 </div>
 </body>
 </html>

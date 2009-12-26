@@ -8,19 +8,6 @@ var text_size = 80
 $(document).ready(function(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
-	if( bell.canPlayType && ( bell.duration == 0 || !bell.canPlayType('audio/ogg') ) ) {
-		if( bell.canPlayType('audio/mpeg') ) {
-			new_src = bell.src.substr(0, bell.src.length-3)+'mp3';
-			bell.parentNode.removeChild(bell);
-			bell = new Audio();
-			bell.src = new_src;
-		} else if( bell.canPlayType('audio/wav') ) {
-			new_src = bell.src.substr(0, bell.src.length-3)+'wav';
-			bell.parentNode.removeChild(bell);
-			bell = new Audio();
-			bell.src = new_src;
-		}
-	}
 	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
