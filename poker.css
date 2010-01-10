@@ -40,6 +40,9 @@ body {
 #poker_levels .level.current {
 	color: white;
 }
+#poker_levels .level.previous {
+	color: #666;
+}
 #poker_levels .time {
 	position: absolute;
 	left: .125em;

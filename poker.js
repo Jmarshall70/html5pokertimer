@@ -1,4 +1,5 @@
 var current_level_dom = null;
+var previous_level_dom = null;
 var container = null;
 var time_per_level = null;
 var bell = null;
@@ -70,9 +71,14 @@ function set_current( new_dom ) {
 	if( new_dom == null ) {
 		new_dom = current_level_dom.nextSibling
 	}
-	$(current_level_dom).removeClass( 'current' );
+	$(previous_level_dom).removeClass( 'previous' );
+	previous_level_dom = current_level_dom
 	current_level_dom = new_dom;
-	$(current_level_dom).addClass( 'current' );
+	
+	$(previous_level_dom).removeClass( 'current' ).addClass( 'previous' );
+	setTimeout( function(){ $(previous_level_dom).removeClass( 'previous' ) }, 60000 );
+	$(current_level_dom).addClass( 'current' ).removeClass( 'previous' );
+	
 	update_view();
 	bell.play();
 }
