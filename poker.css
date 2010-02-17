@@ -18,12 +18,15 @@ body {
 	right: 0px;
 	width: 100%;
 	overflow: hidden;
+	min-height: 320px;
 }
 #poker_levels {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	width: 100%;
+	bottom: 0px;
+	height: 100%;
 }
 #poker_levels .game, #poker_levels .time {
 	font-size: 80%;
@@ -133,4 +136,9 @@ input.time {
 	border: 0;
 	width: 100%;
 	height: 100%;
+}
+audio {
+	display: none;
+	position: absolute;
+	z-index: -1;
 }
