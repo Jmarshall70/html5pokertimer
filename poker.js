@@ -12,7 +12,6 @@ $(document).ready(function(){
 	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
-	
 });
 
 function count() {
@@ -134,7 +133,7 @@ function change_size(scroll, animate){
 	$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
 	$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
 	//$('.level').css({'height':ratio*90});
-	var third_height = Math.floor( window.innerHeight/3 );
+	var third_height = Math.floor( container.innerHeight/3 );
 	$(container).css({ 'paddingTop': third_height, 'paddingBottom': third_height, height: third_height });
 	if( scroll ) {	
 		update_view(animate);
