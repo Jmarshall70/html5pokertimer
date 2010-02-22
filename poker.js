@@ -9,6 +9,7 @@ var bell = null;
 var last_update = null;
 
 var text_size = 80;
+var game_data = ''
 
 current_level_id = null;
 
@@ -16,20 +17,28 @@ current_level_id = null;
 $(document).ready( function(){ $('form').bind( 'submit', post_game ) });
 
 function post_game( e ) {
-	data = {
-		title: $('input[name=title]').val(),
-		time: $('input[name=time]').val(),
-		blinds: $('textarea[name=blinds]').val(),
-		games: $('textarea[name=games]').val()
+	
+	title = $('input[name=title]').val();
+	time_per_level = $('input[name=time]').val();
+	blinds = $('textarea[name=blinds]').val().split('\n');
+	games = $('textarea[name=games]').val().split('\n');
+		
+	var game_data_a = [];
+	var level_counter = 0;
+	for( var i = 0, c=blinds.length; i < c; i++ ) {
+		if( blinds[i] ) {
+			var new_line = time_per_level+'\t'+blinds[i]+'\t'+games[level_counter%games.length];
+			level_counter += 1
+		} else {
+			var new_line = time_per_level+'\tBreak\t'
+		}
+		game_data_a.push( new_line );
 	}
-	
-	time_per_level = data.time;
-	blinds = data.blinds.split('\n');
-	games = data.games.split('\n');
-	
+	console.log( game_data_a );
+	game_data = game_data_a.join( '\n' )
 	$('#start').hide();
 	setup()
-	data['method'] = 'start_game'
+	data = {'method': 'save', data: game_data, 'title':title};
 	$.post( 'pokertimer.php', data );
 	return false;
 }
@@ -66,6 +75,7 @@ function draw( current_blinds, current_time, on_break ) {
 			level.childNodes[0].innerHTML = time_per_level;
 			level.childNodes[1].innerHTML = blinds[i];
 			level.childNodes[2].innerHTML = games[level_counter%games.length]
+			level.level_id = i;
 			level_counter += 1;
 			if( i == current_blinds ) {
 				if( on_break ) {
