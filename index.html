@@ -8,7 +8,8 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<link href="poker.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="jquery/jquery.json.min.js"></script>
 	<script type="text/javascript" src="poker.js"></script>
 </head>
 <body>
@@ -62,38 +63,11 @@ Omaha</textarea>
 	</form>
 </div>
 <div id="poker_container">
-	<!--
-	<div id="settings">
-		<div class="menu">Settings</div>
-		<div class="level">
-			<input type="text" size="4" id="time" class="time" value="10:00">
-			<textarea class="blinds" id="blinds" rows="4" cols="55">25/50
-25/50
-50/100
-75/150
-100/200
-150/300
-200/400
-300/600
-400/800
-500/1000
-800/1600
-1000/2000
-1500/3000
-2000/4000
-3000/6000
-4000/8000</textarea>
-			<textarea class="game" id="games" rows="4" cols="40">Hold 'Em
-Omaha</textarea>
-			<button onclick="draw()" >Start</button>
-		</div>
-	</div>
-	-->
 	<div id="poker_levels"></div>
 	<audio id="bell" autoplay="false" autobuffer="true">
-		<source src="Goblet_G_Medium.ogg" type="audio/ogg"/>
-		<source src="Goblet_G_Medium.mp3" type="audio/mp3"/>
-		<source src="Goblet_G_Medium.wav" type="audio/wav"/>
+		<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
+		<source src="audio/Goblet_G_Medium.mp3" type="audio/mp3"/>
+		<source src="audio/Goblet_G_Medium.wav" type="audio/wav"/>
 	</audio>
 </div>
 </body>

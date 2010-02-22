@@ -9,7 +9,7 @@ var bell = null;
 var last_update = null;
 
 var text_size = 80;
-var game_data = ''
+var level_data = []
 
 current_level_id = null;
 
@@ -23,21 +23,21 @@ function post_game( e ) {
 	blinds = $('textarea[name=blinds]').val().split('\n');
 	games = $('textarea[name=games]').val().split('\n');
 		
-	var game_data_a = [];
+	level_data = [];
 	var level_counter = 0;
 	for( var i = 0, c=blinds.length; i < c; i++ ) {
 		if( blinds[i] ) {
-			var new_line = time_per_level+'\t'+blinds[i]+'\t'+games[level_counter%games.length];
+			var new_line = [ time_per_level, blinds[i], games[level_counter%games.length] ]
 			level_counter += 1
 		} else {
-			var new_line = time_per_level+'\tBreak\t'
+			var new_line = [ time_per_level, 'Break', '' ];
 		}
-		game_data_a.push( new_line );
+		level_data.push( new_line );
 	}
-	game_data = game_data_a.join( '\n' )
+
 	$('#start').hide();
 	setup()
-	data = {'method': 'save', data: game_data, 'title':title};
+	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
 	$.post( 'pokertimer.php', data );
 	return false;
 }
@@ -47,61 +47,37 @@ function setup(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
 	container = id('poker_levels');
-	draw();
+	$('#poker_container').show();
+	draw( 0 );
 	setInterval( count, 1000 );
 }
 
 // creates the dom elements for the board.
-function draw( current_blinds, current_time, on_break ) {
+function draw( current_blinds ) {
 	//read the values from the HTML
-	//time_per_level = id('time').value
-	//blinds = id('blinds').value.split('\n');
-	//games = id('games').value.split('\n');
 	
 	container.innerHTML = '';
 	// make blind levels
 	current_level = level = null;
 	var level_counter = 0
-	for( var i = 0,c=blinds.length; i < c; i++ ) {
-	
-		if( blinds[i] ) {
-			if( !level ) {
-				var level = create('div');
-				$(level).addClass('level');
-				level.innerHTML = '<div class="time">'+time_per_level+'</div><div class="blinds"></div><div class="game"></div><a class="break" href="#" onclick="add_break(this.parentNode); return false">add break</a>';
-				container.appendChild( level );
-			}
-			level.childNodes[0].innerHTML = time_per_level;
-			level.childNodes[1].innerHTML = blinds[i];
-			level.childNodes[2].innerHTML = games[level_counter%games.length]
-			level.level_id = i;
-			level_counter += 1;
+	for( var i = 0,c=level_data.length; i < c; i++ ) {
+		var data = level_data[i]
+		var time = data[0];
+		var blind = data[1];
+		var game = data[2];
+		if( game ) {
+			var level = create('div');
+			$(level).addClass('level');
+			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break(this.parentNode); return false">add break</a>';
 			if( i == current_blinds ) {
-				if( on_break ) {
-					break_dom = new_break();
-					container.appendChild( break_dom );
-					level = break_dom;
-					level.childNodes[0].innerHTML = current_time;
-				} else {
-					level.childNodes[0].innerHTML = current_time;
-				}
 				current_level = level;
 			}
 			
 		} else { // There's a blank line in the blinds, indicating a break.			
-			break_dom = new_break();
-			if( level ) {
-				container.replaceChild( break_dom, level );
-				level = break_dom;
-			} else {
-				container.appendChild( break_dom );
-				level = break_dom;
-			}
+			var level = new_break();
 		}
-		level = level.nextSibling;
-	}
-	while( level && level.nextSibling ) {
-		level.parentNode.removeChild( level.nextSibling );
+		level.level_id = i;
+		container.appendChild( level );
 	}
 	change_size()
 	set_current( current_level || container.firstChild, current_blinds );
@@ -204,9 +180,10 @@ function change_size(scroll, animate){
 	}
 }
 
-function update_game( game_data ) {
-	if( game_data.last_update != last_update ) {
-		draw( game_data.current_blinds, game_data.current_time, game_data.on_break )
+function update_game( e, data ) {
+	if( data.last_update != last_update ) {
+		current_blinds = data.level_id;
+		level_data = data.level_data;
 	}
 }
 
