@@ -142,3 +142,15 @@ audio {
 	position: absolute;
 	z-index: -1;
 }
+
+#start {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	padding:  5%;
+	background-color: white;
+	font-family: helvetica;
+	z-index: 20;
+}

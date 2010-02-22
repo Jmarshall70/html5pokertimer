@@ -2,31 +2,59 @@ var current_level_dom = null;
 var previous_level_dom = null;
 var container = null;
 var time_per_level = null;
+var blinds = null;
+var games = null
 var bell = null;
 
-var text_size = 80
+var last_update = null;
+
+var text_size = 80;
+
+current_level_id = null;
+
+
+$(document).ready( function(){ $('form').bind( 'submit', post_game ) });
+
+function post_game( e ) {
+	data = {
+		title: $('input[name=title]').val(),
+		time: $('input[name=time]').val(),
+		blinds: $('textarea[name=blinds]').val(),
+		games: $('textarea[name=games]').val()
+	}
+	console.log( data )
+	
+	time_per_level = data.time;
+	blinds = data.blinds.split('\n');
+	games = data.games.split('\n');
+	
+	$('#start').hide();
+	setup()
+	return false;
+}
 
 //initial setup
-$(document).ready(function(){
+function setup(){
 	$(window).bind( 'resize', function(){change_size(true, true)} );
 	bell = document.getElementById('bell');
 	container = id('poker_levels');
 	draw();
 	setInterval( count, 1000 );
-});
+}
 
 // creates the dom elements for the board.
-function draw() {
+function draw( current_blinds, current_time, on_break ) {
 	//read the values from the HTML
-	time_per_level = id('time').value
-	blinds = id('blinds').value.split('\n');
-	games = id('games').value.split('\n');
+	//time_per_level = id('time').value
+	//blinds = id('blinds').value.split('\n');
+	//games = id('games').value.split('\n');
 	
+	container.innerHTML = '';
 	// make blind levels
-	level = container.firstChild;
+	current_level = level = null;
 	var level_counter = 0
 	for( var i = 0,c=blinds.length; i < c; i++ ) {
-		// if there's a blank line in the blinds it's a break.
+	
 		if( blinds[i] ) {
 			if( !level ) {
 				var level = create('div');
@@ -38,7 +66,19 @@ function draw() {
 			level.childNodes[1].innerHTML = blinds[i];
 			level.childNodes[2].innerHTML = games[level_counter%games.length]
 			level_counter += 1;
-		} else {
+			if( i == current_blinds ) {
+				if( on_break ) {
+					break_dom = new_break();
+					container.appendChild( break_dom );
+					level = break_dom;
+					level.childNodes[0].innerHTML = current_time;
+				} else {
+					level.childNodes[0].innerHTML = current_time;
+				}
+				current_level = level;
+			}
+			
+		} else { // There's a blank line in the blinds, indicating a break.			
 			break_dom = new_break();
 			if( level ) {
 				container.replaceChild( break_dom, level );
@@ -54,12 +94,15 @@ function draw() {
 		level.parentNode.removeChild( level.nextSibling );
 	}
 	change_size()
-	set_current( container.firstChild );
+	set_current( current_level || container.firstChild, current_blinds );
 }
 //set the current level
-function set_current( new_dom ) {
+function set_current( new_dom, id ) {
 	if( new_dom == null ) {
 		new_dom = current_level_dom.nextSibling
+		current_level_id += 1;
+	} else if( id || id === 0 ) {
+		current_level_id = id;
 	}
 	$(previous_level_dom).removeClass( 'previous' );
 	previous_level_dom = current_level_dom
@@ -69,7 +112,7 @@ function set_current( new_dom ) {
 	setTimeout( function(){ $(previous_level_dom).removeClass( 'previous' ) }, 60000 );
 	$(current_level_dom).addClass( 'current' ).removeClass( 'previous' );
 	
-	update_view();
+	update_view();	
 	bell.play();
 }
 // update the location dom elements
@@ -112,6 +155,7 @@ function new_break() {
 	$(break_dom).addClass('level');
 	$(break_dom).addClass( 'break' );
 	break_dom.innerHTML = '<div class="time">'+time_per_level+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode)">Break&rsquo;s over</button></div>';
+	break_dom.is_break = true;
 	return break_dom;
 }
 // "add break" button pushed.
@@ -150,6 +194,12 @@ function change_size(scroll, animate){
 	}
 }
 
+function update_game( game_data ) {
+	if( game_data.last_update != last_update ) {
+		draw( game_data.current_blinds, game_data.current_time, game_data.on_break )
+	}
+}
+
 //convenience functions
 function id(e){return document.getElementById(e)}
 function create(e){return document.createElement(e)}
@@ -168,4 +218,27 @@ function pad(num, totalChars, padWith) {
 	} else {}
 
 	return num;
+}
+// from MDC
+if (!Array.prototype.indexOf)
+{
+  Array.prototype.indexOf = function(elt /*, from*/)
+  {
+    var len = this.length >>> 0;
+
+    var from = Number(arguments[1]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0)
+      from += len;
+
+    for (; from < len; from++)
+    {
+      if (from in this &&
+          this[from] === elt)
+        return from;
+    }
+    return -1;
+  };
 }

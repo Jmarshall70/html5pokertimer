@@ -12,7 +12,54 @@
 	<script type="text/javascript" src="poker.js"></script>
 </head>
 <body>
+<div id="start">
+	<h1>Pick A Game</h1>
+	<table>
+	<thead>
+		<tr><td>Game Title</td><td>Current Blinds</td><td>Current Game</td><td>Level Time</td></tr>
+	</thead>
+	<tbody>
+		<tr><td><a href="./">Bill's Thursday Game</a></td><td>100/200</td><td>Hold 'Em</td><td>10:00</td></tr>
+		<tr><td><a href="./">Jimmy's Game<a href="./"></td><td>100/200</td><td>Hold 'Em</td><td>7:00</td></tr>
+	</tbody>
+	</table>
+	<h1>or Make a New Game</h1>
+	<form action="" method="post">
+		<fieldset>
+			Game Title: 
+			<input type="text" size="20" name="title" value="New Game 12:34 PM">
+			<br>
+			Time:
+			<input type="text" size="4" name="time" value="10:00">
+			<br>
+			Blind Levels:<br>
+			<textarea class="blinds" id="blinds" name="blinds" rows="15" cols="55">25/50
+25/50
+50/100
+75/150
+100/200
+150/300
+200/400
+300/600
+400/800
+500/1000
+800/1600
+1000/2000
+1500/3000
+2000/4000
+3000/6000
+4000/8000</textarea>
+			<br>
+			<br>
+			Games:<br>
+			<textarea class="game" id="games" name="games" rows="4" cols="40">Hold 'Em
+Omaha</textarea><br>
+			<input type="submit" name="new_game" value="Start">
+		</fieldset>
+	</form>
+</div>
 <div id="poker_container">
+	<!--
 	<div id="settings">
 		<div class="menu">Settings</div>
 		<div class="level">
@@ -38,6 +85,7 @@ Omaha</textarea>
 			<button onclick="draw()" >Start</button>
 		</div>
 	</div>
+	-->
 	<div id="poker_levels"></div>
 	<audio id="bell" autoplay="false" autobuffer="true">
 		<source src="Goblet_G_Medium.ogg" type="audio/ogg"/>
