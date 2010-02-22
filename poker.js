@@ -22,7 +22,6 @@ function post_game( e ) {
 		blinds: $('textarea[name=blinds]').val(),
 		games: $('textarea[name=games]').val()
 	}
-	console.log( data )
 	
 	time_per_level = data.time;
 	blinds = data.blinds.split('\n');
@@ -30,6 +29,8 @@ function post_game( e ) {
 	
 	$('#start').hide();
 	setup()
+	data['method'] = 'start_game'
+	$.post( 'pokertimer.php', data );
 	return false;
 }
 
