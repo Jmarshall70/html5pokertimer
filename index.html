@@ -14,6 +14,8 @@
 <body>
 <div id="start">
 	<h1>Pick A Game</h1>
+	<p>Game sharing is coming.</p>
+	<!--
 	<table>
 	<thead>
 		<tr><td>Game Title</td><td>Current Blinds</td><td>Current Game</td><td>Level Time</td></tr>
@@ -23,17 +25,18 @@
 		<tr><td><a href="./">Jimmy's Game<a href="./"></td><td>100/200</td><td>Hold 'Em</td><td>7:00</td></tr>
 	</tbody>
 	</table>
-	<h1>or Make a New Game</h1>
+	-->
+	<h1>Make a New Game</h1>
 	<form action="" method="post">
 		<fieldset>
 			Game Title: 
 			<input type="text" size="20" name="title" value="New Game 12:34 PM">
-			<br>
+			<p>
 			Time:
 			<input type="text" size="4" name="time" value="10:00">
-			<br>
+			<p>
 			Blind Levels:<br>
-			<textarea class="blinds" id="blinds" name="blinds" rows="15" cols="55">25/50
+			<textarea class="blinds" id="blinds" name="blinds" rows="8" cols="20">25/50
 25/50
 50/100
 75/150
@@ -49,11 +52,11 @@
 2000/4000
 3000/6000
 4000/8000</textarea>
-			<br>
-			<br>
+			<p>
 			Games:<br>
-			<textarea class="game" id="games" name="games" rows="4" cols="40">Hold 'Em
-Omaha</textarea><br>
+			<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
+Omaha</textarea>
+			<p>
 			<input type="submit" name="new_game" value="Start">
 		</fieldset>
 	</form>
