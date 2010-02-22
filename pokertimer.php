@@ -3,7 +3,6 @@ header( 'content-type: text/plain' );
 
 if( isset( $_REQUEST['title'] ) ) {
 	$file_name = 'games/'.preg_replace( '/[\W]/', '', $_REQUEST['title'] ).'.json';
-	echo $file_name;
 }
 
 if( !is_dir( 'games' ) ) {
@@ -22,6 +21,8 @@ switch( $_REQUEST['method'] ) {
 			$game_data = json_decode( file_get_contents( $file_name ), true );
 			$game_data['time_since_update'] = time() - $game_data['last_updated'];
 			echo json_encode( $game_data );
+		} else {
+			echo $file_name.' not found';
 		}
 		break;
 	case 'list':

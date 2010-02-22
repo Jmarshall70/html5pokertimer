@@ -34,7 +34,6 @@ function post_game( e ) {
 		}
 		game_data_a.push( new_line );
 	}
-	console.log( game_data_a );
 	game_data = game_data_a.join( '\n' )
 	$('#start').hide();
 	setup()
