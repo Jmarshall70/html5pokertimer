@@ -5,7 +5,7 @@ var time_per_level = null;
 var blinds = null;
 var games = null
 var bell = null;
-
+var game_list = null
 var last_update = null;
 
 var text_size = 80;
@@ -14,8 +14,26 @@ var level_data = []
 current_level_id = null;
 
 
-$(document).ready( function(){ $('form').bind( 'submit', post_game ) });
+$(document).ready( function(){ 
+	$('form').bind( 'submit', post_game )
+	$.getJSON( 'pokertimer.php?method=list', draw_list );
+	$(window).bind( 'resize', function(){change_size(true, true)} );
+	bell = document.getElementById('bell');
+	container = id('poker_levels');
+	setInterval( count, 1000 );
+});
 
+function draw_list( new_game_list ) {
+	game_list = new_game_list;
+	var table_html = '<table>';
+	for( var i = 0, c = game_list.length; i < c; i++ ) {
+		var game = game_list[i];
+		var level = game['level_data'][game['current_level']];
+		table_html += '<tr><td><a href="#" onclick="update_game(game_list['+i+']); return false">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
+	}
+	table_html += '</table>';
+	$('#games').html( table_html );
+}
 function post_game( e ) {
 	
 	title = $('input[name=title]').val();
@@ -41,21 +59,16 @@ function post_game( e ) {
 	$.post( 'pokertimer.php', data );
 	return false;
 }
-
 //initial setup
 function setup(){
-	$(window).bind( 'resize', function(){change_size(true, true)} );
-	bell = document.getElementById('bell');
-	container = id('poker_levels');
-	$('#poker_container').show();
 	draw( 0 );
-	setInterval( count, 1000 );
 }
 
 // creates the dom elements for the board.
 function draw( current_blinds ) {
 	//read the values from the HTML
 	
+	$('#poker_container').show();
 	container.innerHTML = '';
 	// make blind levels
 	current_level = level = null;
@@ -180,10 +193,12 @@ function change_size(scroll, animate){
 	}
 }
 
-function update_game( e, data ) {
-	if( data.last_update != last_update ) {
-		current_blinds = data.level_id;
+function update_game( data ) {
+	console.log( data );
+	if( true || data.last_update != last_update ) {
+		current_blinds = data.current_level;
 		level_data = data.level_data;
+		draw( current_blinds );
 	}
 }
 
