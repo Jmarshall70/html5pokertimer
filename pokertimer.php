@@ -13,8 +13,8 @@ if( !is_dir( 'games' ) ) {
 switch( $_REQUEST['method'] ) {
 	case 'save':
 		$time = time();
-		print_r( $_POST );
-		$save_a = array( 'level_data' => json_decode( $_POST['data'] ), 'last_updated' => $time, 'title' => $_POST['title'] );
+		$save_a = array( 'level_data' => json_decode( stripslashes( $_POST['data'] ) ), 'last_updated' => $time, 'title' => $_POST['title'] );
+		print_r( $save_a );
 		file_put_contents( 'games/'.$file_name, json_encode( $save_a ) );
 		break;
 	case 'get':

@@ -129,23 +129,25 @@ function update_view(abrupt) {
 
 // count down 1 second
 function count() {
-	c = current_level_dom.childNodes;
-	var time = c[0].innerHTML
-	var time_a = time.split(':');
-	var minutes = parseInt( time_a[0], 10 );
-	var seconds = parseInt( time_a[1], 10 );
-	if( seconds == 0 && minutes == 0 ) {
-		set_current()
-		return;
-	} else if( seconds == 0 ) {
-		minutes -= 1;
-		seconds = 59;
-	} else {
-		seconds -= 1;
+	if( current_level_dom ) {
+		c = current_level_dom.childNodes;
+		var time = c[0].innerHTML
+		var time_a = time.split(':');
+		var minutes = parseInt( time_a[0], 10 );
+		var seconds = parseInt( time_a[1], 10 );
+		if( seconds == 0 && minutes == 0 ) {
+			set_current()
+			return;
+		} else if( seconds == 0 ) {
+			minutes -= 1;
+			seconds = 59;
+		} else {
+			seconds -= 1;
+		}
+		time = minutes+':'+pad(seconds);
+		c[0].innerHTML = time
+		$('title').html( time + ' - ' + c[1].innerHTML + ' - ' + c[2].innerHTML );
 	}
-	time = minutes+':'+pad(seconds);
-	c[0].innerHTML = time
-	$('title').html( time + ' - ' + c[1].innerHTML + ' - ' + c[2].innerHTML );
 }
 
 // create a DOM element for a break
@@ -181,15 +183,17 @@ function remove_break(break_dom) {
 
 // called initially and on resize
 function change_size(scroll, animate){
-	var width = container.offsetWidth;
-	var ratio_text_size = ( width / 1000 ) * text_size;
-	$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
-	$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
-	//$('.level').css({'height':ratio*90});
-	var third_height = Math.floor( container.innerHeight/3 );
-	$(container).css({ 'paddingTop': third_height, 'paddingBottom': third_height, height: third_height });
-	if( scroll ) {	
-		update_view(animate);
+	if( current_level_dom ) {
+		var width = container.offsetWidth;
+		var ratio_text_size = ( width / 1000 ) * text_size;
+		$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
+		$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
+		//$('.level').css({'height':ratio*90});
+		var third_height = Math.floor( container.innerHeight/3 );
+		$(container).css({ 'paddingTop': third_height, 'paddingBottom': third_height, height: third_height });
+		if( scroll ) {	
+			update_view(animate);
+		}
 	}
 }
 
