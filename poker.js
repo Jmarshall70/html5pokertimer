@@ -28,6 +28,7 @@ $(document).ready( function(){
 function request_update( new_title ) {
 	if( typeof new_title == 'string' ) {
 		title = new_title
+		
 	}
 	if( title ) {
 		$.getJSON( 'pokertimer.php', { 'method':'get', 'title':title }, update_game )
@@ -82,7 +83,6 @@ function draw( current_blinds ) {
 	container.innerHTML = '';
 	// make blind levels
 	current_level = level = null;
-	current_level_id = current_blinds;
 	var level_counter = 0
 	for( var i = 0,c=level_data.length; i < c; i++ ) {
 		var data = level_data[i]
@@ -100,39 +100,43 @@ function draw( current_blinds ) {
 			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break( this.parentNode, '+i+', \''+break_time+'\'); return false">add break</a>';
 			
 		} else { // There's a blank line in the blinds, indicating a break.			
-			var level = new_break( time );
+			var level = create('div');
+			$(level).addClass('level');
+			$(level).addClass( 'break' );
+			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode.level_id)">Break&rsquo;s over</button></div>';
+			level.is_break = true;
 		}
 		level.level_id = i;
 		container.appendChild( level );
 	}
 	set_current( current_blinds );
-	change_size( true )
 }
 //set the current level
 function set_current( new_id ) {
 	
-	previous_level_dom = container.childNodes[current_level_id]
-	current_level_dom = container.childNodes[new_id];
-	
-	$(previous_level_dom).removeClass( 'current' ).addClass( 'previous' );
-	setTimeout( function(){ $(previous_level_dom).removeClass( 'previous' ) }, 60000 );
-	$(current_level_dom).addClass( 'current' ).removeClass( 'previous' );
-	if( current_level_id != new_id ) {
-		current_level_id = new_id;
-		update_view();	
-		bell.play();
+	if( new_id != current_level_id ) {
+		previous_level_dom = container.childNodes[current_level_id]
+		current_level_dom = container.childNodes[new_id];
+		
+		$(previous_level_dom).removeClass( 'current' ).addClass( 'previous' );
+		setTimeout( function(){ $(previous_level_dom).removeClass( 'previous' ) }, 60000 );
+		$(current_level_dom).addClass( 'current' ).removeClass( 'previous' );
+		if( current_level_id != new_id ) {
+			current_level_id = new_id;
+			update_view();
+		}
 	}
 }
 // update the location dom elements
 function update_view(abrupt) {
-	if( current_level_dom ) {
+	if( current_level_id ) {
 		var dom_height = current_level_dom.offsetHeight;
 		var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
 		var dom_top = current_level_dom.offsetTop;
 		if( abrupt ) {
-			$(container).css({ 'top':-1*(dom_top-top_of_center) });
+			$(container).stop().css({ 'top':-1*(dom_top-top_of_center) });
 		} else {
-			$(container).animate({ 'top': -1*(dom_top-top_of_center) });
+			$(container).stop().animate({ 'top': -1*(dom_top-top_of_center) });
 		}
 	}
 }
@@ -147,6 +151,7 @@ function count() {
 		var seconds = parseInt( time_a[1], 10 );
 		if( seconds == 0 && minutes == 0 ) {
 			set_current()
+			bell.play();
 			return;
 		} else if( seconds == 0 ) {
 			minutes -= 1;
@@ -161,20 +166,12 @@ function count() {
 	}
 }
 
-// create a DOM element for a break
-function new_break( time ) {
-	var break_dom = create('div');
-	$(break_dom).addClass('level');
-	$(break_dom).addClass( 'break' );
-	break_dom.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode.level_id)">Break&rsquo;s over</button></div>';
-	break_dom.is_break = true;
-	return break_dom;
-}
 // "add break" button pushed.
 function add_break(	node_before, node_id, time ) {
 	var break_a = [ time, 'Break', false ]
 	level_data.splice( node_id, 0, break_a )
 	draw( current_level_id );
+	change_size( true )
 	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
 	$.post( 'pokertimer.php', data );
 	
@@ -186,6 +183,7 @@ function remove_break( level_id ) {
 		current_level_id -= 1;
 	}
 	draw( current_level_id );
+	change_size( true )
 	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
 	$.post( 'pokertimer.php', data );
 }
@@ -195,11 +193,9 @@ function change_size(scroll, animate){
 	if( current_level_dom ) {
 		var width = container.offsetWidth;
 		var ratio_text_size = ( width / 1000 ) * text_size;
-		$(container).css({'fontSize':ratio_text_size, 'lineHeight':1});
-		$('#settings').css({'fontSize':ratio_text_size, 'lineHeight':1});
-		//$('.level').css({'height':ratio*90});
+		$(container).css({'font-size':ratio_text_size});
 		var third_height = Math.floor( container.innerHeight/3 );
-		$(container).css({ 'paddingTop': third_height, 'paddingBottom': third_height, height: third_height });
+		$(container).css({ 'padding-top': third_height, 'padding-bottom': third_height, height: third_height });
 		if( scroll ) {	
 			update_view(animate);
 		}
@@ -207,12 +203,17 @@ function change_size(scroll, animate){
 }
 
 function update_game( data ) {
-	if( data.last_updated && data.last_updated != last_updated ) {
+	if( data.level_data && data.title ) {
 		title = data.title;
+		var old_last_updated = last_updated;
 		last_updated = data.last_updated;
 		level_data = data.level_data;
+		current_level_id = null;
 		draw( data.current_level );
-		bell.play();
+		change_size(true);
+		if( old_last_updated != last_updated ) {
+			bell.play();
+		}
 	}
 }
 
