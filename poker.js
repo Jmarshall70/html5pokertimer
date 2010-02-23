@@ -26,7 +26,7 @@ $(document).ready( function(){
 
 });
 function request_update( new_title ) {
-	if( new_title ) {
+	if( typeof new_title == 'string' ) {
 		title = new_title
 	}
 	if( title ) {
@@ -105,9 +105,8 @@ function draw( current_blinds ) {
 		level.level_id = i;
 		container.appendChild( level );
 	}
-	change_size()
 	set_current( current_blinds );
-	change_size();
+	change_size( true )
 }
 //set the current level
 function set_current( new_id ) {
@@ -126,7 +125,7 @@ function set_current( new_id ) {
 }
 // update the location dom elements
 function update_view(abrupt) {
-	if( current_level_id ) {
+	if( current_level_dom ) {
 		var dom_height = current_level_dom.offsetHeight;
 		var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
 		var dom_top = current_level_dom.offsetTop;
@@ -158,7 +157,7 @@ function count() {
 		time = minutes+':'+pad(seconds);
 		level_data[current_level_id][0] = c.childNodes[0].innerHTML = time
 		
-		$('title').html( time + ' - ' + c.childNodes[1].innerHTML + ' - ' + c.childNodes[0].innerHTML );
+		$('title').html( title + ' - ' + time + ' - ' + c.childNodes[1].innerHTML + ' - ' + c.childNodes[0].innerHTML );
 	}
 }
 
@@ -208,9 +207,7 @@ function change_size(scroll, animate){
 }
 
 function update_game( data ) {
-	console.log( data.last_updated );
 	if( data.last_updated && data.last_updated != last_updated ) {
-		console.log( data );
 		title = data.title;
 		last_updated = data.last_updated;
 		level_data = data.level_data;

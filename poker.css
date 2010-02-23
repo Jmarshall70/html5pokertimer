@@ -157,4 +157,17 @@ audio {
 	position: absolute;
 	z-index: -1;
 }
-
+#games table {
+	border-left: 1px solid silver;
+	border-bottom: 1px solid silver;
+	border-top: 1px solid silver;
+	border-collapse: collapse;
+}
+#games table td {
+	border-right: 1px solid silver;
+	padding: 0.25em 0.5em;
+	margin: 0;
+}
+#games table tr:nth-child(odd) {
+	background-color: #eaeaea;
+}
