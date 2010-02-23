@@ -25,7 +25,10 @@ $(document).ready( function(){
 	$('#new_game_title').val( random_word() );
 
 });
-function request_update() {
+function request_update( new_title ) {
+	if( new_title ) {
+		title = new_title
+	}
 	if( title ) {
 		$.getJSON( 'pokertimer.php', { 'method':'get', 'title':title }, update_game )
 	}
@@ -36,7 +39,7 @@ function draw_list( new_game_list ) {
 	for( var i = 0, c = game_list.length; i < c; i++ ) {
 		var game = game_list[i];
 		var level = game['level_data'][game['current_level']];
-		table_html += '<tr><td><a href="#'+game['title']+'" onclick="update_game(game_list['+i+']);">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
+		table_html += '<tr><td><a href="#'+game['title']+'" onclick="request_update(\''+game['title'].replace("'", "")+'\');">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
 	}
 	table_html += '</table>';
 	$('#games').html( table_html );
