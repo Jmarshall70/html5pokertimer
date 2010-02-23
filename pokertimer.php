@@ -81,7 +81,7 @@ function string_to_seconds( $time_s ) {
 function seconds_to_string( $seconds ) {
 	$minutes = floor( $seconds / 60 );
 	$seconds = $seconds % 60;
-	return $minutes.':'.str_pad( $seconds, 2, '0' );
+	return $minutes.':'.str_pad( $seconds, 2, '0', STR_PAD_LEFT );
 }
 function get_game( $file_name ) {
 	if( file_exists( $file_name ) ) {
