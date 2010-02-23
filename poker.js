@@ -6,12 +6,12 @@ var blinds = null;
 var games = null
 var bell = null;
 var game_list = null
-var last_update = null;
+var last_updated = null;
 
 var text_size = 80;
 var level_data = []
-
-current_level_id = null;
+var title = ''
+var current_level_id = null;
 
 
 $(document).ready( function(){ 
@@ -21,15 +21,22 @@ $(document).ready( function(){
 	bell = document.getElementById('bell');
 	container = id('poker_levels');
 	setInterval( count, 1000 );
-});
+	setInterval( request_update, 5000 );
+	$('#new_game_title').val( random_word() );
 
+});
+function request_update() {
+	if( title ) {
+		$.getJSON( 'pokertimer.php', { 'method':'get', 'title':title }, update_game )
+	}
+}
 function draw_list( new_game_list ) {
 	game_list = new_game_list;
 	var table_html = '<table>';
 	for( var i = 0, c = game_list.length; i < c; i++ ) {
 		var game = game_list[i];
 		var level = game['level_data'][game['current_level']];
-		table_html += '<tr><td><a href="#" onclick="update_game(game_list['+i+']); return false">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
+		table_html += '<tr><td><a href="#'+game['title']+'" onclick="update_game(game_list['+i+']);">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
 	}
 	table_html += '</table>';
 	$('#games').html( table_html );
@@ -72,6 +79,7 @@ function draw( current_blinds ) {
 	container.innerHTML = '';
 	// make blind levels
 	current_level = level = null;
+	current_level_id = current_blinds;
 	var level_counter = 0
 	for( var i = 0,c=level_data.length; i < c; i++ ) {
 		var data = level_data[i]
@@ -86,10 +94,7 @@ function draw( current_blinds ) {
 		if( game ) {
 			var level = create('div');
 			$(level).addClass('level');
-			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break(this.parentNode, \''+break_time+'\'); return false">add break</a>';
-			if( i == current_blinds ) {
-				current_level = level;
-			}
+			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break( this.parentNode, '+i+', \''+break_time+'\'); return false">add break</a>';
 			
 		} else { // There's a blank line in the blinds, indicating a break.			
 			var level = new_break( time );
@@ -98,45 +103,43 @@ function draw( current_blinds ) {
 		container.appendChild( level );
 	}
 	change_size()
-	set_current( current_level || container.firstChild, current_blinds );
+	set_current( current_blinds );
+	change_size();
 }
 //set the current level
-function set_current( new_dom, id ) {
-	if( new_dom == null ) {
-		new_dom = current_level_dom.nextSibling
-		current_level_id += 1;
-	} else if( id || id === 0 ) {
-		current_level_id = id;
-	}
-	$(previous_level_dom).removeClass( 'previous' );
-	previous_level_dom = current_level_dom
-	current_level_dom = new_dom;
+function set_current( new_id ) {
+	
+	previous_level_dom = container.childNodes[current_level_id]
+	current_level_dom = container.childNodes[new_id];
 	
 	$(previous_level_dom).removeClass( 'current' ).addClass( 'previous' );
 	setTimeout( function(){ $(previous_level_dom).removeClass( 'previous' ) }, 60000 );
 	$(current_level_dom).addClass( 'current' ).removeClass( 'previous' );
-	
-	update_view();	
-	bell.play();
+	if( current_level_id != new_id ) {
+		current_level_id = new_id;
+		update_view();	
+		bell.play();
+	}
 }
 // update the location dom elements
 function update_view(abrupt) {
-	var dom_height = current_level_dom.offsetHeight;
-	var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
-	var dom_top = current_level_dom.offsetTop;
-	if( abrupt ) {
-		$(container).css({ 'top':-1*(dom_top-top_of_center) });
-	} else {
-		$(container).animate({ 'top': -1*(dom_top-top_of_center) });
+	if( current_level_id ) {
+		var dom_height = current_level_dom.offsetHeight;
+		var top_of_center = Math.floor( window.innerHeight/2 -dom_height/2);
+		var dom_top = current_level_dom.offsetTop;
+		if( abrupt ) {
+			$(container).css({ 'top':-1*(dom_top-top_of_center) });
+		} else {
+			$(container).animate({ 'top': -1*(dom_top-top_of_center) });
+		}
 	}
-	//$(controls).css({ 'top': dom_top + dom_height });
 }
 
 // count down 1 second
 function count() {
-	if( current_level_dom ) {
-		c = current_level_dom.childNodes;
-		var time = c[0].innerHTML
+	if( title ) {
+		c = container.childNodes[current_level_id];
+		var time = level_data[current_level_id][0]; //c[0].innerHTML
 		var time_a = time.split(':');
 		var minutes = parseInt( time_a[0], 10 );
 		var seconds = parseInt( time_a[1], 10 );
@@ -150,8 +153,9 @@ function count() {
 			seconds -= 1;
 		}
 		time = minutes+':'+pad(seconds);
-		c[0].innerHTML = time
-		$('title').html( time + ' - ' + c[1].innerHTML + ' - ' + c[2].innerHTML );
+		level_data[current_level_id][0] = c.childNodes[0].innerHTML = time
+		
+		$('title').html( time + ' - ' + c.childNodes[1].innerHTML + ' - ' + c.childNodes[0].innerHTML );
 	}
 }
 
@@ -160,30 +164,28 @@ function new_break( time ) {
 	var break_dom = create('div');
 	$(break_dom).addClass('level');
 	$(break_dom).addClass( 'break' );
-	break_dom.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode)">Break&rsquo;s over</button></div>';
+	break_dom.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode.level_id)">Break&rsquo;s over</button></div>';
 	break_dom.is_break = true;
 	return break_dom;
 }
 // "add break" button pushed.
-function add_break(	node_before, time ) {
-	break_dom = new_break( time );
-	$(break_dom).css({ 'display': 'none' });
-	current_level_dom.parentNode.insertBefore( break_dom, node_before );
-	change_size();
-	if( node_before == current_level_dom ) {
-		$(current_level_dom).removeClass( 'current' );
-		current_level_dom = break_dom;
-		$(current_level_dom).addClass( 'current' );
-	}
-	$(break_dom).slideDown();
+function add_break(	node_before, node_id, time ) {
+	var break_a = [ time, 'Break', false ]
+	level_data.splice( node_id, 0, break_a )
+	draw( current_level_id );
+	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
+	$.post( 'pokertimer.php', data );
+	
 }
 // "break's done" button pushed
-function remove_break(break_dom) {
-	if( break_dom == current_level_dom ) {
-		$(break_dom).slideUp( function() { set_current(); container.removeChild( break_dom ) } );
-	} else {
-		$(break_dom).slideUp( function() { container.removeChild( break_dom ) } );
+function remove_break( level_id ) {
+	level_data.splice( level_id, 1 )
+	if( level_id < current_level_id ) {
+		current_level_id -= 1;
 	}
+	draw( current_level_id );
+	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
+	$.post( 'pokertimer.php', data );
 }
 
 // called initially and on resize
@@ -203,12 +205,28 @@ function change_size(scroll, animate){
 }
 
 function update_game( data ) {
-	console.log( data );
-	if( true || data.last_update != last_update ) {
-		current_blinds = data.current_level;
+	console.log( data.last_updated );
+	if( data.last_updated && data.last_updated != last_updated ) {
+		console.log( data );
+		title = data.title;
+		last_updated = data.last_updated;
 		level_data = data.level_data;
-		draw( current_blinds );
+		draw( data.current_level );
+		bell.play();
 	}
+}
+
+function random_word() {
+	var consonants = 'bcdfghjklmnprstvwyz';
+	var vowels = 'aeiou';
+	var word = '';
+	var consonant_length = consonants.length;
+	var vowel_length = vowels.length;
+	for( var i = 0; i < 4; i++ ) {
+		word += consonants.charAt( Math.floor(Math.random() * consonant_length ) );
+		word += vowels.charAt( Math.floor(Math.random() * vowel_length ) )
+	}
+	return word;
 }
 
 //convenience functions
@@ -229,27 +247,4 @@ function pad(num, totalChars, padWith) {
 	} else {}
 
 	return num;
-}
-// from MDC
-if (!Array.prototype.indexOf)
-{
-  Array.prototype.indexOf = function(elt /*, from*/)
-  {
-    var len = this.length >>> 0;
-
-    var from = Number(arguments[1]) || 0;
-    from = (from < 0)
-         ? Math.ceil(from)
-         : Math.floor(from);
-    if (from < 0)
-      from += len;
-
-    for (; from < len; from++)
-    {
-      if (from in this &&
-          this[from] === elt)
-        return from;
-    }
-    return -1;
-  };
 }
