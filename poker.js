@@ -82,7 +82,7 @@ function draw( current_blinds ) {
 	$('#poker_container').show();
 	container.innerHTML = '';
 	// make blind levels
-	current_level = level = null;
+	current_level_id = current_level = level = null;
 	var level_counter = 0
 	for( var i = 0,c=level_data.length; i < c; i++ ) {
 		var data = level_data[i]
@@ -94,13 +94,12 @@ function draw( current_blinds ) {
 		}
 		var blind = data[1];
 		var game = data[2];
+		var level = create('div');
 		if( game ) {
-			var level = create('div');
 			$(level).addClass('level');
 			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break( this.parentNode, '+i+', \''+break_time+'\'); return false">add break</a>';
 			
 		} else { // There's a blank line in the blinds, indicating a break.			
-			var level = create('div');
 			$(level).addClass('level');
 			$(level).addClass( 'break' );
 			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode.level_id)">Break&rsquo;s over</button></div>';
@@ -171,19 +170,20 @@ function add_break(	node_before, node_id, time ) {
 	var break_a = [ time, 'Break', false ]
 	level_data.splice( node_id, 0, break_a )
 	draw( current_level_id );
-	change_size( true )
+	set_current( current_level_id );
 	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
 	$.post( 'pokertimer.php', data );
 	
 }
 // "break's done" button pushed
 function remove_break( level_id ) {
+	console.log( level_id );
 	level_data.splice( level_id, 1 )
 	if( level_id < current_level_id ) {
-		current_level_id -= 1;
+		level_id = current_level_id - 1;
 	}
-	draw( current_level_id );
-	change_size( true )
+	set_current( level_id );
+	draw( level_id );
 	data = {'method': 'save', 'data': $.toJSON(level_data), 'title':title};
 	$.post( 'pokertimer.php', data );
 }
