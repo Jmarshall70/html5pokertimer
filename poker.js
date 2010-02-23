@@ -150,7 +150,7 @@ function count() {
 		var seconds = parseInt( time_a[1], 10 );
 		if( seconds == 0 && minutes == 0 ) {
 			set_current()
-			bell.play();
+			ding();
 			return;
 		} else if( seconds == 0 ) {
 			minutes -= 1;
@@ -177,7 +177,6 @@ function add_break(	node_before, node_id, time ) {
 }
 // "break's done" button pushed
 function remove_break( level_id ) {
-	console.log( level_id );
 	level_data.splice( level_id, 1 )
 	if( level_id < current_level_id ) {
 		level_id = current_level_id - 1;
@@ -212,7 +211,7 @@ function update_game( data ) {
 		draw( data.current_level );
 		change_size(true);
 		if( old_last_updated != last_updated ) {
-			bell.play();
+			ding()
 		}
 	}
 }
@@ -229,7 +228,11 @@ function random_word() {
 	}
 	return word;
 }
-
+function ding() {
+	if( bell && bell.play ) {
+		bell.play();
+	}
+}
 //convenience functions
 function id(e){return document.getElementById(e)}
 function create(e){return document.createElement(e)}
