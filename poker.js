@@ -76,18 +76,23 @@ function draw( current_blinds ) {
 	for( var i = 0,c=level_data.length; i < c; i++ ) {
 		var data = level_data[i]
 		var time = data[0];
+		if( level_data[i+1] && level_data[i+1][0] != time ) {
+			var break_time = level_data[i+1][0];
+		} else {
+			var break_time = time;
+		}
 		var blind = data[1];
 		var game = data[2];
 		if( game ) {
 			var level = create('div');
 			$(level).addClass('level');
-			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break(this.parentNode); return false">add break</a>';
+			level.innerHTML = '<div class="time">'+time+'</div><div class="blinds">'+blind+'</div><div class="game">'+game+'</div><a class="break" href="#" onclick="add_break(this.parentNode, \''+break_time+'\'); return false">add break</a>';
 			if( i == current_blinds ) {
 				current_level = level;
 			}
 			
 		} else { // There's a blank line in the blinds, indicating a break.			
-			var level = new_break();
+			var level = new_break( time );
 		}
 		level.level_id = i;
 		container.appendChild( level );
@@ -151,17 +156,17 @@ function count() {
 }
 
 // create a DOM element for a break
-function new_break() {
+function new_break( time ) {
 	var break_dom = create('div');
 	$(break_dom).addClass('level');
 	$(break_dom).addClass( 'break' );
-	break_dom.innerHTML = '<div class="time">'+time_per_level+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode)">Break&rsquo;s over</button></div>';
+	break_dom.innerHTML = '<div class="time">'+time+'</div><div class="blinds">Break!</div><div class="game"><button onclick="remove_break(this.parentNode.parentNode)">Break&rsquo;s over</button></div>';
 	break_dom.is_break = true;
 	return break_dom;
 }
 // "add break" button pushed.
-function add_break(	node_before ) {
-	break_dom = new_break();
+function add_break(	node_before, time ) {
+	break_dom = new_break( time );
 	$(break_dom).css({ 'display': 'none' });
 	current_level_dom.parentNode.insertBefore( break_dom, node_before );
 	change_size();

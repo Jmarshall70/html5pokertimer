@@ -13,8 +13,11 @@ if( !is_dir( 'games' ) ) {
 switch( $_REQUEST['method'] ) {
 	case 'save':
 		$time = time();
-		$save_a = array( 'level_data' => json_decode( stripslashes( $_POST['data'] ) ), 'last_updated' => $time, 'title' => $_POST['title'] );
-		print_r( $save_a );
+		$save_a = array( 
+						'level_data' => json_decode( unescape( $_POST['data'] ) ), 
+						'last_updated' => $time, 
+						'title' => unescape( $_POST['title'] ) 
+						);
 		file_put_contents( 'games/'.$file_name, json_encode( $save_a ) );
 		break;
 	case 'get':
@@ -89,5 +92,7 @@ function get_game( $file_name ) {
 		return false;
 	}
 }
-
+function unescape( $s ) {
+	return strip_tags( stripslashes( $s ) );
+}
 ?>
