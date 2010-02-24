@@ -195,9 +195,7 @@ function change_size(scroll, animate){
 		$(container).css({'font-size':ratio_text_size});
 		var third_height = Math.floor( container.innerHeight/3 );
 		$(container).css({ 'padding-top': third_height, 'padding-bottom': third_height, height: third_height });
-		if( scroll ) {	
-			update_view(animate);
-		}
+		update_view(animate);
 	}
 }
 
