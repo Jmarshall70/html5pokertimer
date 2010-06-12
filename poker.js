@@ -31,20 +31,26 @@ function request_update( new_title ) {
 		
 	}
 	if( title ) {
-		$.getJSON( 'pokertimer.php', { 'method':'get', 'title':title }, update_game )
+		$.getJSON( 'pokertimer.php', { 'method':'get', 'title':title, 'rand':Math.random() }, update_game )
 	}
 }
+//Make the listing of games in progress.
 function draw_list( new_game_list ) {
-	game_list = new_game_list;
-	var table_html = '<table>';
-	for( var i = 0, c = game_list.length; i < c; i++ ) {
-		var game = game_list[i];
-		var level = game['level_data'][game['current_level']];
-		table_html += '<tr><td><a href="#'+game['title']+'" onclick="request_update(\''+game['title'].replace("'", "")+'\');">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
+	if( new_game_list && new_game_list.length ) {
+		game_list = new_game_list;
+		var table_html = '<table>';
+		for( var i = 0, c = game_list.length; i < c; i++ ) {
+			var game = game_list[i];
+			var level = game['level_data'][game['current_level']];
+			table_html += '<tr><td><a href="#'+game['title']+'" onclick="request_update(\''+game['title'].replace("'", "")+'\');">'+game['title']+'</a></td><td>'+level[1]+'</td><td>'+level[2]+'</td><td>'+level[0]+'</td></tr>';
+		}
+		table_html += '</table>';
+		$('#games').html( table_html );
+	} else {
+		$('.games').hide();
 	}
-	table_html += '</table>';
-	$('#games').html( table_html );
 }
+
 function post_game( e ) {
 	
 	title = $('input[name=title]').val();
@@ -250,3 +256,4 @@ function pad(num, totalChars, padWith) {
 
 	return num;
 }
+
