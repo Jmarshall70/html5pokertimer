@@ -6,24 +6,27 @@
 	<meta http-equiv="content-style-type" content="text/css">
 	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<link href="poker.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="jquery/jquery.min.js"></script>
-	<script type="text/javascript" src="jquery/jquery.json.min.js"></script>
-	<script type="text/javascript" src="poker.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/util.js"></script>
+	<script type="text/javascript" src="js/PokerRoom.js"></script>
+	<script type="text/javascript" src="js/PokerGame.js"></script>
+	<script type="text/javascript" src="js/poker.js"></script>
+	<script type="text/javascript">
+	</script>
 </head>
 <body>
 <div id="start">
 	<h1 class="games">Pick A Game</h1>
-	<div id="games" class="games"></div>
+	<div id="poker_games" class="poker_games"></div>
 	<h1>Make a New Game</h1>
 	<form action="" method="post">
 		<fieldset>
-			Game Title: 
-			<input type="text" size="20" name="title" id="new_game_title" value="No Title">
+			Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 			<p>
-			Time:
-			<input type="text" size="4" name="time" value="10:00">
+			Time: <input type="text" size="4" name="time" id="blind_time" value="10:00">
 			<p>
 			Blind Levels:<br>
 			<textarea class="blinds" id="blinds" name="blinds" rows="4" cols="20">25/50
@@ -51,13 +54,20 @@ Omaha</textarea>
 		</fieldset>
 	</form>
 </div>
-<div id="poker_container">
-	<div id="poker_levels"></div>
-	<audio id="bell" autoplay="false" autobuffer="true">
-		<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
-		<source src="audio/Goblet_G_Medium.mp3" type="audio/mp3"/>
-		<source src="audio/Goblet_G_Medium.wav" type="audio/wav"/>
-	</audio>
+<div id="poker_game"></div>
+<audio id="bell" autoplay="false" autobuffer="true">
+	<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
+	<source src="audio/Goblet_G_Medium.mp3" type="audio/mp3"/>
+	<source src="audio/Goblet_G_Medium.wav" type="audio/wav"/>
+</audio>
+<div id="templates">
+	<div class="level">
+		<div class="time"></div>
+		<div class="blinds"></div>
+		<div class="game"></div>
+		<a class="break" href="#">add break</a>
+	</div>
 </div>
+
 </body>
 </html>

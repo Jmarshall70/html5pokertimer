@@ -171,3 +171,7 @@ audio {
 #games table tr:nth-child(odd) {
 	background-color: #eaeaea;
 }
+
+#templates {
+	display: none;
+}
