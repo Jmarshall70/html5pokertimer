@@ -45,7 +45,11 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
 		var frag = util.template( template, binder, state, function(e,game,i) {
 			if( game.blinds == local['break'] ) {
-				$(e).click(function(){ state.splice(i,1); draw(); }).addClass('break');
+				$(e).click(function(){ 
+					state.splice(i,1); 
+					draw(); 
+					save();
+				}).addClass('break');
 			}
 		} );
 		element.appendChild( frag );
@@ -54,16 +58,15 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	update = function() {
 		var now = Date.now() + PokerRoom.timeOffset;
 		var milleseconds = (now-lastUpdate);
-		
-		if (milleseconds < 900) {
+		if ( (milleseconds > 1100 && milleseconds < 2000) || milleseconds < 900 ) {
 			// make them count at different times
 			clearInterval(countInterval);
 			countInterval = false;
-			setTimeout( function(){ count(); }, milleseconds );
+			setTimeout( function(){ count(); }, milleseconds % 1000 );
 			return;
 		}
 		
-		var seconds = Math.floor(milleseconds/1000);
+		var seconds = Math.floor((milleseconds+100)/1000);
 		lastUpdate = now;
 		
 		//count
@@ -117,7 +120,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
-			console.log( 'updating scroll' );
 			var height = currentLevelEl.offsetHeight,
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
 				levelTop = currentLevelEl.offsetTop,
@@ -133,7 +135,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	resize = function() {
 		if( hasFocus ) {
-			console.log( 'resizing' );
 			var width = element.offsetWidth;
 			var fontSize = ( width / 1000 ) * FONT_SIZE;
 			$(element).parent().css({'font-size':fontSize});
@@ -148,7 +149,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	addBreak = function( next ){
 		var index = currentBlindIndex + next;
-		console.log( 'adding break at '+index );
 		state.splice(index, 0, {blinds:local['break'], game:local.clickToRemove, time:breakLength});
 		draw();
 		save();
@@ -170,6 +170,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 				state = updateData.game.state;
 				lastUpdate = updateData.game.lastUpdate;
 				syncToken = updateData.syncToken;
+				draw();
 				ding();
 			}
 			return that;
@@ -181,13 +182,11 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			PokerRoom.removeGame(this);
 		},
 		sleep: function() {
-			console.log( 'sleeping '+name );
 			clearInterval(countInterval);
 			countInterval = false;
 			return that;	
 		},
 		wake: function() {
-			console.log( 'waking '+name );
 			count();
 			return that;
 		},
@@ -195,6 +194,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			hasFocus = true;
 			update();
 			resize();
+			that.wake();
 			window.addEventListener( 'resize', resizeCallback, true );
 			return that;
 		},
@@ -205,8 +205,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			return that;
 		},
 		toString: function() {
-			console.log(name);
-			console.log(that.toJSON());
 			return JSON.stringify(that.toJSON());
 		},
 		toJSON: function() {

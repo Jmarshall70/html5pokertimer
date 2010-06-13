@@ -30,10 +30,10 @@ var PokerRoom = (function($) {
 		if (sync_a.length) {
 			$.post('php/games.php', {method:'sync', games:JSON.stringify( sync_a )}, function(updates) {
 				updates = JSON.parse(updates);
-				for( var i=0,c=updates.length; i<c; i++ ) {
-					var update = updates[i];
-					if (games[update.name]) {
-						games[update.name].update( update );
+				for( var name in updates ) {
+					var update = updates[name];
+					if (games[name]) {
+						games[name].update( update );
 					}
 				}
 				syncTimer = setTimeout( function(){ sync() }, 5000 );
@@ -75,7 +75,7 @@ var PokerRoom = (function($) {
 	};
 	
 	$(document).ready(function(){
-		$.get('php/time.php', function(data) {
+		$.get('php/time.php', {rand:Math.random()}, function(data) {
 			var serverTime = parseInt(data,10);
 			if (serverTime) {
 				timeOffset = serverTime - Date.now();
@@ -99,8 +99,8 @@ var PokerRoom = (function($) {
 			addBreak(1);
 		});
 		
-		document.addEventListener( 'keypress', keyControl );
-		document.addEventListener( 'mousemove', showControls );
+		document.addEventListener( 'keypress', keyControl, true );
+		document.addEventListener( 'mousemove', showControls, true );
 	});
 	
 	var that = {
@@ -220,7 +220,7 @@ var PokerRoom = (function($) {
 				for( var game in games ) {
 					if( game == name ) {
 						gameEl.appendChild( games[game].element );
-						games[game].focus().wake();
+						games[game].focus();
 						currentGame = game
 						hideControls();
 					} else {
@@ -240,7 +240,6 @@ var PokerRoom = (function($) {
 		},
 		startBreak: function(game) {
 			if (game === currentGame) {
-				console.log('starting break');
 				onBreak = true;
 			}
 			hideControls();
@@ -248,7 +247,6 @@ var PokerRoom = (function($) {
 		},
 		endBreak: function(game) {
 			if (game === currentGame) {
-				console.log('ending break');
 				onBreak = false;
 			}
 			return that;
