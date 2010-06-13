@@ -72,7 +72,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 			setTimeout( function() {
 				
 				previousLevel$.removeClass('previous');
-			}, 1 * 1000);
+			}, 90 * 1000);
 		}
 		currentLevelEl = element.childNodes[newIndex]
 		$(currentLevelEl).addClass('current');
@@ -113,7 +113,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		if( hasFocus ) {
 			var width = element.offsetWidth;
 			var fontSize = ( width / 1000 ) * FONT_SIZE;
-			$(element).css({'font-size':fontSize});
+			$(element.parentElement).css({'font-size':fontSize});
 			var third_height = Math.floor( element.innerHeight/3 );
 			updateView(false);
 		}

@@ -48,13 +48,11 @@ fieldset {
 	font-size: 80%;
 }
 #game .level {
-	border-top: .25em solid #222;
 	line-height: 1.2;
 	position: relative;
 	text-align: left;
 	background-color: black;
 	color: white;
-	
 }
 
 #game .level.current {
@@ -71,17 +69,42 @@ fieldset {
 	left: 0px;
 	right: 0px;
 	width: 100%;
-	background-color: black;
-	opacity: 0.7;
+	background-color: rgba(0,0,0,0.7);
 	z-index: 10;
 }
 #curtains > div.top {
 	top: 0px;
-	opacity: 0.4;
+	background-color: rgba(0,0,0,0.4);
+	display: -webkit-box;
 }
-#curtains div.bottom {
+#curtains > div.bottom {
 	bottom: 0px;
 }
+#curtains > div > a {
+	position: absolute;
+	left: 5%;
+	right: 5%;
+	font-size: 1.25em;
+	text-align: center;
+	background-color: white;
+	padding: 0.25em;
+	opacity: 0.8;
+	text-decoration: none;
+	color: black;
+	-webkit-border-radius: 1em;
+	max-height: 50%;
+}
+#curtains > div.top > a {
+	bottom: 0px;
+	-webkit-border-top-left-radius: 1em;
+	-webkit-border-top-right-radius: 1em;
+}
+#curtains > div.bottom > a {
+	top: 0px;
+	-webkit-border-bottom-left-radius: 1em;
+	-webkit-border-bottom-right-radius: 1em;
+}
+
 #game .time {
 	position: absolute;
 	left: .125em;
@@ -100,19 +123,6 @@ fieldset {
 	bottom: .25em;
 	height: 1em;
 	white-space: nowrap;
-}
-#game a.break {
-	position: absolute;
-	top: -1.2em;
-	left: 1em;
-	font-size: 0.16em;
-	line-height: 1;
-	text-decoration: none;
-	color: black;
-}
-#game a.break:hover {
-	text-decoration: underline;
-	color: #aaa;
 }
 input.time {
 	font-size: inherit;
