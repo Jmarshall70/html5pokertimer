@@ -1,4 +1,4 @@
-function PokerGame(PokerRoom, bell, state, breakLength, name, lastSync, lastUpdate) {
+function PokerGame(PokerRoom, state, breakLength, name, lastSync, lastUpdate) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
 		lastSync = state.lastSync;
@@ -42,14 +42,13 @@ function PokerGame(PokerRoom, bell, state, breakLength, name, lastSync, lastUpda
 		} else {
 			blind = state[currentBlindIndex];
 			
-			levelsToAdvance = 0;
-			while (blind && seconds > blind.time) {
+			while (seconds > blind.time) {
 				seconds -= blind.time;
 				blind.time = 0;
-				currentBlindIndex += 1
-				blind = state[currentBlindIndex]
+				currentBlindIndex += 1;
+				blind = state[currentBlindIndex];
 			}
-			if (levelsToAdvance) {
+			if (currentLevelEl != element.childNodes[currentBlindIndex]) {
 				advance(currentBlindIndex);
 			}
 			blind.time -= seconds;
@@ -58,27 +57,20 @@ function PokerGame(PokerRoom, bell, state, breakLength, name, lastSync, lastUpda
 	},
 	advance = function(newIndex) {
 		if( currentLevelEl ) {
-			oldLevel$ = $(currentLevelEl).removeClass('current').addClass('previous');
+			previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous')
 			setTimeout( function() {
-				oldLevel$.removeClass('previous');
-			}, 60000);
-			
+				previousLevel$.removeClass('previous');
+			}, 60 * 1000);
 		}
 		currentLevelEl = element.childNodes[newIndex]
 		$(currentLevelEl).addClass('current');
-		ding();
+		PokerRoom.ding();
 	}
-	ding = function() {
-		if (bell && bell.play) {
-			bell.play();
-		}
-	},
 	draw = function(){
 		element.innerHTML = '';
 		var template = $('#templates .level')[0];
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
 		var frag = util.template( template, binder, state )
-		console.log( frag );
 		element.appendChild( frag );
 	};
 	
@@ -112,7 +104,6 @@ function PokerGame(PokerRoom, bell, state, breakLength, name, lastSync, lastUpda
 	
 	draw();
 	advance(0);
-	console.log(state);
 	count();
 		
 	return that;
