@@ -8,7 +8,8 @@ var PokerRoom = (function($, localStorage) {
 		bell,
 		listEl,
 		gameEl,
-		elementsToAdd = [],
+		topCurtain,
+		bottomCurtain,
 		mute = true,
 		
 	sync = function() {
@@ -51,6 +52,9 @@ var PokerRoom = (function($, localStorage) {
 		bell = getElementById('bell');
 		listEl = getElementById('game_list');
 		gameEl = getElementById('game');
+		
+		topCurtain = $('#curtains .top')[0];
+		bottomCurtain = $('#curtains .bottom')[0];
 	});
 	
 	var that = {
@@ -136,6 +140,10 @@ var PokerRoom = (function($, localStorage) {
 			} else {
 				console.error('Tried to load a game that does not exist.');
 			}
+		},
+		moveCurtains: function( place ) {
+			topCurtain.style.bottom = place+'px';
+			bottomCurtain.style.top = place+'px';
 		}
 	};
 	
