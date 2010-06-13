@@ -20,5 +20,11 @@ function post_game( e ) {
 		'name': getElementById('new_game_title').value
 	};
 	var name = PokerRoom.add( newGame );
+	console.log( name );
 	PokerRoom.showGame(name);
 }
+
+var local = {
+	'break': 'BREAK',
+	clickToRemove: 'Click to Remove'
+};

@@ -59,7 +59,9 @@ fieldset {
 	background-color: black;
 	color: white;
 }
-
+#game .level.break {
+	cursor: pointer;
+}
 #game .level.current {
 	color: white;
 }

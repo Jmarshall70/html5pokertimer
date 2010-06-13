@@ -43,7 +43,11 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		currentLevelEl = null;
 		var template = $('#templates .level')[0];
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
-		var frag = util.template( template, binder, state );
+		var frag = util.template( template, binder, state, function(e,game,i) {
+			if( game.blinds == local['break'] ) {
+				$(e).click(function(){ state.splice(i,1); draw(); }).addClass('break');
+			}
+		} );
 		element.appendChild( frag );
 		update();
 	},
@@ -90,15 +94,15 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 					}, 90 * 1000);
 				}
 				
-				if (state[previousBlindIndex] && state[previousBlindIndex].game == 'break' ) {
-					PokerRoom.endBreak();
+				if (state[previousBlindIndex] && state[previousBlindIndex].blinds == local['break'] ) {
+					PokerRoom.endBreak(name);
 				}
-				if (state[currentBlindIndex].game == 'break') {
-					PokerRoom.startBreak();
+				if (state[currentBlindIndex].blinds == local['break']) {
+					PokerRoom.startBreak(name);
 				}
 				currentLevelEl = element.childNodes[currentBlindIndex];
 				$(currentLevelEl).addClass('current');
-				
+								
 				updateScroll( true, function(){ding();} );
 			}
 			blind.time -= seconds;
@@ -145,7 +149,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	addBreak = function( next ){
 		var index = currentBlindIndex + next;
 		console.log( 'adding break at '+index );
-		state.splice(index, 0, {blinds:'break', game:'break', time:breakLength});
+		state.splice(index, 0, {blinds:local['break'], game:local.clickToRemove, time:breakLength});
 		draw();
 		save();
 	};
@@ -189,6 +193,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		},
 		focus: function() {
 			hasFocus = true;
+			update();
 			resize();
 			window.addEventListener( 'resize', resizeCallback, true );
 			return that;
@@ -213,7 +218,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			};
 		},
 		resize: function(animate) {
-			updateScroll(animate);
+			resize(animate);
 			return that;
 		},
 		redraw: function() {

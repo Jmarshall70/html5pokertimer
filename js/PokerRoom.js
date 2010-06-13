@@ -43,7 +43,6 @@ var PokerRoom = (function($) {
 		}
 	},
 	addBreak = function(next) {
-		console.log(currentGame);
 		games[currentGame].addBreak(next);
 	},
 	keyControl = function(e) {
@@ -65,48 +64,43 @@ var PokerRoom = (function($) {
 		if (controlsTimeout) {
 			clearInterval(controlsTimeout);
 		}
-		$('.control').stop().animate({opacity:'1'}, 'fast');
-		controlsTimeout = setTimeout( hideControls, 2000 );
+		if (!onBreak) {
+			$('.control').stop().animate({opacity:'1'}, 'fast');
+			controlsTimeout = setTimeout( hideControls, 2000 );
+		}
 	},
 	hideControls = function() {
 		clearInterval(controlsTimeout);
 		$('.control').stop().animate({opacity:'0'}, 'slow');
 	};
 	
-	$.get('php/time.php', function(data) {
-		var serverTime = parseInt(data,10);
-		if (serverTime) {
-			timeOffset = serverTime - Date.now();
-		}
-	});
 	$(document).ready(function(){
+		$.get('php/time.php', function(data) {
+			var serverTime = parseInt(data,10);
+			if (serverTime) {
+				timeOffset = serverTime - Date.now();
+			}
+			that.listGames();
+		});
 		bell = getElementById('bell');
 		listEl = getElementById('game_list');
 		gameEl = getElementById('game');
 		
 		topCurtain = $('#curtains .top')[0];
 		bottomCurtain = $('#curtains .bottom')[0];
-		that.listGames();
 		
 		$('#break_now').click( function(e){
 			e.preventDefault();
-			if (!onBreak) {
-				addBreak(0);
-			}
+			addBreak(0);
 		});
 		
 		$('#break_next').click( function(e){
 			e.preventDefault();
-			if (!onBreak) {
-				addBreak(1);
-			}
+			addBreak(1);
 		});
 		
 		document.addEventListener( 'keypress', keyControl );
 		document.addEventListener( 'mousemove', showControls );
-		
-		
-		
 	});
 	
 	var that = {
@@ -190,7 +184,6 @@ var PokerRoom = (function($) {
 				}
 				var games_a = [];
 				for( var game in games ) {
-					console.log( game );
 					games[game].wake();
 					games_a.push(games[game]);
 				}
@@ -245,12 +238,19 @@ var PokerRoom = (function($) {
 			bottomCurtain.style.top = place+'px';
 			return that;
 		},
-		startBreak: function() {
-			onBreak = true;
+		startBreak: function(game) {
+			if (game === currentGame) {
+				console.log('starting break');
+				onBreak = true;
+			}
+			hideControls();
 			return that;
 		},
-		endBreak: function() {
-			onBreak = false;
+		endBreak: function(game) {
+			if (game === currentGame) {
+				console.log('ending break');
+				onBreak = false;
+			}
 			return that;
 		}
 	};
