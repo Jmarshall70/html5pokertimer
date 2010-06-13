@@ -14,7 +14,6 @@ foreach( $_POST as $key => $val ) {
 switch( $_REQUEST['method'] ) {
 	case 'save':
 		$game = json_decode($_POST['game'], true);
-		print_r( $game );
 		$file_name = name_to_file($game['name']);
 		file_put_contents( $file_name, $_POST['game'] );
 		echo filemtime( $file_name );

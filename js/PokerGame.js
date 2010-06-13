@@ -25,15 +25,16 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		// use the time from the last blind as the default break length
 		// if the game is already on the second level the first one will be zero.
 	}
-	var interval,
+	var countInterval,
 		element = createElement('div', 'poker-game'),
 		currentLevelEl = null,
 		hasFocus = false,
-		previousDimmerTimer;		
+		previousDimmerTimer,	
+		currentBlindIndex = -1,
 	
 	count = function() {
-		if (!interval) {
-			interval = setInterval(function(){count()}, 1000);
+		if (!countInterval) {
+			countInterval = setInterval(function(){count();}, 1000);
 		}
 		update();
 	},
@@ -42,18 +43,28 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		currentLevelEl = null;
 		var template = $('#templates .level')[0];
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
-		var frag = util.template( template, binder, state )
+		var frag = util.template( template, binder, state );
 		element.appendChild( frag );
 		update();
 	},
 	update = function() {
 		var now = Date.now() + PokerRoom.timeOffset;
-		var milleseconds = (now-lastUpdate)
+		var milleseconds = (now-lastUpdate);
+		
+		if (milleseconds < 900) {
+			// make them count at different times
+			clearInterval(countInterval);
+			countInterval = false;
+			setTimeout( function(){ count(); }, milleseconds );
+			return;
+		}
+		
 		var seconds = Math.floor(milleseconds/1000);
 		lastUpdate = now;
 		
 		//count
-		var currentBlindIndex = -1;
+		var previousBlindIndex = currentBlindIndex;
+		currentBlindIndex = -1;
 		for( var i=0,c=state.length; i<c; i++ ) {
 			if( state[i].time ) {
 				currentBlindIndex = i;
@@ -72,32 +83,37 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 				blind = state[currentBlindIndex];
 			}
 			if (currentLevelEl != element.childNodes[currentBlindIndex]) {
-				advance(currentBlindIndex);
+				if( currentLevelEl ) {
+					var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played');
+					previousDimmerTimer = setTimeout( function() {
+						previousLevel$.removeClass('previous');
+					}, 90 * 1000);
+				}
+				
+				if (state[previousBlindIndex] && state[previousBlindIndex].game == 'break' ) {
+					PokerRoom.endBreak();
+				}
+				if (state[currentBlindIndex].game == 'break') {
+					PokerRoom.startBreak();
+				}
+				currentLevelEl = element.childNodes[currentBlindIndex];
+				$(currentLevelEl).addClass('current');
+				
+				updateScroll( true, function(){ding();} );
 			}
 			blind.time -= seconds;
 			$('.time',element.childNodes[currentBlindIndex]).html(util.secondsToString(blind.time));
 		}
 	},
-	advance = function(newIndex) {
-		if( currentLevelEl ) {
-			var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played')
-			previousDimmerTimer = setTimeout( function() {
-				previousLevel$.removeClass('previous');
-			}, 90 * 1000);
-		}
-		currentLevelEl = element.childNodes[newIndex]
-		$(currentLevelEl).addClass('current');
-		
-		updateScroll( true, function(){ ding() } );
-	},
 	ding = function() {
 		PokerRoom.ding(that);
 	},
 	save = function() {
-		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){ syncToken = data });
+		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){syncToken=data;});
 	},
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
+			console.log( 'updating scroll' );
 			var height = currentLevelEl.offsetHeight,
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
 				levelTop = currentLevelEl.offsetTop,
@@ -113,16 +129,28 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	resize = function() {
 		if( hasFocus ) {
+			console.log( 'resizing' );
 			var width = element.offsetWidth;
 			var fontSize = ( width / 1000 ) * FONT_SIZE;
 			$(element).parent().css({'font-size':fontSize});
 			var third_height = Math.floor( element.innerHeight/3 );
 			updateScroll(false);
+		} else {
+			console.log( 'not resizing -- no focus' );
 		}
 	},
-	resizeCallback = function(){ resize() };
+	resizeCallback = function(){ 
+		resize();
+	},
+	addBreak = function( next ){
+		var index = currentBlindIndex + next;
+		console.log( 'adding break at '+index );
+		state.splice(index, 0, {blinds:'break', game:'break', time:breakLength});
+		draw();
+		save();
+	};
 	
-	that = {
+	var that = {
 		update: function( updateData ) {
 			if (!updateData) {
 				$.getJSON('games.php', {game:name}, function(data) {
@@ -144,30 +172,36 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		},
 		remove: function() {
 			$(element).remove();
-			clearInterval(interval);
+			clearInterval(countInterval);
+			countInterval = false;
 			PokerRoom.removeGame(this);
 		},
 		sleep: function() {
-			clearInterval(interval);
+			console.log( 'sleeping '+name );
+			clearInterval(countInterval);
+			countInterval = false;
 			return that;	
 		},
 		wake: function() {
+			console.log( 'waking '+name );
 			count();
 			return that;
 		},
 		focus: function() {
 			hasFocus = true;
 			resize();
-			window.addEventListener( 'resize', resizeCallback, false );
+			window.addEventListener( 'resize', resizeCallback, true );
 			return that;
 		},
 		blur: function() {
 			hasFocus = false;
 			PokerRoom.moveCurtains('auto');
-			window.removeEventListener( 'resize', resizeCallback, false );
+			window.removeEventListener( 'resize', resizeCallback, true );
 			return that;
 		},
 		toString: function() {
+			console.log(name);
+			console.log(that.toJSON());
 			return JSON.stringify(that.toJSON());
 		},
 		toJSON: function() {
@@ -180,8 +214,17 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		},
 		resize: function(animate) {
 			updateScroll(animate);
+			return that;
+		},
+		redraw: function() {
+			draw();
+			return that;
+		},
+		addBreak: function(next){
+			addBreak(next);
+			return that;
 		}
-	}
+	};
 	that.__defineGetter__( 'syncToken', function(){return syncToken} );
 	that.__defineGetter__( 'element', function(){return element} );
 	that.__defineGetter__( 'name', function(){return name} );

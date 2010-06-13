@@ -21,10 +21,15 @@ fieldset {
 	padding: 1em;
 }
 
+#game_list > li {
+	cursor: pointer;
+}
 #game_list div.level:not(.current) {
 	display: none;
 }
-
+#game_list div {
+	display: inline;
+}
 #game {
 	position: relative;
 	background-color: black;
