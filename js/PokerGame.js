@@ -1,4 +1,4 @@
-var PokerGame = (function($) { return function PokerGame (PokerRoom, state, breakLength, name, syncToken, lastUpdate) {
+var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
 		syncToken = state.syncToken;
@@ -11,13 +11,21 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 	if (!lastUpdate) {
 		lastUpdate = Date.now();
 	}
-	
+	if (!syncToken) {
+		syncToken = 0;
+	}
+	if (!name || typeof name != 'string') {
+		name = util.randomWord();
+	}
+	if( !breakLength ) {
+		breakLength = state[state.length-1].time; 
+		// use the time from the last blind as the default break length
+		// if the game is already on the second level the first one will be zero.
+	}
 	var interval,
 		element = createElement('div', 'poker-game'),
 		currentLevelEl = null,
-		hasFocus = false,
-		syncToken = false;
-		
+		hasFocus = false;		
 	
 	count = function() {
 		if (!interval) {
@@ -104,7 +112,6 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 		}
 	}
 	resizeCallback = function(animate){resize() };
-	;
 	
 	that = {
 		update: function( updateData ) {
@@ -148,12 +155,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 			return that;
 		},
 		toString: function() {
-			return JSON.stringify({
-				lastUpdate: lastUpdate,
-				breakLength: breakLength,
-				name: name,
-				state: state
-			});
+			return JSON.stringify(that.toJSON());
 		},
 		toJSON: function() {
 			return {
@@ -172,6 +174,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 	that.__defineGetter__( 'hasFocus', function(){return hasFocus} );
 	
 	draw();
+	
 	if (!syncToken) {
 		save();
 	}

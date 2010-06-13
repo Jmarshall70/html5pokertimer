@@ -66,7 +66,7 @@ var PokerRoom = (function($, localStorage) {
 			clearTimeout(syncTimer);
 			syncTimer = false;
 		},
-		add: function (blindTime, blinds, p_games, name, breakLength) {
+		add: function (blindTime, blinds, p_games, name, breakLength, syncToken) {
 			if (typeof blindTime === 'string') {
 				blindTime = util.formValue( blindTime );
 				blindTime = util.stringToSeconds(blindTime);
@@ -93,9 +93,8 @@ var PokerRoom = (function($, localStorage) {
 			} else {
 				name = util.randomWord();
 			}
-			var newGame = PokerGame( this, state, breakLength, name, Date.now() );
-			games[name] = newGame;
-			//container.appendChild(newGame.element);
+			
+			games[name] = PokerGame( this, state, name, breakLength );
 			saveGames();
 			
 			return name;

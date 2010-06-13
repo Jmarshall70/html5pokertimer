@@ -88,21 +88,6 @@ var util = {
 	}
 };
 
-/*
-Array.prototype.toString = function() {
-	return s = '['+this.join(',')+']';
-};
-*/
-/*
-Array.prototype.toJSON = function() {
-	var newArray = []
-	for( var i=0,c=this.length; i<c; i++ ) {
-		newArray.push(this[i]);
-	}	
-	return newArray;
-};
-*/
-
 function getElementById( id ) {
 	return document.getElementById(id);
 }
