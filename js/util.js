@@ -8,28 +8,30 @@ var util = {
 		template.removeAttribute('id');
 		
 		var frag = document.createDocumentFragment();
-		for(var i=0, c=items.length; i < c; i++) {
+		for(var i=0, c=items.length; i<c; i++) {
 			var item = items[i];
 			var e = template.cloneNode(true);
-			for (var key in bindings) {
-				var binding = bindings[key];
+			for (var j=0,d=bindings.length; j < d; j++) {
+				var binding = bindings[j];
 				if (typeof binding === 'string') {
 					binding = { selector:'.'+binding, key:binding };
 				}
 				var item$ = $(binding.selector,e);
 				
-				if (binding.fn) {
-					item$.html( binding.fn(item[binding.key]) );
-				} else if ( binding.nodeName ) {
-					item$.append(item[binding.key]);
-				} else {
-					item$.html(item[binding.key]);
-				}
-				if (binding.onclick) {
-					item$.click(binding.onclick);
-				}
-				if (binding.callback) {
-					binding.callback( e, item$[0], item );
+				if (item$.length) {
+					if (binding.fn) {
+						item$.html( binding.fn(item[binding.key]) );
+					} else if ( binding.nodeName ) {
+						item$.append(item[binding.key]);
+					} else {
+						item$.html(item[binding.key]);
+					}
+					if (binding.onclick) {
+						item$.click(binding.onclick);
+					}
+					if (binding.callback) {
+						binding.callback( e, item$[0], item );
+					}
 				}
 			}
 			if (callback) {

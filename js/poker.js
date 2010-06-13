@@ -9,6 +9,13 @@ $(document).ready(function() {
 
 function post_game( e ) {
 	
-	var name = PokerRoom.add( 'blind_time', 'blinds', 'games', 'new_game_title' );
+	var newGame = {
+		'blindTime': getElementById('blind_time').value,
+		'blinds': getElementById('blinds').value,
+		'games': getElementById('games').value,
+		'name': getElementById('new_game_title').value
+	};
+	
+	var name = PokerRoom.add( newGame );
 	PokerRoom.showGame(name);
 }
