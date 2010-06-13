@@ -20,6 +20,8 @@ var util = {
 				
 				if (binding.fn) {
 					item$.html( binding.fn(item[binding.key]) );
+				} else if ( binding.nodeName ) {
+					item$.append(item[binding.key]);
 				} else {
 					item$.html(item[binding.key]);
 				}
@@ -86,9 +88,20 @@ var util = {
 	}
 };
 
+/*
 Array.prototype.toString = function() {
 	return s = '['+this.join(',')+']';
 };
+*/
+/*
+Array.prototype.toJSON = function() {
+	var newArray = []
+	for( var i=0,c=this.length; i<c; i++ ) {
+		newArray.push(this[i]);
+	}	
+	return newArray;
+};
+*/
 
 function getElementById( id ) {
 	return document.getElementById(id);

@@ -20,7 +20,7 @@
 <body>
 <div id="start">
 	<h1 class="games">Pick A Game</h1>
-	<div id="poker_games" class="poker_games"></div>
+	<ul id="game_list" class="game_list"></ul>
 	<h1>Make a New Game</h1>
 	<form action="" method="post">
 		<fieldset>
@@ -50,12 +50,13 @@
 			<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
 Omaha</textarea>
 			<p>
+			<a href="#" id="asdf">asdf</a>
 			<input type="submit" name="new_game" value="Start">
 		</fieldset>
 	</form>
 </div>
-<div id="poker_game"></div>
-<audio id="bell" autoplay="false" autobuffer="true">
+<div id="game"></div>
+<audio id="bell" autobuffer="true">
 	<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
 	<source src="audio/Goblet_G_Medium.mp3" type="audio/mp3"/>
 	<source src="audio/Goblet_G_Medium.wav" type="audio/wav"/>
@@ -67,6 +68,10 @@ Omaha</textarea>
 		<div class="game"></div>
 		<a class="break" href="#">add break</a>
 	</div>
+	<li class="game">
+		<div class="name"></div>
+		<div class="state"></div>
+	</li>
 </div>
 
 </body>
