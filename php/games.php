@@ -14,6 +14,7 @@ foreach( $_POST as $key => $val ) {
 switch( $_REQUEST['method'] ) {
 	case 'save':
 		$game = json_decode($_POST['game'], true);
+		print_r( $game );
 		$file_name = name_to_file($game['name']);
 		file_put_contents( $file_name, $_POST['game'] );
 		echo filemtime( $file_name );
@@ -29,7 +30,7 @@ switch( $_REQUEST['method'] ) {
 		break;
 		
 	case 'sync':
-		$games = json_decode( trim($_GET['games']), true );
+		$games = json_decode( trim($_POST['games']), true );
 		$updates = array();
 		foreach( $games as $game ) {
 			$file_name = name_to_file( $game['name'] );
@@ -47,12 +48,14 @@ switch( $_REQUEST['method'] ) {
 		break;
 		
 	case 'list':
-		$game_files = scandir( 'games', '*.json' );
+		//print_r(scandir('games'));
+		$game_files = glob( 'games/*' );
+		//print_r( $game_files );
 		$games = array();
 		foreach( $game_files as $game_file ) {
-			$game_data = evaluate_game( $game_file );
+			$game_data = evaluate_game( $game_file, $_POST['syncToken'] );
 			if( $game_data ) {
-				$games[] = $game_data;
+				$games[$game_data['name']] = $game_data;
 			}
 		}
 		echo json_encode( $games );
@@ -61,24 +64,28 @@ switch( $_REQUEST['method'] ) {
 	default:
 		echo 'Please select a method. save, sync, get, list';
 }
-function evaluate_game( $file_name ) {
+function evaluate_game( $file_name, $syncToken=0 ) {
 	if( file_exists( $file_name ) ) {
-		
 		$game_data = get_game( $file_name );
-		$now = date()*1000;
-		$countdown = $now - $game_data['lastUpdate'];
-		
-		foreach( $game_data['state'] as $key => $level ) {
-			if( $level['time'] > $countdown ) {
-				$countdown = 0;
-				break;
-			} else {
-				$countdown -= $seconds;
+		$now = time();
+		$countdown = $now - intVal($game_data['lastUpdate']/1000);
+		if( !$syncToken || $syncToken < filemtime( $file_name ) ) {
+			foreach( $game_data['state'] as $key => $level ) {
+				if( $level['time'] > $countdown ) {
+					$countdown = 0;
+					break;
+				} else {
+					$countdown -= $level['time'];
+				}
 			}
-		}
-		if( $countdown >= 0 ) {
-			//the game is over.
-			unlink( 'games/'.$file_name );
+			if( $countdown > 0 ) {
+				//the game is over.
+				unlink( $file_name );
+				$game_data = false;
+			} else {
+				$game_data['syncToken'] = filemtime( $file_name );
+			}
+		} else {
 			$game_data = false;
 		}
 	} else {

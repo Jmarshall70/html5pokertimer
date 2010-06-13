@@ -1,13 +1,16 @@
-var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
+var PokerGame = (function($, window) { return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
 		syncToken = state.syncToken;
 		lastUpdate = state.lastUpdate;
 		breakLength = state.breakLength;
-		name = p_state.name;
-		state = p_state.state;
+		name = state.name;
+		state = state.state;
 	}
-	
+	if( !$.isArray(state)) {
+		console.error( 'state is not an array!' );
+		return false;
+	}
 	if (!lastUpdate) {
 		lastUpdate = Date.now();
 	}
@@ -25,7 +28,8 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 	var interval,
 		element = createElement('div', 'poker-game'),
 		currentLevelEl = null,
-		hasFocus = false;		
+		hasFocus = false,
+		previousDimmerTimer;		
 	
 	count = function() {
 		if (!interval) {
@@ -33,9 +37,17 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		}
 		update();
 	},
+	draw = function(){
+		element.innerHTML = '';
+		currentLevelEl = null;
+		var template = $('#templates .level')[0];
+		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
+		var frag = util.template( template, binder, state )
+		element.appendChild( frag );
+		update();
+	},
 	update = function() {
 		var now = Date.now() + PokerRoom.timeOffset;
-		
 		var milleseconds = (now-lastUpdate)
 		var seconds = Math.floor(milleseconds/1000);
 		lastUpdate = now;
@@ -68,25 +80,15 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 	},
 	advance = function(newIndex) {
 		if( currentLevelEl ) {
-			previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played')
-			setTimeout( function() {
-				
+			var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played')
+			previousDimmerTimer = setTimeout( function() {
 				previousLevel$.removeClass('previous');
 			}, 90 * 1000);
 		}
 		currentLevelEl = element.childNodes[newIndex]
 		$(currentLevelEl).addClass('current');
 		
-		updateView( true, function(){ ding() } );
-	}
-	draw = function(){
-		element.innerHTML = '';
-		var template = $('#templates .level')[0];
-		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
-		var frag = util.template( template, binder, state )
-		element.appendChild( frag );
-		update();
-		updateView( false );
+		updateScroll( true, function(){ ding() } );
 	},
 	ding = function() {
 		PokerRoom.ding(that);
@@ -94,7 +96,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 	save = function() {
 		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){ syncToken = data });
 	},
-	updateView = function( animate, callback ) {
+	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
 			var height = currentLevelEl.offsetHeight,
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
@@ -113,20 +115,23 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		if( hasFocus ) {
 			var width = element.offsetWidth;
 			var fontSize = ( width / 1000 ) * FONT_SIZE;
-			$(element.parentElement).css({'font-size':fontSize});
+			$(element).parent().css({'font-size':fontSize});
 			var third_height = Math.floor( element.innerHeight/3 );
-			updateView(false);
+			updateScroll(false);
 		}
-	}
-	resizeCallback = function(animate){resize() };
+	},
+	resizeCallback = function(){ resize() };
 	
 	that = {
 		update: function( updateData ) {
 			if (!updateData) {
-				$.get('games.php', {game:name}, function(data) {
-					data = JSON.parse( data );
+				$.getJSON('games.php', {game:name}, function(data) {
 					if( data ) {
-						that.update();
+						clearTimeout(previousDimmerTimer);
+						syncToken = data.syncToken;
+						lastUpdate = data.lastUpdate;
+						state = data.state;
+						draw();
 					}
 				});
 			} else if (updateData.syncToken && updateData.syncToken > syncToken) {
@@ -153,13 +158,13 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		focus: function() {
 			hasFocus = true;
 			resize();
-			window.addEventListener( 'resize', resizeCallback );
+			window.addEventListener( 'resize', resizeCallback, false );
 			return that;
 		},
 		blur: function() {
 			hasFocus = false;
 			PokerRoom.moveCurtains('auto');
-			window.removeEventListener( 'resize', resizeCallback );
+			window.removeEventListener( 'resize', resizeCallback, false );
 			return that;
 		},
 		toString: function() {
@@ -174,11 +179,12 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 			};
 		},
 		resize: function(animate) {
-			updateView(animate);
+			updateScroll(animate);
 		}
 	}
 	that.__defineGetter__( 'syncToken', function(){return syncToken} );
 	that.__defineGetter__( 'element', function(){return element} );
+	that.__defineGetter__( 'name', function(){return name} );
 	that.__defineGetter__( 'hasFocus', function(){return hasFocus} );
 	
 	draw();
@@ -186,7 +192,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 	if (!syncToken) {
 		save();
 	}
-		
+	
 	return that;
 }
-})(jQuery)
+})(jQuery, window)
