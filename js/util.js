@@ -65,7 +65,7 @@ var util = {
 		if (time_a.length > 1) {
 			return (parseInt(time_a[0],10)*60) + parseInt(time_a[1],10);
 		} else {
-			return parseInt(blindTime,10);
+			return parseInt(time,10);
 		}
 	},
 	pad: function (num, totalChars, padWith) {

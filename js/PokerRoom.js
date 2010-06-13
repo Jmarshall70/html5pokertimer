@@ -18,7 +18,6 @@ var PokerRoom = (function($, localStorage) {
 		if (serverTime) {
 			timeOffset = serverTime - Date.now();
 		}
-		console.log('time offset: '+timeOffset);
 	});
 	
 	$(document).ready(function(){
@@ -63,7 +62,7 @@ var PokerRoom = (function($, localStorage) {
 			} else {
 				name = util.randomWord();
 			}
-			var newGame = PokerGame( this, bell, state, breakLength, name, Date.now() );
+			var newGame = PokerGame( this, state, breakLength, name, Date.now() );
 			games.push(newGame);
 			container.appendChild(newGame.element);
 			saveGames();
@@ -87,6 +86,11 @@ var PokerRoom = (function($, localStorage) {
 			}
 			newHome.appendChild( container );
 		},
+		ding: function() {
+			if (bell && bell.play) {
+				bell.play();
+			}
+		}
 		
 	};
 
