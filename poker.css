@@ -49,18 +49,38 @@ fieldset {
 }
 #game .level {
 	border-top: .25em solid #222;
-	/*height: 1.7em;*/
 	line-height: 1.2;
 	position: relative;
 	text-align: left;
 	background-color: black;
-	color: #222;
+	color: white;
+	
 }
+
 #game .level.current {
 	color: white;
 }
-#game .level.previous {
-	color: #666;
+#game .level.previous.played {
+	color: white;
+}
+#game .level.played {
+	color: #777;
+}
+#curtains > div {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	width: 100%;
+	background-color: black;
+	opacity: 0.7;
+	z-index: 10;
+}
+#curtains > div.top {
+	top: 0px;
+	opacity: 0.4;
+}
+#curtains div.bottom {
+	bottom: 0px;
 }
 #game .time {
 	position: absolute;

@@ -68,14 +68,16 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 	},
 	advance = function(newIndex) {
 		if( currentLevelEl ) {
-			previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous')
+			previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played')
 			setTimeout( function() {
+				
 				previousLevel$.removeClass('previous');
-			}, 60 * 1000);
+			}, 1 * 1000);
 		}
 		currentLevelEl = element.childNodes[newIndex]
 		$(currentLevelEl).addClass('current');
-		PokerRoom.ding(that);
+		
+		updateView( true, function(){ ding() } );
 	}
 	draw = function(){
 		element.innerHTML = '';
@@ -86,6 +88,9 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		update();
 		updateView( false );
 	},
+	ding = function() {
+		PokerRoom.ding(that);
+	},
 	save = function() {
 		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){ syncToken = data });
 	},
@@ -93,12 +98,14 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		if( hasFocus ) {
 			var height = currentLevelEl.offsetHeight,
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
-				levelTop = currentLevelEl.offsetTop;
-			console.log( 'height: '+height+' topOffset: '+topOffset+' levelTop: '+levelTop );
+				levelTop = currentLevelEl.offsetTop,
+				top = -1*(levelTop-topOffset);
 			if( animate ) {
-				$(element).stop().animate({ 'top':-1*(levelTop-topOffset) }, callback);
+				PokerRoom.moveCurtains( topOffset+height );
+				$(element).stop().animate({ 'top': top}, callback);
 			} else {
-				$(element).stop().css({ 'top': -1*(levelTop-topOffset) }, callback);
+				PokerRoom.moveCurtains( topOffset+height );
+				$(element).stop().css({ 'top': top }, callback);
 			}
 		}
 	},
@@ -151,6 +158,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, name
 		},
 		blur: function() {
 			hasFocus = false;
+			PokerRoom.moveCurtains('auto');
 			window.removeEventListener( 'resize', resizeCallback );
 			return that;
 		},

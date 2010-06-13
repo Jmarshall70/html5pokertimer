@@ -26,7 +26,7 @@
 		<fieldset>
 			Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 			<p>
-			Time: <input type="text" size="4" name="time" id="blind_time" value="10:00">
+			Time: <input type="text" size="4" name="time" id="blind_time" value="10">
 			<p>
 			Blind Levels:<br>
 			<textarea class="blinds" id="blinds" name="blinds" rows="4" cols="20">25/50
@@ -56,6 +56,10 @@ Omaha</textarea>
 	</form>
 </div>
 <div id="game"></div>
+<div id="curtains">
+	<div class="top"></div>
+	<div class="bottom"></div>
+</div>
 <audio id="bell" autobuffer="true">
 	<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
 	<source src="audio/Goblet_G_Medium.mp3" type="audio/mp3"/>
