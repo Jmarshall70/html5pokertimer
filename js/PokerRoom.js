@@ -4,7 +4,7 @@ var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
 		timeOffset = 0,
-		syncTimer = true,
+		syncTimer = false,
 		bell,
 		listEl,
 		gameEl,
@@ -12,35 +12,65 @@ var PokerRoom = (function($) {
 		bottomCurtain,
 		mute = true,
 		syncToken = 0,
+		currentGame,
+		onBreak = false,
+		controlsTimeout,
 		
-	sync = function() {
+	sync = function(timer) {
+		clearTimeout( syncTimer );
+		
 		var sync_a = [];
 		for (var name in games) {
 			var gameSyncToken = games[name].syncToken;
 			// TODO: have this add games that have changes to send to the server
 			if (gameSyncToken) {
-				sync_a.push( {name:name, token:gameSyncToken} );
+				sync_a.push( {name:name, syncToken:gameSyncToken} );
 			}
 		}
 		if (sync_a.length) {
 			$.post('php/games.php', {method:'sync', games:JSON.stringify( sync_a )}, function(updates) {
 				updates = JSON.parse(updates);
-				if (syncTimer) {
-					for( var i=0,c=updates.length; i<c; i++ ) {
-						var update = updates[i];
-						if (games[update.name]) {
-							games[update.name].update( update );
-						}
+				for( var i=0,c=updates.length; i<c; i++ ) {
+					var update = updates[i];
+					if (games[update.name]) {
+						games[update.name].update( update );
 					}
-					syncTimer = setTimeout( function(){ sync() }, 5000 );
 				}
+				syncTimer = setTimeout( function(){ sync() }, 5000 );
 			})
 		} else {
 			syncTimer = setTimeout( function(){ sync() }, 5000 );
 		}
 	},
-	makeList = function() {
-		
+	addBreak = function(next) {
+		console.log(currentGame);
+		games[currentGame].addBreak(next);
+	},
+	keyControl = function(e) {
+		var key = ""+String.fromCharCode(e.charCode).toLowerCase();
+		switch( key ) {
+			case 'b':
+				addBreak(0);
+				break;
+			case 'n':
+				addBreak(1);
+				break;
+			default:
+				showControls();
+				return;
+		}
+		e.preventDefault();
+	},
+	showControls = function() {
+		if (controlsTimeout) {
+			clearInterval(controlsTimeout);
+		}
+		$('.control').stop().animate({opacity:'1'}, 'fast');
+		controlsTimeout = setTimeout( hideControls, 2000 );
+	},
+	hideControls = function() {
+		clearInterval(controlsTimeout);
+		$('.control').stop().animate({opacity:'0'}, 'slow');
 	};
 	
 	$.get('php/time.php', function(data) {
@@ -57,6 +87,26 @@ var PokerRoom = (function($) {
 		topCurtain = $('#curtains .top')[0];
 		bottomCurtain = $('#curtains .bottom')[0];
 		that.listGames();
+		
+		$('#break_now').click( function(e){
+			e.preventDefault();
+			if (!onBreak) {
+				addBreak(0);
+			}
+		});
+		
+		$('#break_next').click( function(e){
+			e.preventDefault();
+			if (!onBreak) {
+				addBreak(1);
+			}
+		});
+		
+		document.addEventListener( 'keypress', keyControl );
+		document.addEventListener( 'mousemove', showControls );
+		
+		
+		
 	});
 	
 	var that = {
@@ -67,10 +117,16 @@ var PokerRoom = (function($) {
 			} else {
 				sync();
 			}
+			return that;
 		},
 		suspend: function() {
 			clearTimeout(syncTimer);
 			syncTimer = false;
+			return that;
+		},
+		resume: function() {
+			sync();
+			return that;
 		},
 		add: function (blindTime, blinds, p_games, name, breakLength, lastUpdate, p_syncToken) {
 			
@@ -78,7 +134,7 @@ var PokerRoom = (function($) {
 				//blind time is actually a game.
 				var o = blindTime;
 				if( o.state ) {
-					games[o.name] = PokerGame( this, o );
+					games[o.name] = new PokerGame( this, o );
 					return o.name;
 				}
 				blindTime = o.blindTime;
@@ -110,8 +166,7 @@ var PokerRoom = (function($) {
 				name = util.randomWord();
 			}
 			
-			games[name] = PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
-			
+			games[name] = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
 			
 			return name;
 		},
@@ -122,7 +177,7 @@ var PokerRoom = (function($) {
 			return games.toString();
 		},
 		list: function() {
-			console.log( games );
+			return games;
 		},
 		listGames: function() {
 			$.getJSON('php/games.php', {method:'list',syncToken:syncToken}, function(p_games) {
@@ -134,29 +189,35 @@ var PokerRoom = (function($) {
 					}
 				}
 				var games_a = [];
-				for( game in games ) {
+				for( var game in games ) {
+					console.log( game );
 					games[game].wake();
 					games_a.push(games[game]);
 				}
 				var template = $('#templates li.game')[0];
 				var bindings = ['name', {key:'element',selector:'.state'}];
-				var frag = util.template( template, bindings, games_a );
+				var frag = util.template( template, bindings, games_a, function(e, game) {
+					$(e).click(function(){that.showGame(game.name)});
+				});
 				listEl.innerHTML = '';
 				listEl.appendChild( frag );
-				setTimeout( function(){ sync() }, 5000 );
-
+				currentGame = null;
+				that.resume();
 			});
+			return that;
 		},
 		move: function( newHome ) {
 			if( typeof newHome === 'string' ) {
 				newHome = getElementById( newHome );
 			}
 			newHome.appendChild( container );
+			return that;
 		},
 		ding: function(game) {
 			if (!mute && game.hasFocus && bell && bell.play) {
 				bell.play();
 			}
+			return that;
 		},
 		showGame: function( name ) {
 			mute = false;
@@ -166,19 +227,31 @@ var PokerRoom = (function($) {
 				for( var game in games ) {
 					if( game == name ) {
 						gameEl.appendChild( games[game].element );
-						games[game].wake().focus();
+						games[game].focus().wake();
+						currentGame = game
+						hideControls();
 					} else {
 						$(games[game]).remove();
-						game.sleep().blur();
+						games[game].sleep().blur();
 					}
 				}
 			} else {
 				console.error('Tried to load a game that does not exist.');
 			}
+			return that;
 		},
 		moveCurtains: function( place ) {
 			topCurtain.style.bottom = place+'px';
 			bottomCurtain.style.top = place+'px';
+			return that;
+		},
+		startBreak: function() {
+			onBreak = true;
+			return that;
+		},
+		endBreak: function() {
+			onBreak = false;
+			return that;
 		}
 	};
 	
