@@ -54,7 +54,7 @@ var PokerRoom = (function($, localStorage) {
 			var gamesLength = p_games.length;
 			var state = [];
 			for (var i=0,c=blinds.length; i<c; i++ ) {
-				state.push({ time:blindTime, originalTime:blindTime, blinds:blinds[i], game: p_games[i%gamesLength] });
+				state.push({ time:blindTime, blinds:blinds[i], game: p_games[i%gamesLength] });
 			}
 			
 			if (name) {
