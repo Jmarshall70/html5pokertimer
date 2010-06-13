@@ -46,9 +46,12 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		var frag = util.template( template, binder, state, function(e,game,i) {
 			if( game.blinds == local['break'] ) {
 				$(e).click(function(){ 
-					state.splice(i,1); 
+					state.splice(i,1);
 					draw(); 
 					save();
+					if (i === currentBlindIndex) {
+						PokerRoom.endBreak(name);
+					}
 				}).addClass('break');
 			}
 		} );
