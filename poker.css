@@ -20,7 +20,12 @@ h1 {
 fieldset {
 	padding: 1em;
 }
-#poker_container {
+
+#game_list div.level:not(.current) {
+	display: none;
+}
+
+#game {
 	position: relative;
 	background-color: black;
 	font-size: 100px;
@@ -35,18 +40,14 @@ fieldset {
 	min-height: 320px;
 	display: none;
 }
-#poker_levels {
+#game .poker-game {
 	position: absolute;
-	top: 0px;
-	left: 0px;
 	width: 100%;
-	bottom: 0px;
-	height: 100%;
 }
-#poker_levels .game, #poker_levels .time {
+#game .game, #game .time {
 	font-size: 80%;
 }
-#poker_levels .level {
+#game .level {
 	border-top: .25em solid #222;
 	/*height: 1.7em;*/
 	line-height: 1.2;
@@ -55,32 +56,32 @@ fieldset {
 	background-color: black;
 	color: #222;
 }
-#poker_levels .level.current {
+#game .level.current {
 	color: white;
 }
-#poker_levels .level.previous {
+#game .level.previous {
 	color: #666;
 }
-#poker_levels .time {
+#game .time {
 	position: absolute;
 	left: .125em;
 	top: .125em;
 }
-#poker_levels .blinds {
+#game .blinds {
 	font-size: 190%;
 	line-height: 1;
 	height: 1em;
 	margin: 0;
 	text-align: right;
 }
-#poker_levels .game {
+#game .game {
 	position: absolute;
 	left: .125em;
 	bottom: .25em;
 	height: 1em;
 	white-space: nowrap;
 }
-#poker_levels a.break {
+#game a.break {
 	position: absolute;
 	top: -1.2em;
 	left: 1em;
@@ -89,61 +90,9 @@ fieldset {
 	text-decoration: none;
 	color: black;
 }
-#poker_levels a.break:hover {
+#game a.break:hover {
 	text-decoration: underline;
 	color: #aaa;
-}
-#poker_levels .level.current a.break {
-}
-#poker_levels textarea {
-	border: 1px solid grey;
-	overflow: auto;
-}
-#poker_levels textarea.game {
-	width: 25%;
-	height: 90%;
-}
-#poker_levels textarea.blinds {
-	width: 35%;
-	right: 40%;
-	height: 90%;
-}
-#poker_levels .level button {
-	padding: .125em;
-	font-size: 50%;
-}
-#poker_levels .game a {
-	color: black;
-	text-decoration: none;
-}
-#poker_levels .game a:hover {
-	text-decoration: underline;
-}
-#settings {
-	position: fixed;
-	width: 100%;
-	z-index: 2;
-}
-#settings .menu {
-	color: #333;
-	font-size: 0.125em;
-}
-#settings:hover .level {
-	display: block;
-}
-#settings .level {
-	display: none;
-	background-color: white;
-	border: 0;
-}
-#settings .level .blinds {
-	background-color: white;
-}
-#settings .level button {
-	position: absolute;
-	right: 4px;
-	bottom: 4px;
-	font-size: 16px;
 }
 input.time {
 	font-size: inherit;
@@ -157,21 +106,6 @@ audio {
 	position: absolute;
 	z-index: -1;
 }
-#games table {
-	border-left: 1px solid silver;
-	border-bottom: 1px solid silver;
-	border-top: 1px solid silver;
-	border-collapse: collapse;
-}
-#games table td {
-	border-right: 1px solid silver;
-	padding: 0.25em 0.5em;
-	margin: 0;
-}
-#games table tr:nth-child(odd) {
-	background-color: #eaeaea;
-}
-
 #templates {
 	display: none;
 }

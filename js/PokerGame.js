@@ -1,7 +1,7 @@
-var PokerGame = (function($) { return function PokerGame (PokerRoom, state, breakLength, name, lastSync, lastUpdate) {
+var PokerGame = (function($) { return function PokerGame (PokerRoom, state, breakLength, name, syncToken, lastUpdate) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
-		lastSync = state.lastSync;
+		syncToken = state.syncToken;
 		lastUpdate = state.lastUpdate;
 		breakLength = state.breakLength;
 		name = p_state.name;
@@ -15,6 +15,9 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 	var interval,
 		element = createElement('div', 'poker-game'),
 		currentLevelEl = null,
+		hasFocus = false,
+		syncToken = false;
+		
 	
 	count = function() {
 		if (!interval) {
@@ -64,7 +67,7 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 		}
 		currentLevelEl = element.childNodes[newIndex]
 		$(currentLevelEl).addClass('current');
-		PokerRoom.ding();
+		PokerRoom.ding(that);
 	}
 	draw = function(){
 		element.innerHTML = '';
@@ -72,17 +75,53 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
 		var frag = util.template( template, binder, state )
 		element.appendChild( frag );
-	};
+		update();
+		updateView( false );
+	},
+	save = function() {
+		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){ syncToken = data });
+	},
+	updateView = function( animate, callback ) {
+		if( hasFocus ) {
+			var height = currentLevelEl.offsetHeight,
+				topOffset = Math.floor( window.innerHeight/2 - height/2),
+				levelTop = currentLevelEl.offsetTop;
+			console.log( 'height: '+height+' topOffset: '+topOffset+' levelTop: '+levelTop );
+			if( animate ) {
+				$(element).stop().animate({ 'top':-1*(levelTop-topOffset) }, callback);
+			} else {
+				$(element).stop().css({ 'top': -1*(levelTop-topOffset) }, callback);
+			}
+		}
+	},
+	resize = function() {
+		if( hasFocus ) {
+			var width = element.offsetWidth;
+			var fontSize = ( width / 1000 ) * FONT_SIZE;
+			$(element).css({'font-size':fontSize});
+			var third_height = Math.floor( element.innerHeight/3 );
+			updateView(false);
+		}
+	}
+	resizeCallback = function(animate){resize() };
+	;
 	
 	that = {
-		lastSync: lastSync,
-		element: element,
-		update: function( updateTime, newState ) {
-			if (updateTime > lastUpdate) {
-				state = newState;
-				lastUpdate = updateTime;
+		update: function( updateData ) {
+			if (!updateData) {
+				$.get('games.php', {game:name}, function(data) {
+					data = JSON.parse( data );
+					if( data ) {
+						that.update();
+					}
+				});
+			} else if (updateData.syncToken && updateData.syncToken > syncToken) {
+				state = updateData.game.state;
+				lastUpdate = updateData.game.lastUpdate;
+				syncToken = updateData.syncToken;
 				ding();
 			}
+			return that;
 		},
 		remove: function() {
 			$(element).remove();
@@ -90,7 +129,23 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 			PokerRoom.removeGame(this);
 		},
 		sleep: function() {
-			clearInterval(interval);	
+			clearInterval(interval);
+			return that;	
+		},
+		wake: function() {
+			count();
+			return that;
+		},
+		focus: function() {
+			hasFocus = true;
+			resize();
+			window.addEventListener( 'resize', resizeCallback );
+			return that;
+		},
+		blur: function() {
+			hasFocus = false;
+			window.removeEventListener( 'resize', resizeCallback );
+			return that;
 		},
 		toString: function() {
 			return JSON.stringify({
@@ -99,12 +154,27 @@ var PokerGame = (function($) { return function PokerGame (PokerRoom, state, brea
 				name: name,
 				state: state
 			});
+		},
+		toJSON: function() {
+			return {
+				lastUpdate: lastUpdate,
+				breakLength: breakLength,
+				name: name,
+				state: state
+			};
+		},
+		resize: function(animate) {
+			updateView(animate);
 		}
 	}
+	that.__defineGetter__( 'syncToken', function(){return syncToken} );
+	that.__defineGetter__( 'element', function(){return element} );
+	that.__defineGetter__( 'hasFocus', function(){return hasFocus} );
 	
 	draw();
-	advance(0);
-	count();
+	if (!syncToken) {
+		save();
+	}
 		
 	return that;
 }

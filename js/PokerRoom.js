@@ -1,13 +1,40 @@
+var FONT_SIZE = 75;
+
 var PokerRoom = (function($, localStorage) {
 	// hold games in localStorage
-	var games = [],
+	var games = {},
 		timeOffset = 0,
+		syncTimer = true,
 		bell,
-		container = createElement('div', 'poker-room'),
+		listEl,
+		gameEl,
 		elementsToAdd = [],
-	updateFromServer = function() {
-		// get game names and last update token
-		// check them against what's on the server, update if needed
+		mute = true,
+		
+	sync = function() {
+		var sync_a = [];
+		for (var name in games) {
+			var syncToken = games[name].syncToken;
+			if (syncToken) {
+				sync_a.push( {name:name, token:syncToken} );
+			}
+		}
+		if (sync_a.length) {
+			$.get('php/games.php', {method:'sync', games:JSON.stringify( sync_a )}, function(data) {
+				if (syncTimer) {
+					var updates = JSON.parse( data );
+					for( var i=0,c=updates.length; i<c; i++ ) {
+						var update = updates[i];
+						if (games[update.name]) {
+							games[update.name].update( update );
+						}
+					}
+					syncTimer = setTimeout( function(){ sync() }, 5000 );
+				}
+			})
+		} else {
+			syncTimer = setTimeout( function(){ sync() }, 5000 );
+		}
 	},
 	saveGames = function() {
 		localStorage.setItem('PokerGames',games);
@@ -22,18 +49,22 @@ var PokerRoom = (function($, localStorage) {
 	
 	$(document).ready(function(){
 		bell = getElementById('bell');
-		if( elementsToAdd ) {
-			elementsToAdd.forEach(function( element, i ) {
-				container.appendChild(element);
-			});
-		}
+		listEl = getElementById('game_list');
+		gameEl = getElementById('game');
 	});
 	
-	return {
+	var that = {
 		timeOffset: timeOffset,
 		update: function(game) {
 			if (game) {
+				games[game].update();
+			} else {
+				sync();
 			}
+		},
+		suspend: function() {
+			clearTimeout(syncTimer);
+			syncTimer = false;
 		},
 		add: function (blindTime, blinds, p_games, name, breakLength) {
 			if (typeof blindTime === 'string') {
@@ -63,22 +94,20 @@ var PokerRoom = (function($, localStorage) {
 				name = util.randomWord();
 			}
 			var newGame = PokerGame( this, state, breakLength, name, Date.now() );
-			games.push(newGame);
-			container.appendChild(newGame.element);
+			games[name] = newGame;
+			//container.appendChild(newGame.element);
 			saveGames();
+			
+			return name;
 		},
 		removeGame: function(game) {
-			var i = games.indexOf(game);
-			if (i != -1) {
-				games.splice(i,1);
-			}
-			game = null;
+			delete games[game.name];
 		},
 		JSON: function() {
 			return games.toString();
 		},
 		listGames: function() {
-			return games;
+			
 		},
 		move: function( newHome ) {
 			if( typeof newHome === 'string' ) {
@@ -86,12 +115,33 @@ var PokerRoom = (function($, localStorage) {
 			}
 			newHome.appendChild( container );
 		},
-		ding: function() {
-			if (bell && bell.play) {
+		ding: function(game) {
+			if (!mute && game.hasFocus && bell && bell.play) {
 				bell.play();
 			}
+		},
+		showGame: function( name ) {
+			mute = false;
+			if( games[name] ) {
+				$('#start').hide();
+				$(gameEl).show();
+				for( var game in games ) {
+					if( game == name ) {
+						gameEl.appendChild( games[game].element );
+						games[game].wake().focus();
+					} else {
+						$(games[game]).remove();
+						game.sleep().blur();
+					}
+				}
+			} else {
+				console.error('Tried to load a game that does not exist.');
+			}
 		}
-		
 	};
+	
+	sync();
+	
+	return that;
 
 })(jQuery, localStorage);
