@@ -1,4 +1,4 @@
-function PokerGame(PokerRoom, state, breakLength, name, lastSync, lastUpdate) {
+var PokerGame = (function($) { return function PokerGame (PokerRoom, state, breakLength, name, lastSync, lastUpdate) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
 		lastSync = state.lastSync;
@@ -108,3 +108,4 @@ function PokerGame(PokerRoom, state, breakLength, name, lastSync, lastUpdate) {
 		
 	return that;
 }
+})(jQuery)
