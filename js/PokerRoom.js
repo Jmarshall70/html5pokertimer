@@ -71,8 +71,9 @@ var PokerRoom = (function($) {
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
 		var frag = util.template( template, bindings, games_a, function(el, game) {
-			el.addEventListener( 'click', function(){
+			el.addEventListener( 'click', function(e){
 				that.showGame(game.name)
+				e.stopPropagation();
 			}, true);
 		});
 		listEl.innerHTML = '';
@@ -247,9 +248,9 @@ var PokerRoom = (function($) {
 				$(gameEl).show();
 				for( var game in games ) {
 					if( game == name ) {
+						currentGame = game
 						gameEl.appendChild( games[game].element );
 						games[game].focus();
-						currentGame = game
 						hideControls();
 					} else {
 						$(games[game]).remove();
