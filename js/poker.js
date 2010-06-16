@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	
 	$('#new_game_title').val( util.randomWord() );
-	
+	PokerRoom.start();
 	//$('#asdf').click( post_game );
 	$('form').bind( 'submit', post_game )	
 });

@@ -62,14 +62,15 @@ var util = {
 		}
 	},
 	secondsToString: function( sec ) {
+		sec = Math.round( sec / 1000 );
 		return Math.floor(sec/60)+':'+util.pad(sec%60,2);
 	},
 	stringToSeconds: function( time ) {
 		var time_a = time.split(':');
 		if (time_a.length > 1) {
-			return (parseInt(time_a[0],10)*60) + parseInt(time_a[1],10);
+			return ((parseInt(time_a[0],10)*60) + parseInt(time_a[1],10)) * 1000;
 		} else {
-			return parseInt(time,10);
+			return parseInt(time,10) * 1000;
 		}
 	},
 	pad: function (num, totalChars, padWith) {
