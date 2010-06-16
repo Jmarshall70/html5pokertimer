@@ -29,63 +29,62 @@ switch( $_REQUEST['method'] ) {
 		break;
 		
 	case 'sync':
-		$games = json_decode( trim($_POST['games']), true );
-		$updates = array();
-		foreach( $games as $game ) {
-			$file_name = name_to_file( $game['name'] );
-			if( file_exists( $file_name ) ) {
-				$syncToken = filemtime( $file_name );
-				if( $game['syncToken'] <  $syncToken ) {
-					$updates[$game['name']] = array(
-						'syncToken' => $syncToken,
-						'game' => get_game( $file_name )
-					);
+		if( isset( $_POST['games'] ) ) {
+			// sync specific games
+			$games = json_decode( trim($_POST['games']), true );
+			$updates = array();
+			foreach( $games as $game ) {
+				$file_name = name_to_file( $game['name'] );
+				if( file_exists( $file_name ) ) {
+					$syncToken = filemtime( $file_name );
+					if( $game['syncToken'] <  $syncToken ) {
+						$updates[$game['name']] = array(
+							'syncToken' => $syncToken,
+							'game' => get_game( $file_name )
+						);
+					}
 				}
 			}
-		}
-		echo json_encode($updates);
-		break;
-		
-	case 'list':
-		//print_r(scandir('games'));
-		$game_files = glob( 'games/*' );
-		//print_r( $game_files );
-		$games = array();
-		foreach( $game_files as $game_file ) {
-			$game_data = evaluate_game( $game_file, $_POST['syncToken'] );
-			if( $game_data ) {
-				$games[$game_data['name']] = $game_data;
+			echo json_encode($updates);
+		} else {
+			// sync all games
+			$game_files = glob( 'games/*' );
+			$games = array();
+			$syncToken = time();
+			foreach( $game_files as $game_file ) {
+				if( filemtime( $game_file ) > $_POST['syncToken'] ) {
+					$game_data = evaluate_game( $game_file );
+					if( $game_data ) {
+						$games[] = $game_data;
+					}
+				}
 			}
+			echo json_encode( array( 'games' => $games, 'syncToken' => $syncToken ) );
 		}
-		echo json_encode( $games );
 		break;
 	
 	default:
 		echo 'Please select a method. save, sync, get, list';
 }
-function evaluate_game( $file_name, $syncToken=0 ) {
+function evaluate_game( $file_name ) {
 	if( file_exists( $file_name ) ) {
 		$game_data = get_game( $file_name );
-		$now = time();
-		$countdown = $now - intVal($game_data['lastUpdate']/1000);
-		if( !$syncToken || $syncToken < filemtime( $file_name ) ) {
-			foreach( $game_data['state'] as $key => $level ) {
-				if( $level['time'] > $countdown ) {
-					$countdown = 0;
-					break;
-				} else {
-					$countdown -= $level['time'];
-				}
-			}
-			if( $countdown > 0 ) {
-				//the game is over.
-				unlink( $file_name );
-				$game_data = false;
+		$now = time()*1000;
+		$countdown = $now - $game_data['lastUpdate'];
+		foreach( $game_data['state'] as $key => $level ) {
+			if( $level['time'] > $countdown ) {
+				$countdown = 0;
+				break;
 			} else {
-				$game_data['syncToken'] = filemtime( $file_name );
+				$countdown -= $level['time'];
 			}
-		} else {
+		}
+		if( $countdown > 0 ) {
+			//the game is over.
+			unlink( $file_name );
 			$game_data = false;
+		} else {
+			$game_data['syncToken'] = filemtime( $file_name );
 		}
 	} else {
 		$game_data = false;

@@ -31,6 +31,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		hasFocus = false,
 		previousDimmerTimer,	
 		currentBlindIndex = -1,
+		blindTimeRemaining = 0,
 	
 	count = function() {
 		if (!countInterval) {
@@ -43,16 +44,18 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		currentLevelEl = null;
 		var template = $('#templates .level')[0];
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
-		var frag = util.template( template, binder, state, function(e,game,i) {
+		var frag = util.template( template, binder, state, function(el,game,i) {
 			if( game.blinds == local['break'] ) {
-				$(e).click(function(){ 
-					state.splice(i,1);
-					draw(); 
-					save();
-					if (i === currentBlindIndex) {
-						PokerRoom.endBreak(name);
+				$(el).addClass('break').click(function(){ 
+					if (hasFocus) {
+						state.splice(i,1);
+						draw(); 
+						save();
+						if (i === currentBlindIndex) {
+							PokerRoom.endBreak(name);
+						}
 					}
-				}).addClass('break');
+				});
 			}
 		} );
 		element.appendChild( frag );
@@ -60,16 +63,17 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	update = function() {
 		var now = Date.now() + PokerRoom.timeOffset;
-		var milleseconds = (now-lastUpdate);
-		if ( (milleseconds > 1100 && milleseconds < 2000) || milleseconds < 900 ) {
-			// make them count at different times
+		var milliseconds = (now-lastUpdate);
+		if ( countInterval && ((blindTimeRemaining-milliseconds) % 1000) > 50 ) {
+			// end this timer and start a new one if we're off by more than 1/20 seconds
 			clearInterval(countInterval);
-			countInterval = false;
-			setTimeout( function(){ count(); }, milleseconds % 1000 );
-			return;
+			countInterval = null;
+			setTimeout( function(){ count(); }, ((blindTimeRemaining-milliseconds) % 1000)  );
 		}
 		
-		var seconds = Math.floor((milleseconds+100)/1000);
+		if (milliseconds < 500 && currentLevelEl) {
+			return;
+		}
 		lastUpdate = now;
 		
 		//count
@@ -86,18 +90,20 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		} else {
 			blind = state[currentBlindIndex];
 			
-			while (seconds > blind.time) {
-				seconds -= blind.time;
+			while (milliseconds > blind.time) {
+				milliseconds -= blind.time;
 				blind.time = 0;
 				currentBlindIndex += 1;
 				blind = state[currentBlindIndex];
 			}
-			if (currentLevelEl != element.childNodes[currentBlindIndex]) {
+			if (previousBlindIndex != currentBlindIndex) {
 				if( currentLevelEl ) {
 					var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played');
 					previousDimmerTimer = setTimeout( function() {
 						previousLevel$.removeClass('previous');
 					}, 90 * 1000);
+				} else {
+					currentLevelEl = element.childNodes[currentBlindIndex];
 				}
 				
 				if (state[previousBlindIndex] && state[previousBlindIndex].blinds == local['break'] ) {
@@ -107,11 +113,19 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 					PokerRoom.startBreak(name);
 				}
 				currentLevelEl = element.childNodes[currentBlindIndex];
-				$(currentLevelEl).addClass('current');
+				if (currentLevelEl) {
+					$(currentLevelEl).addClass('current');
+				} else {
+					// the game is over.
+					that.remove();
+				}
 								
 				updateScroll( true, function(){ding();} );
+			} else if (!currentLevelEl) {
+				currentLevelEl = element.childNodes[currentBlindIndex];
 			}
-			blind.time -= seconds;
+			blind.time -= milliseconds;
+			blindTimeRemaining = blind.time;
 			$('.time',element.childNodes[currentBlindIndex]).html(util.secondsToString(blind.time));
 		}
 	},
@@ -182,7 +196,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			$(element).remove();
 			clearInterval(countInterval);
 			countInterval = false;
-			PokerRoom.removeGame(this);
+			PokerRoom.removeGame(name);
 		},
 		sleep: function() {
 			clearInterval(countInterval);
@@ -195,9 +209,9 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		},
 		focus: function() {
 			hasFocus = true;
+			that.wake();
 			update();
 			resize();
-			that.wake();
 			window.addEventListener( 'resize', resizeCallback, true );
 			return that;
 		},
