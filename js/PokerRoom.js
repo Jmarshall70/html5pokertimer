@@ -71,9 +71,9 @@ var PokerRoom = (function($) {
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
 		var frag = util.template( template, bindings, games_a, function(el, game) {
-			$(el).click(function(){
+			el.addEventListener( 'click', function(){
 				that.showGame(game.name)
-			});
+			}, true);
 		});
 		listEl.innerHTML = '';
 		listEl.appendChild( frag );
@@ -110,7 +110,7 @@ var PokerRoom = (function($) {
 			clearInterval(controlsTimeout);
 		}
 		if (!onBreak) {
-			$('.control').stop().animate({opacity:'1'}, 'fast');
+			$('.control').stop().animate({opacity:'1'}, 150);
 			controlsTimeout = setTimeout( hideControls, 2000 );
 		}
 	},
@@ -133,16 +133,16 @@ var PokerRoom = (function($) {
 		topCurtain = $('#curtains .top')[0];
 		bottomCurtain = $('#curtains .bottom')[0];
 		
-		$('#break_now')[0].addEventListener('click',/*.click(*/ function(e){
+		$('#break_now')[0].addEventListener('click', function(e){
 			e.preventDefault();
 			addBreak(0);
 		}, true);
 
 		
-		$('#break_next').click( function(e){
+		$('#break_next')[0].addEventListener( 'click', function(e){
 			e.preventDefault();
 			addBreak(1);
-		});
+		}, true);
 		
 		document.addEventListener( 'keydown', keyControl, true );
 		document.addEventListener( 'mousemove', showControls, true );
