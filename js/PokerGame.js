@@ -49,13 +49,13 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 				$(el).addClass('break')[0].addEventListener( 'click', function(){ 
 					if (hasFocus) {
 						state.splice(i,1);
-						draw(); 
+						draw();
 						save();
 						if (i === currentBlindIndex) {
 							PokerRoom.endBreak(name);
 						}
 					}
-				}, true);
+				}, false);
 			}
 		} );
 		element.appendChild( frag );
