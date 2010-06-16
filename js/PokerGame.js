@@ -46,7 +46,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
 		var frag = util.template( template, binder, state, function(el,game,i) {
 			if( game.blinds == local['break'] ) {
-				$(el).addClass('break').click(function(){ 
+				$(el).addClass('break')[0].addEventListener( 'click', function(){ 
 					if (hasFocus) {
 						state.splice(i,1);
 						draw(); 
@@ -55,7 +55,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 							PokerRoom.endBreak(name);
 						}
 					}
-				});
+				}, true);
 			}
 		} );
 		element.appendChild( frag );
