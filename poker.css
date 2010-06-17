@@ -9,7 +9,7 @@ body {
 p {
 	margin-top: 1em;
 }
-h1 {
+h1, h2 {
 	margin-top: 1em;
 }
 #start {
@@ -23,6 +23,7 @@ fieldset {
 
 #game_list > li {
 	cursor: pointer;
+	list-style-type: none;
 }
 #game_list div.level:not(.current) {
 	display: none;
