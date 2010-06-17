@@ -12,15 +12,53 @@ p {
 h1, h2 {
 	margin-top: 1em;
 }
+input {
+	font-size: 100%;
+}
 #start {
-	padding:  0 5%;
+	padding:  0;
+	max-width: 760px;
+	margin: auto;
 	background-color: white;
 	z-index: 20;
+	font-size: 120%;
 }
 fieldset {
-	padding: 1em;
+	padding: 0;
 }
-
+#start fieldset div.title {
+	padding: 2%;
+	border-bottom: 1px solid silver;
+	margin-bottom: 1em;
+}
+#start fieldset div.title #new_game {
+	float: right;
+}
+#start fieldset div.time {
+	float: left;
+	width: 29%;
+	padding: 2% 2%
+}
+#start fieldset div.time input {
+	font-size: 300%;
+	padding: 10px;
+}
+#start fieldset div.blinds {
+	float: left;
+	width: 29%;
+	padding: 2% 2%
+}
+#start fieldset div.games {
+	float: left;
+	width: 29%;
+	padding: 2% 2%
+}
+#start textarea {
+	width: 92%;	
+	font-size: 100%;
+	line-height: 1.2;
+	padding: 10px;
+}
 #game_list > li {
 	cursor: pointer;
 	list-style-type: none;
