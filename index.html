@@ -18,19 +18,25 @@
 <body>
 <div id="start">
 	<h1>Tournament Poker Timer</h1>
-	<p>The tournament poker timer keeps track of blinds for poker tournaments. You can customize your blind levels, games, and time per blind below.</p>
-	<p>Games can easily be synchronized between different devices by clicking the game below.</p>
+	<p>A simple way to keep track of blinds for poker tournaments. Breaks can be added, and all aspects of the game are automatically synchronized over multiple devices.</p>
+	<p>To start a new game, customize your blind levels, games, and time per blind below, then hit start.</p>
+	
+	<p>To view an existing game, choose a game below.</p>
 	<h2 class="games">Pick A Game</h2>
 	<ul id="game_list" class="game_list"><li>Checking for games...</li></ul>
 	<h2>Make a New Game</h2>
 	<form action="" method="post">
 		<fieldset>
-			Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
-			<p>
-			Time: <input type="text" size="4" name="time" id="blind_time" value="10:00">
-			<p>
-			Blind Levels:<br>
-			<textarea class="blinds" id="blinds" name="blinds" rows="4" cols="20">25/50
+			<div class="title">
+				Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
+				<input type="submit" id="new_game" name="new_game" value="Start">
+			</div>
+			<div class="time">
+				Time: <input type="text" size="4" name="time" id="blind_time" value="10:00">
+			</div>
+			<div class="blinds">
+				Blind Levels:<br>
+				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
 25/50
 50/100
 75/150
@@ -46,12 +52,12 @@
 2000/4000
 3000/6000
 4000/8000</textarea>
-			<p>
-			Games:<br>
-			<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
+			</div>
+			<div class="games">
+				Games:<br>
+				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
 Omaha</textarea>
-			<p>
-			<input type="submit" name="new_game" value="Start">
+			</div>
 		</fieldset>
 	</form>
 </div>
