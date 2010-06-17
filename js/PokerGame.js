@@ -93,6 +93,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			while (milliseconds > blind.time) {
 				milliseconds -= blind.time;
 				blind.time = 0;
+				$('.time',element.childNodes[currentBlindIndex]).html(util.secondsToString(0));
 				currentBlindIndex += 1;
 				blind = state[currentBlindIndex];
 			}
