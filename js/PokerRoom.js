@@ -3,6 +3,7 @@ var FONT_SIZE = 75; //text size constant.
 var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
+		gameCount = 0,
 		timeOffset = 0,
 		bell,
 		listEl,
@@ -51,34 +52,40 @@ var PokerRoom = (function($) {
 	updateList = function( syncResult ) {
 		var serverGames = syncResult.games;
 		syncToken = syncResult.syncToken;
-		if (!serverGames.length) {
-			return;
-		}
-		for( var i=0,c=serverGames.length; i<c; i++ ) {
-			var game = serverGames[i];
-			if (games[game.name]) {
-				games[game.name].update( game );
-			} else {
-				that.add( game );
+		
+		if (serverGames.length) {
+	
+			for( var i=0,c=serverGames.length; i<c; i++ ) {
+				var game = serverGames[i];
+				if (games[game.name]) {
+					games[game.name].update( game );
+				} else {
+					that.add( game );
+				}
 			}
+	
+			var games_a = [];
+			for( var name in games ) {
+				games[name].wake();
+				games_a.push(games[name]);
+			}
+			var template = $('#templates li.game')[0];
+			var bindings = ['name', {key:'element',selector:'.state'}];
+			var frag = util.template( template, bindings, games_a, function(el, game) {
+				el.addEventListener( 'click', function(e){
+					that.showGame(game.name)
+					e.stopPropagation();
+				}, true);
+			});
+			listEl.innerHTML = '';
+			if (frag.childNodes.length) {
+				listEl.appendChild( frag );
+			}
+			that.resume();
 		}
-
-		var games_a = [];
-		for( var game in games ) {
-			games[game].wake();
-			games_a.push(games[game]);
+		if (!gameCount) {
+			listEl.innerHTML = '<li>No games in progress. You may start one below.</li>';		
 		}
-		var template = $('#templates li.game')[0];
-		var bindings = ['name', {key:'element',selector:'.state'}];
-		var frag = util.template( template, bindings, games_a, function(el, game) {
-			el.addEventListener( 'click', function(e){
-				that.showGame(game.name)
-				e.stopPropagation();
-			}, true);
-		});
-		listEl.innerHTML = '';
-		listEl.appendChild( frag );
-		that.resume();
 	},
 	updateGames = function( updates ) {
 		for( var name in updates ) {
@@ -87,7 +94,7 @@ var PokerRoom = (function($) {
 				games[name].update( update );
 			}
 		}
-	}
+	},
 	addBreak = function(next) {
 		games[currentGame].addBreak(next);
 	},
@@ -181,6 +188,7 @@ var PokerRoom = (function($) {
 				var o = blindTime;
 				if( o.state ) {
 					games[o.name] = new PokerGame( this, o );
+					gameCount++;
 					return o.name;
 				}
 				blindTime = o.blindTime;
@@ -213,13 +221,17 @@ var PokerRoom = (function($) {
 			}
 			
 			games[name] = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
-			
+			gameCount++;
 			return name;
 		},
 		removeGame: function(name) {
-			delete games[name];
-			if (name === currentGame || !games[currentGame]) {
-				updateList();
+			if (games[name]) {
+				gameCount--;
+				delete games[name];
+				if (name === currentGame || !games[currentGame]) {
+					currentGame = null;
+					updateList();
+				}
 			}
 		},
 		JSON: function() {
