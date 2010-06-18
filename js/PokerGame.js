@@ -139,16 +139,24 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
-			var height = currentLevelEl.offsetHeight,
+			
+			if (window.innerHeight > currentLevelEl.offsetHeight * 3) {
+				$(element).addClass('tall');
+			} else {
+				$(element).removeClass('tall');
+			}
+			
+			var height = currentLevelEl.offsetHeight;
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
 				levelTop = currentLevelEl.offsetTop,
-				top = -1*(levelTop-topOffset);
+				newTop = topOffset-levelTop;
+			
 			if( animate ) {
 				PokerRoom.movePanels( topOffset+height );
-				$(element).stop().animate({ 'top': top}, callback);
+				$(element).stop().animate({ 'top': newTop}, callback);
 			} else {
 				PokerRoom.movePanels( topOffset+height );
-				$(element).stop().css({ 'top': top }, callback);
+				$(element).stop().css({ 'top': newTop }, callback);
 			}
 		}
 	},

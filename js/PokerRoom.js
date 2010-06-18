@@ -132,10 +132,15 @@ var PokerRoom = (function($) {
 	};
 	
 	$(document).ready(function(){
-		$.get('php/time.php', {rand:Math.random()}, function(data) {
-			var serverTime = parseInt(data,10);
+		var rand = Math.random(), requestStartTime = new Date();
+		$.get('php/time.php', {rand:rand}, function(data) {
+			console.log(arguments);
+			var requestEndTime = new Date(),
+				requestTime = requestEndTime - requestStartTime,
+				serverTime = parseInt(data,10);
+			
 			if (serverTime) {
-				timeOffset = serverTime - Date.now();
+				timeOffset = serverTime - (requestTime/2);
 			}
 		});
 		bell = getElementById('bell');
