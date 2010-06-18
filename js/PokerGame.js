@@ -144,10 +144,10 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 				levelTop = currentLevelEl.offsetTop,
 				top = -1*(levelTop-topOffset);
 			if( animate ) {
-				PokerRoom.moveCurtains( topOffset+height );
+				PokerRoom.movePanels( topOffset+height );
 				$(element).stop().animate({ 'top': top}, callback);
 			} else {
-				PokerRoom.moveCurtains( topOffset+height );
+				PokerRoom.movePanels( topOffset+height );
 				$(element).stop().css({ 'top': top }, callback);
 			}
 		}
@@ -219,7 +219,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		},
 		blur: function() {
 			hasFocus = false;
-			PokerRoom.moveCurtains('auto');
+			PokerRoom.movePanels('auto');
 			window.removeEventListener( 'resize', resizeCallback, true );
 			return that;
 		},

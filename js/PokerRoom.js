@@ -8,8 +8,8 @@ var PokerRoom = (function($) {
 		bell,
 		listEl,
 		gameEl,
-		topCurtain,
-		bottomCurtain,
+		topPanel,
+		bottomPanel,
 		mute = true,
 		currentGame,
 		onBreak = false,
@@ -17,6 +17,7 @@ var PokerRoom = (function($) {
 		syncInProgress = false,
 		syncTimer = false,
 		syncSuspended = false,
+		curtain$,
 		syncToken = 0, //this is the syncToken for the game list
 		
 	sync = function() {
@@ -114,6 +115,7 @@ var PokerRoom = (function($) {
 		e.preventDefault();
 	},
 	showControls = function() {
+		curtain$.hide();
 		if (controlsTimeout) {
 			clearInterval(controlsTimeout);
 		}
@@ -124,7 +126,9 @@ var PokerRoom = (function($) {
 	},
 	hideControls = function() {
 		clearInterval(controlsTimeout);
-		$('.control').stop().animate({opacity:'0'}, 'slow');
+		$('.control').stop().animate({opacity:'0'}, 'slow', function() {
+			curtain$.show();
+		});
 	};
 	
 	$(document).ready(function(){
@@ -138,22 +142,31 @@ var PokerRoom = (function($) {
 		listEl = getElementById('game_list');
 		gameEl = getElementById('game');
 		
-		topCurtain = $('#curtains .top')[0];
-		bottomCurtain = $('#curtains .bottom')[0];
+		topPanel = $('#panels .top')[0];
+		bottomPanel = $('#panels .bottom')[0];
+		
+		curtain$ = $('#curtain').click( function(e) {
+			e.stopPropagation();
+			e.stopBubble = true;
+			showControls();
+		});
 		
 		$('#break_now')[0].addEventListener('click', function(e){
 			e.preventDefault();
 			addBreak(0);
-		}, true);
+		}, false);
 
 		
 		$('#break_next')[0].addEventListener( 'click', function(e){
 			e.preventDefault();
 			addBreak(1);
-		}, true);
+		}, false);
 		
+		hideControls();
 		document.addEventListener( 'keydown', keyControl, true );
-		document.addEventListener( 'mousemove', showControls, true );
+		if (!window.Touch) {
+			document.addEventListener( 'mousemove', showControls, true );
+		}
 	});
 	
 	var that = {
@@ -274,9 +287,9 @@ var PokerRoom = (function($) {
 			}
 			return that;
 		},
-		moveCurtains: function( place ) {
-			topCurtain.style.bottom = place+'px';
-			bottomCurtain.style.top = place+'px';
+		movePanels: function( place ) {
+			topPanel.style.bottom = place+'px';
+			bottomPanel.style.top = place+'px';
 			return that;
 		},
 		startBreak: function(game) {
