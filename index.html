@@ -31,9 +31,6 @@
 				Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 				<input type="submit" id="new_game" name="new_game" value="Start">
 			</div>
-			<div class="time">
-				Time: <input type="text" size="4" name="time" id="blind_time" value="10:00">
-			</div>
 			<div class="blinds">
 				Blind Levels:<br>
 				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
@@ -58,11 +55,15 @@
 				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
 Omaha</textarea>
 			</div>
+			<div class="time">
+				Time:<br>
+				<input type="text" size="4" name="time" id="blind_time" value="10:00">
+			</div>
 		</fieldset>
 	</form>
 </div>
 <div id="game">
-	<div id="curtains">
+	<div id="panels">
 		<div class="top">
 			<a id="break_now" href="#" class="control">B - Break Now</a>
 		</div>
@@ -70,6 +71,7 @@ Omaha</textarea>
 			<a id="break_next" href="#" class="control">N - Break Next</a>
 		</div>
 	</div>
+	<div id="curtain"></div>
 </div>
 <audio id="bell" autobuffer="true">
 	<source src="audio/Goblet_G_Medium.ogg" type="audio/ogg"/>
