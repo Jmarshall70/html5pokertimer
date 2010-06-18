@@ -41,17 +41,28 @@ var util = {
 		}
 		return frag;
 	},
-	randomWord: function(){
-		var consonants = 'bcdfghjklmnprstvwyz';
-		var vowels = 'aeiou';
-		var word = '';
-		var consonant_length = consonants.length;
-		var vowel_length = vowels.length;
-		for( var i = 0; i < 4; i++ ) {
-			word += consonants.charAt( Math.floor(Math.random() * consonant_length ) );
-			word += vowels.charAt( Math.floor(Math.random() * vowel_length ) )
+	randomWord: function() {
+		var firstConsonants = [ 'b',  'c',  'd',  'g',  'h',  'j',  'k',  'l',  
+								'm',  'n',  'p',  'r',  's',  't',  'v',  'y',  'z',
+						 	   'br', 'ch', 'pr', 'gr', 'cr', 'fr', 'fl', 'pl', 'dr', 
+						 	   'th', 'sh', 'sw', 'st'],
+			
+			consonants = ['b','c','d','f','g','j','k','l','m','n','p','r','s','t','v','y'],
+			vowels = ['a','e','i','o','u', 'o'],
+			firstConsonantLength = firstConsonants.length
+			consonantLength = consonants.length,
+			vowelLength = vowels.length;
+		
+		return function(){
+			var word = '';
+			word += firstConsonants[Math.floor(Math.random() * firstConsonantLength )];
+			word += vowels[Math.floor(Math.random() * vowelLength )];
+			for( var i = 0; i < 2; i++ ) {
+				word += consonants[Math.floor(Math.random() * consonantLength )];
+				word += vowels[Math.floor(Math.random() * vowelLength )];
+			}
+			return word;
 		}
-		return word;
 	},
 	formValue: function( s ) {
 		var s_dom = getElementById(s);

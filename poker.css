@@ -71,46 +71,85 @@ fieldset {
 	display: inline;
 }
 #game {
-	position: relative;
 	background-color: black;
 	font-size: 100px;
-	line-height: 1.2;
+	line-height: 1;
 	position: absolute;
-	top: 0px;
-	left: 0px;
-	bottom: 0px;
-	right: 0px;
-	width: 100%;
-	overflow: hidden;
-	min-height: 320px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 	display: none;
+	overflow: hidden;
 }
 #game .poker-game {
 	position: absolute;
-	width: 100%;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
-#game .game, #game .time {
+#game .poker-game .level .game, #game .poker-game .level .time {
 	font-size: 80%;
 }
-#game .level {
-	line-height: 1.2;
+#game .poker-game .level {
 	position: relative;
 	text-align: left;
 	background-color: black;
 	color: white;
 }
-#game .level.break {
+#game .poker-game .level.break {
 	cursor: pointer;
 }
-#game .level.current {
+#game .poker-game .time {
+	position: absolute;
+	left: .125em;
+	top: .125em;
+}
+#game .poker-game .blinds {
+	font-size: 190%;
+	height: 1em;
+	margin: 0;
+	text-align: right;
+}
+#game .poker-game .game {
+	position: absolute;
+	left: .125em;
+	bottom: .25em;
+	white-space: nowrap;
+}
+#game .poker-game .level.current {
 	color: white;
 }
-#game .level.previous.played {
+#game .poker-game .level.previous.played {
 	color: white;
 }
-#game .level.played {
+#game .poker-game .level.played {
 	color: #777;
 }
+#game .poker-game.tall .level.current {
+	font-size: 145%;
+}
+#game .poker-game.tall .level.current .time {
+	position: static;
+	float: left;
+	width: 33%;
+	text-align: center;	
+	font-size: 100%;
+}
+#game .poker-game.tall .level.current .game {
+	position: static;
+	width: 66%;
+	float: left;
+	text-align: center;
+	font-size: 100%;
+}
+#game .poker-game.tall .level.current .blinds {
+	text-align: center;
+	clear: both;
+}
+
+
 #panels > div {
 	position: absolute;
 	left: 0px;
@@ -154,32 +193,6 @@ fieldset {
 	bottom: 0;
 	left: 0;
 	z-index: 10000;
-}
-#game .time {
-	position: absolute;
-	left: .125em;
-	top: .125em;
-}
-#game .blinds {
-	font-size: 190%;
-	line-height: 1;
-	height: 1em;
-	margin: 0;
-	text-align: right;
-}
-#game .game {
-	position: absolute;
-	left: .125em;
-	bottom: .25em;
-	height: 1em;
-	white-space: nowrap;
-}
-input.time {
-	font-size: inherit;
-	font-family: inherit;
-	border: 0;
-	width: 100%;
-	height: 100%;
 }
 audio {
 	display: none;
