@@ -90,6 +90,9 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			if( state[i].time ) {
 				currentBlindIndex = i;
 				break;
+			} else {
+				var iElement = $(element.childNodes[i]).addClass('played')[0]
+				$('.time',iElement).html(util.secondsToString(0));
 			}
 		}
 		if( currentBlindIndex === -1 ) {
