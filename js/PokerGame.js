@@ -1,4 +1,8 @@
-var PokerGame = (function($, window) { return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
+var PokerGame = (function($, window) { 
+	
+var SIZE_CONSTANT = 16; //text size constant.
+
+return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
 		syncToken = state.syncToken;
@@ -32,6 +36,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 		previousDimmerTimer,	
 		currentBlindIndex = -1,
 		blindTimeRemaining = 0,
+		defaultLevelHeight,
 	
 	count = function() {
 		if (!countInterval) {
@@ -59,6 +64,8 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 			}
 		} );
 		element.appendChild( frag );
+		currentBlindIndex = -1;
+		currentLevelEl = null;
 		update();
 	},
 	update = function() {
@@ -104,8 +111,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 					previousDimmerTimer = setTimeout( function() {
 						previousLevel$.removeClass('previous');
 					}, 90 * 1000);
-				} else {
-					currentLevelEl = element.childNodes[currentBlindIndex];
 				}
 				
 				if (state[previousBlindIndex] && state[previousBlindIndex].blinds == local['break'] ) {
@@ -121,7 +126,7 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 					// the game is over.
 					that.remove();
 				}
-								
+				console.log( 'rescroll' );
 				updateScroll( true, function(){ding();} );
 			} else if (!currentLevelEl) {
 				currentLevelEl = element.childNodes[currentBlindIndex];
@@ -140,12 +145,6 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
 			
-			if (window.innerHeight > currentLevelEl.offsetHeight * 3) {
-				$(element).addClass('tall');
-			} else {
-				$(element).removeClass('tall');
-			}
-			
 			var height = currentLevelEl.offsetHeight;
 				topOffset = Math.floor( window.innerHeight/2 - height/2),
 				levelTop = currentLevelEl.offsetTop,
@@ -163,9 +162,17 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	resize = function() {
 		if( hasFocus ) {
 			var width = element.offsetWidth;
-			var fontSize = ( width / 1000 ) * FONT_SIZE;
+			var fontSize = width / SIZE_CONSTANT;
+			console.log( fontSize );
 			$(element).parent().css({'font-size':fontSize});
 			var third_height = Math.floor( element.innerHeight/3 );
+			
+			if (window.innerHeight > (currentLevelEl.nextSibling||currentLevelEl.previousSibling).offsetHeight * 3) {
+				$(element).addClass('tall');
+			} else {
+				$(element).removeClass('tall');
+			}
+			
 			updateScroll(false);
 		} else {
 			console.log( 'not resizing -- no focus' );
@@ -176,6 +183,8 @@ var PokerGame = (function($, window) { return function PokerGame (PokerRoom, sta
 	},
 	addBreak = function( next ){
 		var index = currentBlindIndex + next;
+		//currentLevelEl = null;
+		//currentLevelIndex = -1;
 		state.splice(index, 0, {blinds:local['break'], game:local.clickToRemove, time:breakLength});
 		draw();
 		save();

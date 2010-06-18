@@ -1,5 +1,3 @@
-var FONT_SIZE = 75; //text size constant.
-
 var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
