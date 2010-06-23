@@ -1,4 +1,4 @@
-var util = {
+var util = (function($) { return {
 	template: function(template, bindings, items, callback) {
 		if (typeof template === 'string') {
 			template = getElementById(template)
@@ -43,9 +43,9 @@ var util = {
 	},
 	randomWord: function() {
 		var firstConsonants = [ 'b',  'c',  'd',  'g',  'h',  'j',  'k',  'l',  
-								'm',  'n',  'p',  'r',  's',  't',  'v',  'y',  'z',
-						 	   'br', 'ch', 'pr', 'gr', 'cr', 'fr', 'fl', 'pl', 'dr', 
-						 	   'th', 'sh', 'sw', 'st'],
+								'm',  'n',  'p',  'r',  's',  't',  'z',
+						 	   'br', 'ch', 'pr', 'gr', 'cr', 'fr', 'fl', 'pl', 
+						 	   'dr', 'th', 'sh', 'sw', 'st'],
 			
 			consonants = ['b','c','d','f','g','j','k','l','m','n','p','r','s','t','v','y'],
 			vowels = ['a','e','i','o','u', 'o'],
@@ -100,7 +100,7 @@ var util = {
 	
 		return num;
 	}
-};
+}})(jQuery);
 
 function getElementById( id ) {
 	return document.getElementById(id);
