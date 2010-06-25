@@ -1,4 +1,4 @@
-var PokerGame = (function($, window) { 
+var PokerGame = (function($, util) { 
 	
 var SIZE_CONSTANT = 16; //text size constant.
 
@@ -280,4 +280,4 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	
 	return that;
 }
-})(jQuery, window)
+})(jQuery, util)
