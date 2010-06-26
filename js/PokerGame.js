@@ -208,8 +208,14 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					}
 				});
 			} else if (updateData.syncToken && updateData.syncToken > syncToken) {
-				state = updateData.game.state;
-				lastUpdate = updateData.game.lastUpdate;
+				console.log( updateData );
+				if (updateData.game) {
+					state = updateData.game.state;
+					lastUpdate = updateData.game.lastUpdate;
+				} else {
+					state = updateData.state;
+					lastUpdate = updateData.lastUpdate;
+				}
 				syncToken = updateData.syncToken;
 				draw();
 				ding();
