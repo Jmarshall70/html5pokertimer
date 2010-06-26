@@ -92,11 +92,11 @@ var util = (function($) { return {
 			while (num.length < totalChars) {
 				num = padWith + num;
 			}
-		} else {}
+		}
 	
 		if (num.length > totalChars) { //if padWith was a multiple character string and num was overpadded
 			num = num.substring((num.length - totalChars), totalChars);
-		} else {}
+		}
 	
 		return num;
 	}

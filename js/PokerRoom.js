@@ -32,15 +32,6 @@ var PokerRoom = (function($) {
 				syncInProgress = false;
 			})
 		} else {
-			var syncGames = {};
-			for (var name in games) {
-				if (games[name].name ) {
-					var gameSyncToken = games[name].syncToken;
-					if (gameSyncToken && name) {
-						syncGames[name] = gameSyncToken;
-					}
-				}
-			}
 			$.post('php/games.php', {method:'sync', syncToken:syncToken, rand:Math.random()}, function(updates) {
 				updateList( JSON.parse(updates) );
 				syncTimer = setTimeout( function(){ sync() }, 5000 );
@@ -62,6 +53,7 @@ var PokerRoom = (function($) {
 					that.add( game );
 				}
 			}
+			that.save();
 	
 			var games_a = [];
 			for( var name in games ) {
@@ -127,12 +119,19 @@ var PokerRoom = (function($) {
 		$('.control').stop().animate({opacity:'0'}, 'slow', function() {
 			curtain$.show();
 		});
-	};
+	},
+	loadLocalGames = function() {
+		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
+		for (var i=0,c=games_a.length; i < c; i++) {
+			that.add( games_a[i] );
+		}
+		that.save();
+	}
+	;
 	
 	$(document).ready(function(){
 		var rand = Math.random(), requestStartTime = new Date();
 		$.get('php/time.php', {rand:rand}, function(data) {
-			console.log(arguments);
 			var requestEndTime = new Date(),
 				requestTime = requestEndTime - requestStartTime,
 				serverTime = parseInt(data,10);
@@ -154,6 +153,7 @@ var PokerRoom = (function($) {
 			showControls();
 		});
 		
+		
 		$('#break_now')[0].addEventListener('click', function(e){
 			e.preventDefault();
 			addBreak(0);
@@ -165,6 +165,9 @@ var PokerRoom = (function($) {
 			addBreak(1);
 		}, false);
 		
+		$('.toolbar .sync')[0].addEventListener( 'click', function() {
+			that.syncGame();
+		}, false );
 		hideControls();
 		document.addEventListener( 'keydown', keyControl, true );
 		if (!window.Touch) {
@@ -190,7 +193,9 @@ var PokerRoom = (function($) {
 		},
 		start: function() {
 			syncSuspended = false;
+			loadLocalGames();
 			sync();
+			that.save();
 			return that;
 		},
 		resume: function() {
@@ -249,9 +254,21 @@ var PokerRoom = (function($) {
 					updateList();
 				}
 			}
+			return that;
 		},
-		JSON: function() {
-			return games.toString();
+		save: function() {
+			localStorage.setItem('PokerGames', JSON.stringify( that.toArray() ) );
+			return that;
+		},
+		toArray: function() {
+			var games_a = [];
+			console.log(games);
+			for (name in games) {
+				games_a.push( games[name] );
+				console.log(games[name]);
+			}
+			console.log( games_a );
+			return games_a
 		},
 		list: function() {
 			return games;
@@ -300,16 +317,23 @@ var PokerRoom = (function($) {
 				onBreak = true;
 			}
 			hideControls();
+			that.save();
 			return that;
 		},
 		endBreak: function(game) {
 			if (game === currentGame) {
 				onBreak = false;
 			}
+			that.save();
 			return that;
+		},
+		syncGame: function() {
+			if (currentGame && games[currentGame]) {
+				games[currentGame].sync();
+			}
+			that.save();
 		}
-	};
-	
+	};	
 	return that;
 
 })(jQuery);
