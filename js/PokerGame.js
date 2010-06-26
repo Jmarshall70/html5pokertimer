@@ -129,7 +129,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					// the game is over.
 					that.remove();
 				}
-				console.log( 'rescroll' );
 				updateScroll( true, function(){ding();} );
 			} else if (!currentLevelEl) {
 				currentLevelEl = element.childNodes[currentBlindIndex];
@@ -143,7 +142,10 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		PokerRoom.ding(that);
 	},
 	save = function() {
-		$.post('php/games.php', {method:'save',game:that.toString()}, function(data){syncToken=data;});
+		PokerRoom.save();
+		if (syncToken) {
+			$.post('php/games.php', {method:'save',game:that.toString()}, function(data){syncToken=data;});
+		}
 	},
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
@@ -166,7 +168,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		if( hasFocus ) {
 			var width = element.offsetWidth;
 			var fontSize = width / SIZE_CONSTANT;
-			console.log( fontSize );
 			$(element).parent().css({'font-size':fontSize});
 			var third_height = Math.floor( element.innerHeight/3 );
 			
@@ -202,6 +203,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 						syncToken = data.syncToken;
 						lastUpdate = data.lastUpdate;
 						state = data.state;
+						save();
 						draw();
 					}
 				});
@@ -251,7 +253,8 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				lastUpdate: lastUpdate,
 				breakLength: breakLength,
 				name: name,
-				state: state
+				state: state,
+				syncToken: syncToken
 			};
 		},
 		resize: function(animate) {
@@ -265,6 +268,10 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		addBreak: function(next){
 			addBreak(next);
 			return that;
+		},
+		sync: function(){
+			syncToken = true;
+			save();
 		}
 	};
 	that.__defineGetter__( 'syncToken', function(){return syncToken} );
@@ -273,10 +280,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	that.__defineGetter__( 'hasFocus', function(){return hasFocus} );
 	
 	draw();
-	
-	if (!syncToken) {
-		save();
-	}
 	
 	return that;
 }

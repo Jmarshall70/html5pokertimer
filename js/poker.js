@@ -22,6 +22,7 @@ function post_game( e ) {
 		'name': getElementById('new_game_title').value
 	};
 	var name = PokerRoom.add( newGame );
+	PokerRoom.save();
 	PokerRoom.showGame(name);
 }
 

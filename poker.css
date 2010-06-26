@@ -150,7 +150,7 @@ fieldset {
 }
 
 
-#panels > div {
+#panels > div.curtain {
 	position: absolute;
 	left: 0px;
 	right: 0px;
@@ -158,21 +158,22 @@ fieldset {
 	background-color: rgba(0,0,0,0.7);
 	z-index: 10;
 }
-#panels > div.top {
+#panels > div.top.curtain {
 	top: 0px;
 	background-color: rgba(0,0,0,0.4);
 }
-#panels > div.bottom {
+#panels > div.bottom.curtain {
 	bottom: 0px;
 }
-#panels > div > a {
+#panels > div.curtain > a {
 	position: absolute;
-	left: 5%;
-	right: 5%;
-	font-size: 1.25em;
+	left: 3em;
+	right: 3em;
+	font-size: 1em;
+	line-height: 1;
 	text-align: center;
 	background-color: white;
-	padding: 0.25em;
+	padding: 0.5em;
 	opacity: 0.8;
 	text-decoration: none;
 	color: black;
@@ -180,11 +181,28 @@ fieldset {
 	-moz-border-radius: 1em;
 	max-height: 50%;
 }
-#panels > div.top > a {
-	bottom: 0px;
+#panels > div.top.curtain > a {
+	bottom: 0.15em;
 }
-#panels > div.bottom > a {
-	top: 0px;
+#panels > div.bottom.curtain > a {
+	top: 0.15em;
+}
+#panels div.top.curtain div.toolbar {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	text-align: right;
+}
+#panels div.toolbar a {
+	display: block;
+	width: 5.4em;
+	height: 5.4em;
+	margin: 0 1em 1em 0;
+	background-color: #ccc;
+	border: 0.1em solid #999;
+	-webkit-border-radius: 1em;
+	-moz-border-radius: 1em;
+	font-size: 25%;
 }
 #curtain {
 	position: fixed;
