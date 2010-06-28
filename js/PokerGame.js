@@ -97,6 +97,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		}
 		if( currentBlindIndex === -1 ) {
 			that.remove();
+			that = null;
 		} else {
 			blind = state[currentBlindIndex];
 			
@@ -106,6 +107,11 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				var iElement = $(element.childNodes[currentBlindIndex]).addClass('played')[0]
 				$('.time',iElement).html(util.secondsToString(0));
 				currentBlindIndex += 1;
+				if (currentBlindIndex == state.length) {
+					that.remove();
+					that = null;
+					return;
+				}
 				blind = state[currentBlindIndex];
 			}
 			if (previousBlindIndex != currentBlindIndex) {

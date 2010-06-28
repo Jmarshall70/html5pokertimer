@@ -1,7 +1,6 @@
 var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
-		gameCount = 0,
 		timeOffset = 0,
 		bell,
 		listEl,
@@ -73,9 +72,8 @@ var PokerRoom = (function($) {
 				listEl.appendChild( frag );
 			}
 			that.resume();
-		}
-		if (!gameCount) {
-			listEl.innerHTML = '<li>No games in progress. You may start one below.</li>';		
+		} else {
+			$(listEl).append('<li>No shared games in progress.</li>');		
 		}
 	},
 	updateGames = function( updates ) {
@@ -123,7 +121,9 @@ var PokerRoom = (function($) {
 	loadLocalGames = function() {
 		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
 		for (var i=0,c=games_a.length; i < c; i++) {
-			that.add( games_a[i] );
+			if (games_a[i].state) {
+				that.add( games_a[i] );
+			}
 		}
 		that.save();
 	}
@@ -209,7 +209,6 @@ var PokerRoom = (function($) {
 				var o = blindTime;
 				if( o.state ) {
 					games[o.name] = new PokerGame( this, o );
-					gameCount++;
 					return o.name;
 				}
 				blindTime = o.blindTime;
@@ -231,6 +230,7 @@ var PokerRoom = (function($) {
 			if (!breakLength) {
 				breakLength = blindTime;
 			}
+			console.log(arguments);
 			var gamesLength = p_games.length;
 			var state = [];
 			for (var i=0,c=blinds.length; i<c; i++ ) {
@@ -240,34 +240,38 @@ var PokerRoom = (function($) {
 			if (!name) {
 				name = util.randomWord();
 			}
-			
-			games[name] = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
-			gameCount++;
-			return name;
+			var newGame = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
+			if (!newGame) {
+				return false;
+			} else {
+				games[name] = newGame;
+				return name;
+			}
 		},
 		removeGame: function(name) {
+			console.log( 'removing '+name );
 			if (games[name]) {
-				gameCount--;
 				delete games[name];
 				if (name === currentGame || !games[currentGame]) {
 					currentGame = null;
 					updateList();
 				}
 			}
+			that.save();
 			return that;
 		},
 		save: function() {
+			console.log( 'saving' );
+			console.log( that.toArray() );
 			localStorage.setItem('PokerGames', JSON.stringify( that.toArray() ) );
+			console.log( 'saved');
 			return that;
 		},
 		toArray: function() {
 			var games_a = [];
-			console.log(games);
 			for (name in games) {
 				games_a.push( games[name] );
-				console.log(games[name]);
 			}
-			console.log( games_a );
 			return games_a
 		},
 		list: function() {
