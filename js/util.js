@@ -113,3 +113,11 @@ function createElement( type, className ) {
 	}
 	return e;
 }
+
+if (!console) {
+	var console = {
+		log: function(){},
+		dir: function(){},
+		error: function(){}
+	};
+}
