@@ -319,6 +319,9 @@ var PokerRoom = (function($) {
 						currentGame = game
 						gameEl.appendChild( games[game].element );
 						games[game].focus();
+						if (!games[game].syncToken) {
+							that.suspend();
+						}
 						hideControls();
 					} else {
 						$(games[game]).remove();
@@ -351,10 +354,11 @@ var PokerRoom = (function($) {
 			return that;
 		},
 		syncGame: function() {
-			if (currentGame && games[currentGame]) {
-				games[currentGame].sync();
+			var game = games[currentGame];
+			if (game && !game.syncToken) {
+				game.sync();
 			}
-			that.save();
+			return that;
 		}
 	};	
 	return that;
