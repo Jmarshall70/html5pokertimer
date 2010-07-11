@@ -1,9 +1,11 @@
 $(document).ready(function() {
 	
 	$('#new_game_title').val( util.randomWord() );
+	$('#show_advanced').bind( 'click', function(){ $('form .advanced').show(); $('form .no-advanced').hide(); });
+	$('#hide_advanced').bind( 'click', function(){ $('form .advanced').hide(); $('form .no-advanced').show(); }).click();
 	PokerRoom.start();
 	//$('#asdf').click( post_game );
-	$('form').bind( 'submit', post_game )
+	$('form').bind( 'submit', post_game );
 
 
 });
