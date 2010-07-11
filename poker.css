@@ -193,16 +193,34 @@ fieldset {
 	right: 0;
 	text-align: right;
 }
-#panels div.toolbar a {
+#panels div.toolbar a.button {
 	display: block;
-	width: 5.4em;
-	height: 5.4em;
-	margin: 0 1em 1em 0;
-	background-color: #ccc;
-	border: 0.1em solid #999;
-	-webkit-border-radius: 1em;
-	-moz-border-radius: 1em;
+	width: 6.5em;
+	height: 6.5em;
 	font-size: 25%;
+}
+.button {
+	background-image: url(images/button-background.png);
+	background-size: 200% 100%;
+	text-decoration: none;
+}
+.button:hover {
+	background-position-x: 100%;
+}
+
+.button span {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	color: transparent;
+	background-image: url(images/buttons-sprite.png);
+	background-size: 200% 400%;
+}
+
+.button.sync span {
+	background-position-y: 200%;
 }
 #curtain {
 	position: fixed;
