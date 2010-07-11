@@ -3,7 +3,8 @@ var PokerRoom = (function($) {
 	var games = {},
 		timeOffset = 0,
 		bell,
-		listEl,
+		sharedListEl,
+		localListEl,
 		gameEl,
 		topPanel,
 		bottomPanel,
@@ -43,7 +44,7 @@ var PokerRoom = (function($) {
 		syncToken = syncResult.syncToken;
 		
 		if (serverGames.length) {
-	
+			
 			for( var i=0,c=serverGames.length; i<c; i++ ) {
 				var game = serverGames[i];
 				if (games[game.name]) {
@@ -53,28 +54,48 @@ var PokerRoom = (function($) {
 				}
 			}
 			that.save();
-	
-			var games_a = [];
-			for( var name in games ) {
-				games[name].wake();
-				games_a.push(games[name]);
-			}
-			var template = $('#templates li.game')[0];
-			var bindings = ['name', {key:'element',selector:'.state'}];
-			var frag = util.template( template, bindings, games_a, function(el, game) {
-				el.addEventListener( 'click', function(e){
-					that.showGame(game.name)
-					e.stopPropagation();
-				}, true);
-			});
-			listEl.innerHTML = '';
-			if (frag.childNodes.length) {
-				listEl.appendChild( frag );
-			}
-			that.resume();
 		} else {
-			$(listEl).append('<li>No shared games in progress.</li>');		
+			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
 		}
+		
+		var sharedGames_a = [], localGames_a = [];
+		for( var name in games ) {
+			if (games.hasOwnProperty(name)) {
+				games[name].wake();
+				if (games[name].syncToken) {
+					sharedGames_a.push(games[name]);
+				} else {
+					localGames_a.push(games[name]);
+				}
+			}
+		}
+		var template = $('#templates li.game')[0];
+		var bindings = ['name', {key:'element',selector:'.state'}];
+		var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
+			el.addEventListener( 'click', function(e){
+				that.showGame(game.name)
+				e.stopPropagation();
+			}, true);
+		});
+		sharedListEl.innerHTML = '';
+		if (sharedFrag.childNodes.length) {
+			sharedListEl.appendChild( sharedFrag );
+		}
+		
+		var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
+			el.addEventListener( 'click', function(e){
+				that.showGame(game.name)
+				e.stopPropagation();
+			}, true);
+		});
+		if (localFrag.childNodes.length) {
+			localListEl.innerHTML = '';
+			localListEl.appendChild( localFrag );
+		} else {
+			localListEl.innerHTML = '<li>No games in progress.</li>';
+		}
+		
+		that.resume();
 	},
 	updateGames = function( updates ) {
 		for( var name in updates ) {
@@ -141,7 +162,8 @@ var PokerRoom = (function($) {
 			}
 		});
 		bell = getElementById('bell');
-		listEl = getElementById('game_list');
+		sharedListEl = getElementById('shared_games');
+		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
 		
 		topPanel = $('#panels .top')[0];
@@ -261,10 +283,7 @@ var PokerRoom = (function($) {
 			return that;
 		},
 		save: function() {
-			console.log( 'saving' );
-			console.log( that.toArray() );
 			localStorage.setItem('PokerGames', JSON.stringify( that.toArray() ) );
-			console.log( 'saved');
 			return that;
 		},
 		toArray: function() {

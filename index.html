@@ -20,16 +20,20 @@
 	<p>To start a new game, customize your blind levels, games, and time per blind below, then hit start.</p>
 	
 	<p>To view an existing game, choose a game below.</p>
-	<h2 class="games">Pick A Game</h2>
-	<ul id="game_list" class="game_list"><li>Checking for games...</li></ul>
 	<h2>Make a New Game</h2>
 	<form action="" method="post">
 		<fieldset>
-			<div class="title">
+			<div class="title simple">
 				Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 				<input type="submit" id="new_game" name="new_game" value="Start">
 			</div>
-			<div class="blinds">
+			<div class="no-advanced">
+				<a href="#" id="show_advanced">Show advanced controls</a>
+			</div>
+			<div class="advanced">
+				<a href="#" id="hide_advanced">Hide advanced controls</a>
+			</div>
+			<div class="blinds advanced">
 				Blind Levels:<br>
 				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
 25/50
@@ -48,17 +52,22 @@
 3000/6000
 4000/8000</textarea>
 			</div>
-			<div class="games">
+			<div class="games advanced">
 				Games:<br>
 				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
 Omaha</textarea>
 			</div>
-			<div class="time">
+			<div class="time advanced">
 				Time:<br>
 				<input type="text" size="4" name="time" id="blind_time" value="10:00">
 			</div>
 		</fieldset>
 	</form>
+	<h2 class="games">Watch A Game</h2>
+	<h3>Local Games</h3>
+	<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
+	<h3>Shared Games</h3>
+	<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
 </div>
 <div id="game">
 	<div id="panels">

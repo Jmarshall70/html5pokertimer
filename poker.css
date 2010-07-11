@@ -32,7 +32,7 @@ fieldset {
 	margin-bottom: 1em;
 }
 #start fieldset div.title #new_game {
-	float: right;
+/* 	float: right; */
 }
 #start fieldset div.time {
 	float: left;
@@ -60,14 +60,14 @@ fieldset {
 	line-height: 1.2;
 	padding: 10px;
 }
-#game_list > li {
+.game_list > li {
 	cursor: pointer;
 	list-style-type: none;
 }
-#game_list div.level:not(.current) {
+.game_list div.level:not(.current) {
 	display: none;
 }
-#game_list div {
+.game_list div {
 	display: inline;
 }
 #game {
@@ -202,10 +202,11 @@ fieldset {
 .button {
 	background-image: url(images/button-background.png);
 	background-size: 200% 100%;
+	-moz-background-size: 200% 100%;
 	text-decoration: none;
 }
 .button:hover {
-	background-position-x: 100%;
+	background-position: 100% 0;
 }
 
 .button span {
@@ -217,10 +218,11 @@ fieldset {
 	color: transparent;
 	background-image: url(images/buttons-sprite.png);
 	background-size: 200% 400%;
+	-moz-background-size: 200% 400%;
 }
 
 .button.sync span {
-	background-position-y: 200%;
+	background-position: 0 200%;
 }
 #curtain {
 	position: fixed;
