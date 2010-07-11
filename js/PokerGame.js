@@ -150,7 +150,10 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	save = function() {
 		PokerRoom.save();
 		if (syncToken) {
-			$.post('php/games.php', {method:'save',game:that.toString()}, function(data){syncToken=data;});
+			$.post('php/games.php', {method:'save',game:that.toString()}, function(data){
+				syncToken=data;
+				PokerRoom.resume().save();
+			});
 		}
 	},
 	updateScroll = function( animate, callback ) {
