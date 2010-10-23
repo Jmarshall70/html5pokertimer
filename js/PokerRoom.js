@@ -154,11 +154,11 @@ var PokerRoom = (function($) {
 		var rand = Math.random(), requestStartTime = new Date();
 		$.get('php/time.php', {rand:rand}, function(data) {
 			var requestEndTime = new Date(),
-				requestTime = requestEndTime - requestStartTime,
-				serverTime = parseInt(data,10);
+			requestTime = requestEndTime - requestStartTime,
+			serverTime = parseInt(data,10);
 			
 			if (serverTime) {
-				timeOffset = serverTime - (requestTime/2);
+				timeOffset = serverTime - requestStartTime; //(requestTime/2);
 			}
 		});
 		bell = getElementById('bell');
@@ -315,7 +315,7 @@ var PokerRoom = (function($) {
 				$('#start').hide();
 				$(gameEl).show();
 				for( var game in games ) {
-					if( game == name ) {
+					if( game === name ) {
 						currentGame = game
 						gameEl.appendChild( games[game].element );
 						games[game].focus();
@@ -323,7 +323,7 @@ var PokerRoom = (function($) {
 							that.suspend();
 						}
 						hideControls();
-					} else {
+					} else if (games[game]) {
 						$(games[game]).remove();
 						games[game].sleep().blur();
 					}
