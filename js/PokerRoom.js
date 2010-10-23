@@ -315,17 +315,19 @@ var PokerRoom = (function($) {
 				$('#start').hide();
 				$(gameEl).show();
 				for( var game in games ) {
-					if( game === name ) {
-						currentGame = game
-						gameEl.appendChild( games[game].element );
-						games[game].focus();
-						if (!games[game].syncToken) {
-							that.suspend();
+					if (games.hasOwnProperty(game)) {
+						if( game === name ) {
+							currentGame = game
+							gameEl.appendChild( games[game].element );
+							games[game].focus();
+							if (!games[game].syncToken) {
+								that.suspend();
+							}
+							hideControls();
+						} else if (games[game]) {
+							$(games[game]).remove();
+							games[game].sleep().blur();
 						}
-						hideControls();
-					} else if (games[game]) {
-						$(games[game]).remove();
-						games[game].sleep().blur();
 					}
 				}
 			} else {
