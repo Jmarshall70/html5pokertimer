@@ -228,7 +228,7 @@ a.button:active {
 	bottom: 1em;
 	color: transparent;
 	background-image: url(images/buttons-sprite.png);
-	background-size: 200% 400%;
+	background-size: 200% 500%;
 	-moz-background-size: 200% 500%;
 }
 
