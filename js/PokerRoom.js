@@ -27,7 +27,7 @@ var PokerRoom = (function($) {
 			if(updates.syncToken) {
 				updateList( updates );
 			}
-			syncTimer = setTimeout( function(){ sync() }, 5000 );
+			syncTimer = setTimeout( function(){ sync() }, 60000 );
 			syncInProgress = false;
 		})
 	},
