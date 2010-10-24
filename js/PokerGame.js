@@ -192,7 +192,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					if (updates[name]) {
 						game.update( updates[name] );
 					}
-					syncTimer = setTimeout( function(){ run() }, 5000 );
+					syncTimer = setTimeout( function(){ run() }, 30000 );
 				}
 			})
 		
@@ -214,8 +214,12 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				syncTimer = null;
 				syncToken = null;
 			},
-			toggle: function() {
-				
+			run: function() {
+				if (!syncTimer) {
+					sync.start();
+				} else {
+					run();
+				}
 			}
 		}
 		return sync
@@ -369,7 +373,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			
 			$('#toolbar a.sync').bind('click', function(e) {
 				e.preventDefault();
-				sync.start();
+				sync.run();
 			});
 			$('#toolbar a.advance').bind('click', function(e) {
 				e.preventDefault();
