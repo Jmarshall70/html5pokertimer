@@ -1,7 +1,47 @@
 var PokerGame = (function($, util) { 
 	
-var SIZE_CONSTANT = 16; //text size constant.
-
+var SIZE_CONSTANT = 16, //text size constant.
+bell = (function() {
+	var mute = false,
+	element = null,
+	events = new util.Events(['mute', 'unmute', 'ding']);
+	
+	$(document).ready(function() {
+		element = document.getElementById('bell');
+		toggleElement = $('#toolbar a.bell').bind('click', function() {
+			bell.toggle();
+		});
+	});
+	
+	var bell = {
+		ding: function() {
+			if (!mute && element && element.play) {
+				element.play();
+			}
+			events.trigger('ding');
+		},
+		mute: function() {
+			$(document.body).addClass('mute');
+			mute = true;
+			events.trigger('mute');
+		},
+		unmute: function() {
+			$(document.body).removeClass('mute');
+			mute = false;
+			events.trigger('unmute');
+		},
+		toggle: function() {
+			if(mute) {
+				bell.unmute();
+			} else {
+				bell.mute();
+			}
+		},
+		events: events
+	};
+	
+	return bell;
+})()
 return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
 	
 	if ( !$.isArray(state) && typeof state === 'object') {
@@ -30,13 +70,15 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		// if the game is already on the second level the first one will be zero.
 	}
 	var countInterval,
-		element = createElement('div', 'poker-game'),
-		currentLevelEl = null,
-		hasFocus = false,
-		previousDimmerTimer,	
-		currentBlindIndex = -1,
-		blindTimeRemaining = 0,
-		defaultLevelHeight,
+	element = createElement('div', 'poker-game'),
+	currentLevelEl = null,
+	hasFocus = false,
+	previousDimmerTimer,	
+	currentBlindIndex = -1,
+	blindTimeRemaining = 0,
+	defaultLevelHeight,
+	onBreak = false,
+	curtain$,
 	
 	count = function() {
 		if (!countInterval) {
@@ -50,18 +92,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		var template = $('#templates .level')[0];
 		var binder = [ 'blinds', 'game', {selector:'.time', key:'time', fn:util.secondsToString} ];
 		var frag = util.template( template, binder, state, function(el,game,i) {
-			if( game.blinds == local['break'] ) {
-				$(el).addClass('break')[0].addEventListener( 'click', function(){ 
-					if (hasFocus) {
-						state.splice(i,1);
-						draw();
-						save();
-						if (i === currentBlindIndex) {
-							PokerRoom.endBreak(name);
-						}
-					}
-				}, false);
-			}
 		} );
 		element.appendChild( frag );
 		currentBlindIndex = -1;
@@ -96,8 +126,8 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			}
 		}
 		if( currentBlindIndex === -1 ) {
-			that.remove();
-			that = null;
+			game.remove();
+			game = null;
 		} else {
 			blind = state[currentBlindIndex];
 			
@@ -108,8 +138,8 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				$('.time',iElement).html(util.secondsToString(0));
 				currentBlindIndex += 1;
 				if (currentBlindIndex == state.length) {
-					that.remove();
-					that = null;
+					game.remove();
+					game = null;
 					return;
 				}
 				blind = state[currentBlindIndex];
@@ -122,20 +152,21 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					}, 90 * 1000);
 				}
 				
-				if (state[previousBlindIndex] && state[previousBlindIndex].blinds == local['break'] ) {
-					PokerRoom.endBreak(name);
-				}
-				if (state[currentBlindIndex].blinds == local['break']) {
-					PokerRoom.startBreak(name);
+				if (state[currentBlindIndex].blinds === local['break']) {
+					onBreak = true;
+					$(document.body).addClass('onbreak');
+				} else {
+					onBreak = false;
+					$(document.body).removeClass('onbreak');
 				}
 				currentLevelEl = element.childNodes[currentBlindIndex];
 				if (currentLevelEl) {
 					$(currentLevelEl).addClass('current');
 				} else {
 					// the game is over.
-					that.remove();
+					game.remove();
 				}
-				updateScroll( true, function(){ding();} );
+				updateScroll( true, function(){bell.ding();} );
 			} else if (!currentLevelEl) {
 				currentLevelEl = element.childNodes[currentBlindIndex];
 			}
@@ -144,15 +175,11 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			$('.time',element.childNodes[currentBlindIndex]).html(util.secondsToString(blind.time));
 		}
 	},
-	ding = function() {
-		PokerRoom.ding(that);
-	},
 	save = function() {
 		PokerRoom.save();
 		if (syncToken) {
-			$.post('php/games.php', {method:'save',game:that.toString()}, function(data){
+			$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
 				syncToken=data;
-				PokerRoom.resume().save();
 			});
 		}
 	},
@@ -194,16 +221,71 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	resizeCallback = function(){ 
 		resize();
 	},
-	addBreak = function(){
+	startBreak = function(){
+		console.log('starting break');
 		state.splice(currentBlindIndex, 0, {blinds:local['break'], game:'', time:breakLength});
+		onBreak = true;
 		draw();
 		save();
 	},
 	endBreak = function() {
-
+		console.log('ending break');
+		if (onBreak) {
+			onBreak = false;
+			state.splice(currentBlindIndex, 1);
+			draw();
+			save();
+		}
+		
+	},
+	toggleBreak = function() {
+		if (onBreak) {
+			endBreak();
+		} else {
+			startBreak();
+		}
+	},
+	keyControl = function(e) {
+		var key = String.fromCharCode(e.charCode||e.which).toLowerCase();
+		switch( key ) {
+			case 'b':
+				addBreak(0);
+				break;
+			case 'n':
+				addBreak(1);
+				break;
+			default:
+				showControls();
+				return;
+		}
+		e.preventDefault();
+	},
+	controlsTimeout = null,
+	showControls = function() {
+		curtain$.hide();
+		if (controlsTimeout) {
+			clearInterval(controlsTimeout);
+			controlsTimeout = setTimeout( hideControls, 2000 );
+		} else {
+			$('#toolbar').stop().animate({opacity:'1'}, 150);
+			controlsTimeout = setTimeout( hideControls, 2000 );
+		}
+	},
+	hideControls = function() {
+		clearTimeout(controlsTimeout);
+		controlsTimeout = null;
+		$('#toolbar').stop().animate({opacity:'0'}, 'slow', function() {
+			curtain$.show();
+		});
+	},
+	addTime = function(seconds) {
+		state[currentBlindIndex].time += seconds * 1000;
+		lastUpdate = Date.now();
+		draw();
+		save();
 	};
 	
-	var that = {
+	var game = {
 		update: function( updateData ) {
 			if (!updateData) {
 				$.getJSON('games.php', {game:name}, function(data) {
@@ -227,9 +309,9 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				}
 				syncToken = updateData.syncToken;
 				draw();
-				ding();
+				bell.ding();
 			}
-			return that;
+			return game;
 		},
 		remove: function() {
 			$(element).remove();
@@ -240,28 +322,58 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		sleep: function() {
 			clearInterval(countInterval);
 			countInterval = false;
-			return that;	
+			return game;	
 		},
 		wake: function() {
 			count();
-			return that;
+			return game;
 		},
 		focus: function() {
+			$('#toolbar a.break').bind('click', function(e){
+				toggleBreak();
+			});
+			
+			$('#toolbar a.sync').bind('click', function(e) {
+				e.preventDefault();
+				game.sync();
+			});
+			$('#toolbar a.advance').bind('click', function(e) {
+				e.preventDefault();
+				addTime(30);
+			});
+			$('#toolbar a.goback').bind('click', function(e) {
+				e.preventDefault();
+				addTime(-30);
+			});
+			$('#toolbar').bind('click', function() {
+				hideControls();
+			});
+			curtain$ = $('#curtain').click( function(e) {
+				e.stopPropagation();
+				e.stopBubble = true;
+				showControls();
+			});
+			
+			hideControls();
+			$(document).bind('keydown', keyControl);
+			if (!window.Touch) {
+				$(document).bind('mousemove', showControls);
+			}
 			hasFocus = true;
-			that.wake();
+			game.wake();
 			update();
 			resize();
 			window.addEventListener( 'resize', resizeCallback, true );
-			return that;
+			return game;
 		},
 		blur: function() {
 			hasFocus = false;
 			PokerRoom.movePanels('auto');
 			window.removeEventListener( 'resize', resizeCallback, true );
-			return that;
+			return game;
 		},
 		toString: function() {
-			return JSON.stringify(that.toJSON());
+			return JSON.stringify(game.toJSON());
 		},
 		toJSON: function() {
 			return {
@@ -274,31 +386,24 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		},
 		resize: function(animate) {
 			resize(animate);
-			return that;
+			return game;
 		},
 		redraw: function() {
 			draw();
-			return that;
-		},
-		addBreak: function(next){
-			addBreak(next);
-			return that;
-		},
-		endBreak: function() {
-		
+			return game;
 		},
 		sync: function(){
 			syncToken = true;
 			save();
 		}
 	};
-	that.__defineGetter__( 'syncToken', function(){return syncToken} );
-	that.__defineGetter__( 'element', function(){return element} );
-	that.__defineGetter__( 'name', function(){return name} );
-	that.__defineGetter__( 'hasFocus', function(){return hasFocus} );
+	game.__defineGetter__( 'syncToken', function(){return syncToken} );
+	game.__defineGetter__( 'element', function(){return element} );
+	game.__defineGetter__( 'name', function(){return name} );
+	game.__defineGetter__( 'hasFocus', function(){return hasFocus} );
 	
 	draw();
 	
-	return that;
+	return game;
 }
 })(jQuery, util)

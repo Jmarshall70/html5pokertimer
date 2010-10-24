@@ -2,7 +2,6 @@ var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
 		timeOffset = 0,
-		bell,
 		sharedListEl,
 		localListEl,
 		gameEl,
@@ -11,7 +10,6 @@ var PokerRoom = (function($) {
 		mute = true,
 		currentGame,
 		onBreak = false,
-		controlsTimeout,
 		syncInProgress = false,
 		syncTimer = false,
 		syncSuspended = false,
@@ -105,40 +103,6 @@ var PokerRoom = (function($) {
 			}
 		}
 	},
-	addBreak = function(next) {
-		games[currentGame].addBreak(next);
-	},
-	keyControl = function(e) {
-		var key = String.fromCharCode(e.charCode||e.which).toLowerCase();
-		switch( key ) {
-			case 'b':
-				addBreak(0);
-				break;
-			case 'n':
-				addBreak(1);
-				break;
-			default:
-				showControls();
-				return;
-		}
-		e.preventDefault();
-	},
-	showControls = function() {
-		curtain$.hide();
-		if (controlsTimeout) {
-			clearInterval(controlsTimeout);
-		}
-		if (!onBreak) {
-			$('#toolbar').stop().animate({opacity:'1'}, 150);
-			controlsTimeout = setTimeout( hideControls, 2000 );
-		}
-	},
-	hideControls = function() {
-		clearInterval(controlsTimeout);
-		$('#toolbar').stop().animate({opacity:'0'}, 'slow', function() {
-			curtain$.show();
-		});
-	},
 	loadLocalGames = function() {
 		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
 		for (var i=0,c=games_a.length; i < c; i++) {
@@ -151,40 +115,13 @@ var PokerRoom = (function($) {
 	;
 	
 	$(document).ready(function(){
-		bell = getElementById('bell');
 		sharedListEl = getElementById('shared_games');
 		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
 		
 		topPanel = $('#panels .top')[0];
-		bottomPanel = $('#panels .bottom')[0];
+		bottomPanel = $('#panels .bottom')[0];		
 		
-		curtain$ = $('#curtain').click( function(e) {
-			e.stopPropagation();
-			e.stopBubble = true;
-			showControls();
-		});
-		
-		
-		$('#toolbar a.break')[0].addEventListener('click', function(e){
-			e.preventDefault();
-			if (onBreak) {
-				games[currentGame].endBreak();
-			} else {
-				addBreak(0);
-			}
-		}, false);
-
-		
-		$('#toolbar a.sync')[0].addEventListener( 'click', function() {
-			e.preventDefault();
-			that.syncGame();
-		}, false );
-		hideControls();
-		document.addEventListener( 'keydown', keyControl, true );
-		if (!window.Touch) {
-			document.addEventListener( 'mousemove', showControls, true );
-		}
 	});
 	$(window).bind('load', function() {
 		var rand = Math.random();
@@ -303,12 +240,6 @@ var PokerRoom = (function($) {
 			newHome.appendChild( container );
 			return that;
 		},
-		ding: function(game) {
-			if (!mute && game.hasFocus && bell && bell.play) {
-				bell.play();
-			}
-			return that;
-		},
 		showGame: function( name ) {
 			mute = false;
 			if( games[name] ) {
@@ -323,13 +254,13 @@ var PokerRoom = (function($) {
 							if (!games[game].syncToken) {
 								that.suspend();
 							}
-							hideControls();
 						} else if (games[game]) {
 							$(games[game]).remove();
 							games[game].sleep().blur();
 						}
 					}
 				}
+				that.suspend();
 			} else {
 				console.error('Tried to load a game that does not exist.');
 			}
@@ -338,28 +269,6 @@ var PokerRoom = (function($) {
 		movePanels: function( place ) {
 			topPanel.style.bottom = place+'px';
 			bottomPanel.style.top = place+'px';
-			return that;
-		},
-		startBreak: function(game) {
-			if (game === currentGame) {
-				onBreak = true;
-			}
-			hideControls();
-			that.save();
-			return that;
-		},
-		endBreak: function(game) {
-			if (game === currentGame) {
-				onBreak = false;
-			}
-			that.save();
-			return that;
-		},
-		syncGame: function() {
-			var game = games[currentGame];
-			if (game && !game.syncToken) {
-				game.sync();
-			}
 			return that;
 		}
 	};	

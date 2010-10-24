@@ -235,6 +235,9 @@ a.button:active {
 .button.break span {
 	background-position: 0 0;
 }
+.onbreak .button.break span {
+	background-position: 100% 0;
+}
 .button.advance span {
 	background-position: 0 -200%;
 }
@@ -246,6 +249,9 @@ a.button:active {
 }
 .button.bell span {
 	background-position: 0 -400%;
+}
+.mute .button.bell span {
+	background-position: 100% -400%;
 }
 #curtain {
 	position: fixed;
