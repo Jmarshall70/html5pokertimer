@@ -22,20 +22,14 @@ var PokerRoom = (function($) {
 		}
 		clearTimeout( syncTimer );
 		syncInProgress = true;
-		if( currentGame ) {
-			game = games[currentGame];
-			$.post('php/games.php', {method:'sync', games:JSON.stringify([{syncToken:game.syncToken, name:game.name}]), rand:Math.random()}, function(updates) {
-				updateGames( JSON.parse(updates) );
-				syncTimer = setTimeout( function(){ sync() }, 5000 );
-				syncInProgress = false;
-			})
-		} else {
-			$.post('php/games.php', {method:'sync', syncToken:syncToken, rand:Math.random()}, function(updates) {
-				updateList( JSON.parse(updates) );
-				syncTimer = setTimeout( function(){ sync() }, 5000 );
-				syncInProgress = false;
-			})
-		}
+		$.post('php/games.php', {method:'sync', syncToken:syncToken, rand:Math.random()}, function(updates) {
+			updates = JSON.parse(updates);
+			if(updates.syncToken) {
+				updateList( updates );
+			}
+			syncTimer = setTimeout( function(){ sync() }, 5000 );
+			syncInProgress = false;
+		})
 	},
 	updateList = function( syncResult ) {
 		var serverGames = syncResult.games;
@@ -48,10 +42,10 @@ var PokerRoom = (function($) {
 				if (games[game.name]) {
 					games[game.name].update( game );
 				} else {
-					that.add( game );
+					room.add( game );
 				}
 			}
-			that.save();
+			room.save();
 		} else {
 			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
 		}
@@ -71,7 +65,7 @@ var PokerRoom = (function($) {
 		var bindings = ['name', {key:'element',selector:'.state'}];
 		var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
 			el.addEventListener( 'click', function(e){
-				that.showGame(game.name)
+				room.showGame(game.name)
 				e.stopPropagation();
 			}, true);
 		});
@@ -82,7 +76,7 @@ var PokerRoom = (function($) {
 		
 		var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
 			el.addEventListener( 'click', function(e){
-				that.showGame(game.name)
+				room.showGame(game.name)
 				e.stopPropagation();
 			}, true);
 		});
@@ -93,7 +87,7 @@ var PokerRoom = (function($) {
 			localListEl.innerHTML = '<li>No games in progress.</li>';
 		}
 		
-		that.resume();
+		room.resume();
 	},
 	updateGames = function( updates ) {
 		for( var name in updates ) {
@@ -107,10 +101,10 @@ var PokerRoom = (function($) {
 		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
 		for (var i=0,c=games_a.length; i < c; i++) {
 			if (games_a[i].state) {
-				that.add( games_a[i] );
+				room.add( games_a[i] );
 			}
 		}
-		that.save();
+		room.save();
 	}
 	;
 	
@@ -129,12 +123,12 @@ var PokerRoom = (function($) {
 			var requestEndTime = new Date(),
 			serverTime = parseInt(data,10);
 			if (serverTime) {
-				that.timeOffset = timeOffset = serverTime - requestEndTime;
+				room.timeOffset = timeOffset = serverTime - requestEndTime;
 			}
 		});
 	});
 	
-	var that = {
+	var room = {
 		timeOffset: timeOffset,
 		update: function(game) {
 			if (game) {
@@ -142,25 +136,25 @@ var PokerRoom = (function($) {
 			} else {
 				sync();
 			}
-			return that;
+			return room;
 		},
 		suspend: function() {
 			clearTimeout(syncTimer);
 			syncTimer = false;
 			syncSuspended = true;
-			return that;
+			return room;
 		},
 		start: function() {
 			syncSuspended = false;
 			loadLocalGames();
 			sync();
-			that.save();
-			return that;
+			room.save();
+			return room;
 		},
 		resume: function() {
 			syncSuspended = false;
 			sync();
-			return that;
+			return room;
 		},
 		add: function (blindTime, blinds, p_games, name, breakLength, lastUpdate, p_syncToken) {
 			if (typeof blindTime === 'object') {
@@ -189,7 +183,6 @@ var PokerRoom = (function($) {
 			if (!breakLength) {
 				breakLength = blindTime;
 			}
-			console.log(arguments);
 			var gamesLength = p_games.length;
 			var state = [];
 			for (var i=0,c=blinds.length; i<c; i++ ) {
@@ -216,12 +209,12 @@ var PokerRoom = (function($) {
 					updateList();
 				}
 			}
-			that.save();
-			return that;
+			room.save();
+			return room;
 		},
 		save: function() {
-			localStorage.setItem('PokerGames', JSON.stringify( that.toArray() ) );
-			return that;
+			localStorage.setItem('PokerGames', JSON.stringify( room.toArray() ) );
+			return room;
 		},
 		toArray: function() {
 			var games_a = [];
@@ -238,7 +231,7 @@ var PokerRoom = (function($) {
 				newHome = getElementById( newHome );
 			}
 			newHome.appendChild( container );
-			return that;
+			return room;
 		},
 		showGame: function( name ) {
 			mute = false;
@@ -251,27 +244,25 @@ var PokerRoom = (function($) {
 							currentGame = game
 							gameEl.appendChild( games[game].element );
 							games[game].focus();
-							if (!games[game].syncToken) {
-								that.suspend();
-							}
+							room.suspend();
 						} else if (games[game]) {
 							$(games[game]).remove();
 							games[game].sleep().blur();
 						}
 					}
 				}
-				that.suspend();
+				room.suspend();
 			} else {
 				console.error('Tried to load a game that does not exist.');
 			}
-			return that;
+			return room;
 		},
 		movePanels: function( place ) {
 			topPanel.style.bottom = place+'px';
 			bottomPanel.style.top = place+'px';
-			return that;
+			return room;
 		}
 	};	
-	return that;
+	return room;
 
 })(jQuery);

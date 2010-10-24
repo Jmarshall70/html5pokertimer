@@ -180,9 +180,41 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		if (syncToken) {
 			$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
 				syncToken=data;
+				PokerRoom.save();
 			});
 		}
 	},
+	sync = (function() {
+		var run = function() {
+			$.post('php/games.php', {method:'sync', games:JSON.stringify([{syncToken:syncToken, name:name}]), rand:Math.random()}, function(updates) {
+				if (syncTimer) {
+					var updates = JSON.parse(updates);
+					if (updates[name]) {
+						game.update( updates[name] );
+					}
+					syncTimer = setTimeout( function(){ run() }, 5000 );
+				}
+			})
+		
+		},
+		syncTimer = true,
+		
+		sync = {
+			start: function() {
+				syncTimer = true;
+				run();
+			},
+			stop: function() {
+				clearTimeout(syncTimer);
+				syncTimer = null;
+				syncToken = null;
+			},
+			toggle: function() {
+				
+			}
+		}
+		return sync
+	})(),
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
 			
@@ -222,14 +254,12 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		resize();
 	},
 	startBreak = function(){
-		console.log('starting break');
 		state.splice(currentBlindIndex, 0, {blinds:local['break'], game:'', time:breakLength});
 		onBreak = true;
 		draw();
 		save();
 	},
 	endBreak = function() {
-		console.log('ending break');
 		if (onBreak) {
 			onBreak = false;
 			state.splice(currentBlindIndex, 1);
@@ -280,15 +310,15 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	},
 	addTime = function(seconds) {
 		state[currentBlindIndex].time += seconds * 1000;
-		lastUpdate = Date.now();
-		draw();
+		//lastUpdate = Date.now();
 		save();
+		draw();
 	};
 	
 	var game = {
 		update: function( updateData ) {
 			if (!updateData) {
-				$.getJSON('games.php', {game:name}, function(data) {
+				$.getJSON('php/games.php', {game:name}, function(data) {
 					if( data ) {
 						clearTimeout(previousDimmerTimer);
 						syncToken = data.syncToken;
@@ -299,7 +329,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					}
 				});
 			} else if (updateData.syncToken && updateData.syncToken > syncToken) {
-				console.log( updateData );
 				if (updateData.game) {
 					state = updateData.game.state;
 					lastUpdate = updateData.game.lastUpdate;
@@ -335,7 +364,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			
 			$('#toolbar a.sync').bind('click', function(e) {
 				e.preventDefault();
-				game.sync();
+				game.sync.start();
 			});
 			$('#toolbar a.advance').bind('click', function(e) {
 				e.preventDefault();
@@ -364,6 +393,11 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			update();
 			resize();
 			window.addEventListener( 'resize', resizeCallback, true );
+			
+			if (game.syncToken) {
+				sync.start();
+			}
+			
 			return game;
 		},
 		blur: function() {
@@ -391,10 +425,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		redraw: function() {
 			draw();
 			return game;
-		},
-		sync: function(){
-			syncToken = true;
-			save();
 		}
 	};
 	game.__defineGetter__( 'syncToken', function(){return syncToken} );
