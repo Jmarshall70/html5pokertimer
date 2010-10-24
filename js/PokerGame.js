@@ -194,13 +194,13 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	resizeCallback = function(){ 
 		resize();
 	},
-	addBreak = function( next ){
-		var index = currentBlindIndex + next;
-		//currentLevelEl = null;
-		//currentLevelIndex = -1;
-		state.splice(index, 0, {blinds:local['break'], game:local.clickToRemove, time:breakLength});
+	addBreak = function(){
+		state.splice(currentBlindIndex, 0, {blinds:local['break'], game:'', time:breakLength});
 		draw();
 		save();
+	},
+	endBreak = function() {
+
 	};
 	
 	var that = {
@@ -283,6 +283,9 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		addBreak: function(next){
 			addBreak(next);
 			return that;
+		},
+		endBreak: function() {
+		
 		},
 		sync: function(){
 			syncToken = true;

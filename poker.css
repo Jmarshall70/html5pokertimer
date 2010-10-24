@@ -99,7 +99,6 @@ fieldset {
 	color: white;
 }
 #game .poker-game .level.break {
-	cursor: pointer;
 }
 #game .poker-game .time {
 	position: absolute;
@@ -187,17 +186,29 @@ fieldset {
 #panels > div.bottom.curtain > a {
 	top: 0.15em;
 }
-#panels div.top.curtain div.toolbar {
+#toolbar {
 	position: absolute;
-	top: 100%;
+	top: 0;
 	right: 0;
-	text-align: right;
+	left: 0;
+	width: 100%;
+	padding: 0.333em 0;
+	text-align: center;
+	background-color: #aaa;
+	z-index: 100;
+	line-height: 1em;
+	border-bottom: 0.125em solid black;
 }
-#panels div.toolbar a.button {
-	display: block;
-	width: 6.5em;
-	height: 6.5em;
+#toolbar a.button {
+	display: inline-block;
+	vertical-align: bottom;
+	width: 11em;
+	height: 11em;
 	font-size: 25%;
+	position: relative;
+}
+a.button:active {
+	outline: none;
 }
 .button {
 	background-image: url(images/button-background.png);
@@ -211,18 +222,30 @@ fieldset {
 
 .button span {
 	position: absolute;
-	left: 0;
-	top: 0;
-	right: 0;
-	bottom: 0;
+	left: 1em;
+	top: 1em;
+	right: 1em;
+	bottom: 1em;
 	color: transparent;
 	background-image: url(images/buttons-sprite.png);
 	background-size: 200% 400%;
-	-moz-background-size: 200% 400%;
+	-moz-background-size: 200% 500%;
 }
 
+.button.break span {
+	background-position: 0 0;
+}
+.button.advance span {
+	background-position: 0 -200%;
+}
+.button.goback span {
+	background-position: 0 -300%;
+}
 .button.sync span {
-	background-position: 0 200%;
+	background-position: 0 -100%;
+}
+.button.bell span {
+	background-position: 0 -400%;
 }
 #curtain {
 	position: fixed;
