@@ -213,6 +213,7 @@ var PokerRoom = (function($) {
 			return room;
 		},
 		save: function() {
+			localStorage.removeItem('PokerGames');
 			localStorage.setItem('PokerGames', JSON.stringify( room.toArray() ) );
 			return room;
 		},
