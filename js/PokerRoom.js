@@ -129,13 +129,13 @@ var PokerRoom = (function($) {
 			clearInterval(controlsTimeout);
 		}
 		if (!onBreak) {
-			$('.control').stop().animate({opacity:'1'}, 150);
+			$('#toolbar').stop().animate({opacity:'1'}, 150);
 			controlsTimeout = setTimeout( hideControls, 2000 );
 		}
 	},
 	hideControls = function() {
 		clearInterval(controlsTimeout);
-		$('.control').stop().animate({opacity:'0'}, 'slow', function() {
+		$('#toolbar').stop().animate({opacity:'0'}, 'slow', function() {
 			curtain$.show();
 		});
 	},
@@ -151,16 +151,6 @@ var PokerRoom = (function($) {
 	;
 	
 	$(document).ready(function(){
-		var rand = Math.random(), requestStartTime = new Date();
-		$.get('php/time.php', {rand:rand}, function(data) {
-			var requestEndTime = new Date(),
-			requestTime = requestEndTime - requestStartTime,
-			serverTime = parseInt(data,10);
-			
-			if (serverTime) {
-				timeOffset = serverTime - requestStartTime; //(requestTime/2);
-			}
-		});
 		bell = getElementById('bell');
 		sharedListEl = getElementById('shared_games');
 		localListEl = getElementById('local_games');
@@ -176,18 +166,18 @@ var PokerRoom = (function($) {
 		});
 		
 		
-		$('#break_now')[0].addEventListener('click', function(e){
+		$('#toolbar a.break')[0].addEventListener('click', function(e){
 			e.preventDefault();
-			addBreak(0);
+			if (onBreak) {
+				games[currentGame].endBreak();
+			} else {
+				addBreak(0);
+			}
 		}, false);
 
 		
-		$('#break_next')[0].addEventListener( 'click', function(e){
+		$('#toolbar a.sync')[0].addEventListener( 'click', function() {
 			e.preventDefault();
-			addBreak(1);
-		}, false);
-		
-		$('.toolbar .sync')[0].addEventListener( 'click', function() {
 			that.syncGame();
 		}, false );
 		hideControls();
@@ -195,6 +185,16 @@ var PokerRoom = (function($) {
 		if (!window.Touch) {
 			document.addEventListener( 'mousemove', showControls, true );
 		}
+	});
+	$(window).bind('load', function() {
+		var rand = Math.random();
+		$.get('php/time.php', {rand:rand}, function(data) {
+			var requestEndTime = new Date(),
+			serverTime = parseInt(data,10);
+			if (serverTime) {
+				that.timeOffset = timeOffset = serverTime - requestEndTime;
+			}
+		});
 	});
 	
 	var that = {

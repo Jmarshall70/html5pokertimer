@@ -16,16 +16,13 @@
 <body>
 <div id="start">
 	<h1>Tournament Poker Timer</h1>
-	<p>A simple way to keep track of blinds for poker tournaments. Breaks can be added, and all aspects of the game are automatically synchronized over multiple devices.</p>
-	<p>To start a new game, customize your blind levels, games, and time per blind below, then hit start.</p>
-	
-	<p>To view an existing game, choose a game below.</p>
 	<h2>Make a New Game</h2>
 	<form action="" method="post">
 		<fieldset>
 			<div class="title simple">
 				Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 				<input type="submit" id="new_game" name="new_game" value="Start">
+				
 			</div>
 			<div class="no-advanced">
 				<a href="#" id="show_advanced">Show advanced controls</a>
@@ -72,17 +69,15 @@ Omaha</textarea>
 <div id="game">
 	<div id="panels">
 		<div class="top curtain">
-			<a id="break_now" href="#" class="control">B - Break Now</a>
-			<div class="toolbar control">
-				<a href="#" class="sync button"><span>Sync</span></a>
-				<!--
-				<a href="#" class="pause">Pause</a>
-				<a href="#" class="end">end</a>
-				-->
-			</div>
 		</div>
 		<div class="bottom curtain">
-			<a id="break_next" href="#" class="control">N - Break Next</a>
+		</div>
+		<div id="toolbar">
+			<a href="#" class="break button" title="Pause"><span>Pause</span></a>
+			<a href="#" class="advance button" title="Advance 30 seconds"><span>Advance 30 Seconds</span></a>
+			<a href="#" class="goback button" title="Go back 30 seconds"><span>Go back 30 Second</span></a>
+			<a href="#" class="sync button" title="Sync"><span>Sync</span></a>
+			<a href="#" class="bell button" title="Toggle Bell"><span>Toggle Bell</span></a>
 		</div>
 	</div>
 	<div id="curtain"></div>
