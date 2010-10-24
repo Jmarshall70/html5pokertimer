@@ -202,7 +202,12 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		sync = {
 			start: function() {
 				syncTimer = true;
-				run();
+				PokerRoom.save();
+				$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
+					syncToken=data;
+					PokerRoom.save();
+					run();
+				});
 			},
 			stop: function() {
 				clearTimeout(syncTimer);
@@ -364,7 +369,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			
 			$('#toolbar a.sync').bind('click', function(e) {
 				e.preventDefault();
-				game.sync.start();
+				sync.start();
 			});
 			$('#toolbar a.advance').bind('click', function(e) {
 				e.preventDefault();
