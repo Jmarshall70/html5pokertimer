@@ -99,6 +99,51 @@ var util = (function($) { return {
 		}
 	
 		return num;
+	},
+	Events: function(types) {
+		var listeners = {},
+		event = this;
+		
+		for( var i=0, c=types.length; i < c; i += 1 ) {
+			listeners[types[i]] = [];
+		};
+		
+		event.addEventListener = function(type, callback, addToFront) {
+			if (!listeners[type]) {
+				throw 'Tried to add event of type '+type+'. Possible events are '+types.join(', ');
+			}
+			var index = listeners[type].indexOf(callback);
+			if (index !== -1) {
+				if(addTofront) {
+					listeners[type].unshift(callback);
+				} else {
+					listeners[type].push(callback);
+				}
+			}
+		};
+		event.removeEventListener = function(type, callback) {
+			if (!listeners[type]) {
+				throw 'Tried to remove event of type '+type+'. Possible events are '+types.join(', ');
+			}	
+			var index = listeners[type].indexOf(callback);
+			if (index !== -1) {
+				listeners[type].splice(index,1);
+			}
+			
+		};
+		event.trigger = function(type, arguments) {
+			if (!listeners[type]) {
+				throw 'Tried to trigger event of type '+type+'. Possible events are '+types.join(', ');
+			}
+			var callbacks = listeners[type];
+			for (var i=0,c=callbacks.length; i < c; i += 1) {
+				var returnValue = callbacks[i].apply(window, arguments);
+				if (returnValue === false) {
+					break;
+				}
+			}
+		};
+		
 	}
 }})(jQuery);
 
