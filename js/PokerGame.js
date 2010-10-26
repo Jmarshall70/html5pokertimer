@@ -1,6 +1,7 @@
 var PokerGame = (function($, util) { 
 	
 var SIZE_CONSTANT = 16, //text size constant.
+controlsFadeTime = 1000, 
 bell = (function() {
 	var mute = false,
 	element = null,
@@ -79,6 +80,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	defaultLevelHeight,
 	onBreak = false,
 	curtain$,
+	toolbar$,
 	
 	count = function() {
 		if (!countInterval) {
@@ -304,16 +306,16 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		curtain$.hide();
 		if (controlsTimeout) {
 			clearInterval(controlsTimeout);
-			controlsTimeout = setTimeout( hideControls, 2000 );
+			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		} else {
-			$('#toolbar').stop().animate({opacity:'1'}, 150);
-			controlsTimeout = setTimeout( hideControls, 2000 );
+			$(toolbar).stop().animate({opacity:'1'}, 150);
+			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		}
 	},
 	hideControls = function() {
 		clearTimeout(controlsTimeout);
 		controlsTimeout = null;
-		$('#toolbar').stop().animate({opacity:'0'}, 'slow', function() {
+		$(toolbar).stop().animate({opacity:'0'}, 'slow', function() {
 			curtain$.show();
 		});
 	},
@@ -367,35 +369,38 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			return game;
 		},
 		focus: function() {
-			$('#toolbar a.break').bind('click', function(e){
-				toggleBreak();
-			});
-			
-			$('#toolbar a.sync').bind('click', function(e) {
-				e.preventDefault();
-				sync.run();
-			});
-			$('#toolbar a.advance').bind('click', function(e) {
-				e.preventDefault();
-				addTime(30);
-			});
-			$('#toolbar a.goback').bind('click', function(e) {
-				e.preventDefault();
-				addTime(-30);
-			});
-			$('#toolbar').bind('click', function() {
-				hideControls();
-			});
+			toolbar = $('#toolbar')[0];
 			curtain$ = $('#curtain').click( function(e) {
 				e.stopPropagation();
 				e.stopBubble = true;
 				showControls();
+			});
+			$('a.break', toolbar).bind('click', function(e){
+				toggleBreak();
+			});
+			
+			$('a.sync', toolbar).bind('click', function(e) {
+				e.preventDefault();
+				sync.run();
+			});
+			$('a.advance', toolbar).bind('click', function(e) {
+				e.preventDefault();
+				addTime(30);
+			});
+			$('a.goback', toolbar).bind('click', function(e) {
+				e.preventDefault();
+				addTime(-30);
+			});
+			$(toolbar).bind('click', function() {
+				hideControls();
 			});
 			
 			hideControls();
 			$(document).bind('keydown', keyControl);
 			if (!window.Touch) {
 				$(document).bind('mousemove', showControls);
+				$(toolbar).bind('mouseover', function() { controlsFadeTime = 5000 });
+				$(toolbar).bind('mouseout', function() { controlsFadeTime = 1000 });
 			}
 			hasFocus = true;
 			game.wake();

@@ -23,16 +23,21 @@
 				Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
 				<input type="submit" id="new_game" name="new_game" value="Start">
 				
-			</div>
-			<div class="no-advanced">
-				<a href="#" id="show_advanced">Show advanced controls</a>
+				<div class="no-advanced">
+					<a href="#" id="show_advanced">Show advanced controls</a>
+				</div>
+				<div class="advanced">
+					<a href="#" id="hide_advanced">Hide advanced controls</a>
+				</div>
 			</div>
 			<div class="advanced">
-				<a href="#" id="hide_advanced">Hide advanced controls</a>
-			</div>
-			<div class="blinds advanced">
-				Blind Levels:<br>
-				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
+				<div class="restore">
+					<a href="#" id="restore_defaults">Restore Defaults</a><br/>
+					<a href="#" id="restore_last">Restore From Last Game</a>
+				</div>
+				<div class="blinds">
+					Blind Levels:<br>
+					<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
 25/50
 50/100
 75/150
@@ -48,16 +53,17 @@
 2000/4000
 3000/6000
 4000/8000</textarea>
-			</div>
-			<div class="games advanced">
-				Games:<br>
-				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
+				</div>
+				<div class="games">
+					Games:<br>
+					<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
 Omaha</textarea>
-			</div>
-			<div class="time advanced">
-				Time:<br>
-				<input type="text" size="4" name="time" id="blind_time" value="10:00">
-			</div>
+				</div>
+				<div class="time">
+					Time:<br>
+					<input type="text" size="4" name="time" id="blind_time" value="10:00">
+				</div>
+			</advanced>
 		</fieldset>
 	</form>
 	<h2 class="games">Watch A Game</h2>
