@@ -44,12 +44,12 @@ bell = (function() {
 	return bell;
 })()
 return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
-	
+	var game = this;
 	if ( !$.isArray(state) && typeof state === 'object') {
-		syncToken = state.syncToken;
+		game.syncToken = syncToken = state.syncToken;
 		lastUpdate = state.lastUpdate;
 		breakLength = state.breakLength;
-		name = state.name;
+		game.name = name = state.name;
 		state = state.state;
 	}
 	if( !$.isArray(state)) {
@@ -57,13 +57,13 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		return false;
 	}
 	if (!lastUpdate) {
-		lastUpdate = Date.now();
+		lastUpdate = (new Date).getTime();
 	}
 	if (!syncToken) {
-		syncToken = 0;
+		game.syncToken = syncToken = 0;
 	}
 	if (!name || typeof name != 'string') {
-		name = util.randomWord();
+		game.name = name = util.randomWord();
 	}
 	if( !breakLength ) {
 		breakLength = state[state.length-1].time; 
@@ -80,15 +80,18 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	defaultLevelHeight,
 	onBreak = false,
 	curtain$,
-	toolbar$,
+	toolbar;
 	
-	count = function() {
+	game.element = element;
+	
+	var count = function() {
 		if (!countInterval) {
 			countInterval = setInterval(function(){count();}, 1000);
 		}
 		update();
 	},
 	draw = function(){
+		console.log('drawing');
 		element.innerHTML = '';
 		currentLevelEl = null;
 		var template = $('#templates .level')[0];
@@ -101,7 +104,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		update();
 	},
 	update = function() {
-		var now = Date.now() + PokerRoom.timeOffset;
+		var now = (new Date).getTime() + PokerRoom.timeOffset;
 		var milliseconds = (now-lastUpdate);
 		if ( countInterval && ((blindTimeRemaining-milliseconds) % 1000) > 50 ) {
 			// end this timer and start a new one if we're off by more than 1/20 seconds
@@ -168,7 +171,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 					// the game is over.
 					game.remove();
 				}
-				updateScroll( true, function(){bell.ding();} );
+				updateScroll( true, function(){ hasFocus && bell.ding();} );
 			} else if (!currentLevelEl) {
 				currentLevelEl = element.childNodes[currentBlindIndex];
 			}
@@ -181,7 +184,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		PokerRoom.save();
 		if (syncToken) {
 			$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
-				syncToken=data;
+				game.syncToken = syncToken = data;
 				PokerRoom.save();
 			});
 		}
@@ -206,7 +209,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 				syncTimer = true;
 				PokerRoom.save();
 				$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
-					syncToken=data;
+					game.syncToken = syncToken = data;
 					PokerRoom.save();
 					run();
 				});
@@ -308,14 +311,14 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			clearInterval(controlsTimeout);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		} else {
-			$(toolbar).stop().animate({opacity:'1'}, 150);
+			$(toolbar).stop().animate({opacity:0.95}, 150);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		}
 	},
 	hideControls = function() {
 		clearTimeout(controlsTimeout);
 		controlsTimeout = null;
-		$(toolbar).stop().animate({opacity:'0'}, 'slow', function() {
+		$(toolbar).stop().animate({opacity:0}, 'slow', function() {
 			curtain$.show();
 		});
 	},
@@ -323,131 +326,137 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		state[currentBlindIndex].time += seconds * 1000;
 		//lastUpdate = Date.now();
 		save();
-		draw();
+		//draw();
+		update();
 	};
 	
-	var game = {
-		update: function( updateData ) {
-			if (!updateData) {
-				$.getJSON('php/games.php', {game:name}, function(data) {
-					if( data ) {
-						clearTimeout(previousDimmerTimer);
-						syncToken = data.syncToken;
-						lastUpdate = data.lastUpdate;
-						state = data.state;
-						save();
-						draw();
-					}
-				});
-			} else if (updateData.syncToken && updateData.syncToken > syncToken) {
-				if (updateData.game) {
-					state = updateData.game.state;
-					lastUpdate = updateData.game.lastUpdate;
-				} else {
-					state = updateData.state;
-					lastUpdate = updateData.lastUpdate;
+	game.update = function( updateData ) {
+		if (!updateData) {
+			$.getJSON('php/games.php', {game:name}, function(data) {
+				if( data ) {
+					clearTimeout(previousDimmerTimer);
+					syncToken = data.syncToken;
+					lastUpdate = data.lastUpdate;
+					state = data.state;
+					save();
+					draw();
 				}
-				syncToken = updateData.syncToken;
-				draw();
+			});
+		} else if (updateData.syncToken && updateData.syncToken > syncToken) {
+			if (updateData.game) {
+				state = updateData.game.state;
+				lastUpdate = updateData.game.lastUpdate;
+			} else {
+				state = updateData.state;
+				lastUpdate = updateData.lastUpdate;
+			}
+			game.syncToken = syncToken = updateData.syncToken;
+			draw();
+			if (hasFocus) {
 				bell.ding();
 			}
-			return game;
-		},
-		remove: function() {
-			$(element).remove();
-			clearInterval(countInterval);
-			countInterval = false;
-			PokerRoom.removeGame(name);
-		},
-		sleep: function() {
-			clearInterval(countInterval);
-			countInterval = false;
-			return game;	
-		},
-		wake: function() {
-			count();
-			return game;
-		},
-		focus: function() {
-			toolbar = $('#toolbar')[0];
-			curtain$ = $('#curtain').click( function(e) {
-				e.stopPropagation();
-				e.stopBubble = true;
-				showControls();
-			});
-			$('a.break', toolbar).bind('click', function(e){
-				toggleBreak();
-			});
-			
-			$('a.sync', toolbar).bind('click', function(e) {
-				e.preventDefault();
-				sync.run();
-			});
-			$('a.advance', toolbar).bind('click', function(e) {
-				e.preventDefault();
-				addTime(30);
-			});
-			$('a.goback', toolbar).bind('click', function(e) {
-				e.preventDefault();
-				addTime(-30);
-			});
-			$(toolbar).bind('click', function() {
-				hideControls();
-			});
-			
-			hideControls();
-			$(document).bind('keydown', keyControl);
-			if (!window.Touch) {
-				$(document).bind('mousemove', showControls);
-				$(toolbar).bind('mouseover', function() { controlsFadeTime = 5000 });
-				$(toolbar).bind('mouseout', function() { controlsFadeTime = 1000 });
-			}
-			hasFocus = true;
-			game.wake();
-			update();
-			resize();
-			window.addEventListener( 'resize', resizeCallback, true );
-			
-			if (game.syncToken) {
-				sync.start();
-			}
-			
-			return game;
-		},
-		blur: function() {
-			hasFocus = false;
-			PokerRoom.movePanels('auto');
-			window.removeEventListener( 'resize', resizeCallback, true );
-			return game;
-		},
-		toString: function() {
-			return JSON.stringify(game.toJSON());
-		},
-		toJSON: function() {
-			return {
-				lastUpdate: lastUpdate,
-				breakLength: breakLength,
-				name: name,
-				state: state,
-				syncToken: syncToken
-			};
-		},
-		resize: function(animate) {
-			resize(animate);
-			return game;
-		},
-		redraw: function() {
-			draw();
-			return game;
 		}
+		return game;
 	};
-	game.__defineGetter__( 'syncToken', function(){return syncToken} );
-	game.__defineGetter__( 'element', function(){return element} );
-	game.__defineGetter__( 'name', function(){return name} );
-	game.__defineGetter__( 'hasFocus', function(){return hasFocus} );
+	game.remove = function() {
+		$(element).remove();
+		clearInterval(countInterval);
+		countInterval = false;
+		PokerRoom.removeGame(name);
+	};
+	game.sleep = function() {
+		clearInterval(countInterval);
+		countInterval = false;
+		return game;	
+	};
+	game.wake = function() {
+		count();
+		return game;
+	};
+	game.focus = function() {
+		toolbar = $('#toolbar')[0];
+		
+		
+		curtain$ = $('#curtain').bind('click', function(e) {
+			return false
+		});
+		
+		$('a.break', toolbar).bind('click', function(e){
+			toggleBreak();
+		});
+		
+		$('a.sync', toolbar).bind('click', function(e) {
+			e.preventDefault();
+			sync.run();
+		});
+		$('a.advance', toolbar).bind('click', function(e) {
+			e.preventDefault();
+			addTime(30);
+		});
+		$('a.goback', toolbar).bind('click', function(e) {
+			e.preventDefault();
+			addTime(-30);
+		});
+		$(toolbar).bind('click', function() {
+			//hideControls();
+		});
+		
+		hideControls();
+		$(document).bind('keydown', keyControl);
+		if (!window.Touch) {
+			$(document).bind('mousemove', showControls);
+			$(toolbar).bind('mouseover', function() { controlsFadeTime = 5000 });
+			$(toolbar).bind('mouseout', function() { controlsFadeTime = 1000 });
+		}
+		game.hasFocus = hasFocus = true;
+		game.wake();
+		update();
+		resize();
+		window.addEventListener( 'resize', resizeCallback, true );
+		
+		if (game.syncToken) {
+			sync.start();
+		}
+		
+		return game;
+	};
+	game.blur = function() {
+		game.hasFocus = hasFocus = false;
+		PokerRoom.movePanels('auto');
+		$(window).unbind( 'resize', resizeCallback );
+		return game;
+	};
+	game.toString = function() {
+		return JSON.stringify(game.toJSON());
+	};
+	game.toJSON = function() {
+		return {
+			lastUpdate: lastUpdate,
+			breakLength: breakLength,
+			name: name,
+			state: state,
+			syncToken: syncToken
+		};
+	};
+	game.resize = function(animate) {
+		resize(animate);
+		return game;
+	};
+	game.redraw = function() {
+		draw();
+		return game;
+	};
+	
+	if (game.__defineGetter__) {
+		//game.__defineGetter__( 'syncToken', function(){return syncToken;} );
+		//game.__defineGetter__( 'element', function(){return element;} );
+		//game.__defineGetter__( 'name', function(){return name;} );
+		//game.__defineGetter__( 'hasFocus', function(){return hasFocus;} );
+	}
 	
 	draw();
 	
 	return game;
 }
+
 })(jQuery, util)

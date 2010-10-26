@@ -65,10 +65,9 @@ var PokerRoom = (function($) {
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
 		var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
-			el.addEventListener( 'click', function(e){
+			$(el).bind( 'click', function(e){
 				room.showGame(game.name)
-				e.stopPropagation();
-			}, true);
+			});
 		});
 		if (sharedFrag.childNodes.length) {
 			sharedListEl.innerHTML = '';
@@ -76,10 +75,9 @@ var PokerRoom = (function($) {
 		}
 		
 		var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
-			el.addEventListener( 'click', function(e){
+			$(el).bind('click', function(e){
 				room.showGame(game.name)
-				e.stopPropagation();
-			}, true);
+			});
 		});
 		if (localFrag.childNodes.length) {
 			localListEl.innerHTML = '';
@@ -113,7 +111,7 @@ var PokerRoom = (function($) {
 		sharedListEl = getElementById('shared_games');
 		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
-		
+		console.log(gameEl);
 		topPanel = $('#panels .top')[0];
 		bottomPanel = $('#panels .bottom')[0];		
 		
@@ -260,8 +258,8 @@ var PokerRoom = (function($) {
 			return room;
 		},
 		movePanels: function( place ) {
-			topPanel.style.bottom = place+'px';
-			bottomPanel.style.top = place+'px';
+			$(topPanel).css( 'bottom', place );
+			$(bottomPanel).css( 'place', place);
 			return room;
 		}
 	};	
