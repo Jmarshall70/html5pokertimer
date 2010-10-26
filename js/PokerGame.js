@@ -231,18 +231,15 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	})(),
 	updateScroll = function( animate, callback ) {
 		if( hasFocus ) {
-			
-			var height = currentLevelEl.offsetHeight;
-				topOffset = Math.floor( window.innerHeight/2 - height/2),
-				levelTop = currentLevelEl.offsetTop,
-				newTop = topOffset-levelTop;
-			
+			var height = currentLevelEl.offsetHeight,
+			topOffset = Math.floor( (window.innerHeight || html.clientHeight)/2 - height/2),
+			levelTop = currentLevelEl.offsetTop,
+			newTop = topOffset-levelTop;
+			PokerRoom.movePanels( topOffset+height );
 			if( animate ) {
-				PokerRoom.movePanels( topOffset+height );
-				$(element).stop().animate({ 'top': newTop}, callback);
+				$(element).stop().animate({'top': newTop}, callback);
 			} else {
-				PokerRoom.movePanels( topOffset+height );
-				$(element).stop().css({ 'top': newTop }, callback);
+				$(element).stop().css({ 'top': newTop}, callback);
 			}
 		}
 	},
@@ -251,9 +248,9 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			var width = element.offsetWidth;
 			var fontSize = width / SIZE_CONSTANT;
 			$(element).parent().css({'font-size':fontSize});
-			var third_height = Math.floor( element.innerHeight/3 );
+			var third_height = Math.floor( element.clientHeight/3 );
 			
-			if (window.innerHeight > (currentLevelEl.nextSibling||currentLevelEl.previousSibling).offsetHeight * 3) {
+			if ((window.innerHeight || html.clientHeight) > (currentLevelEl.nextSibling||currentLevelEl.previousSibling).offsetHeight * 3) {
 				$(element).addClass('tall');
 			} else {
 				$(element).removeClass('tall');
@@ -412,7 +409,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		game.wake();
 		update();
 		resize();
-		window.addEventListener( 'resize', resizeCallback, true );
+		$(window).bind('resize', resizeCallback);
 		
 		if (game.syncToken) {
 			sync.start();
@@ -421,9 +418,8 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		return game;
 	};
 	game.blur = function() {
-		game.hasFocus = hasFocus = false;
-		PokerRoom.movePanels('auto');
-		$(window).unbind( 'resize', resizeCallback );
+		//game.hasFocus = hasFocus = false;
+		//$(window).unbind( 'resize', resizeCallback );
 		return game;
 	};
 	game.toString = function() {

@@ -158,6 +158,8 @@ function createElement( type, className ) {
 	}
 	return e;
 }
+var html = $('html')[0];
+
 
 if (!console) {
 	var console = {
