@@ -25,41 +25,42 @@ var PokerRoom = (function($) {
 		$.post('php/games.php', {method:'sync', syncToken:syncToken, rand:Math.random()}, function(updates) {
 			updates = JSON.parse(updates);
 			if(updates.syncToken) {
-				updateList( updates );
+				var serverGames = updates.games;
+				syncToken = updates.syncToken;
+				
+				if (serverGames.length) {
+					
+					for( var i=0,c=serverGames.length; i<c; i++ ) {
+						var game = serverGames[i];
+						if (games[game.name]) {
+							games[game.name].update( game );
+						} else {
+							room.add( game );
+						}
+					}
+					room.save();
+				}
+				updateList();
 			}
 			syncTimer = setTimeout( function(){ sync() }, 60000 );
 			syncInProgress = false;
 		})
 	},
-	updateList = function( syncResult ) {
-		var serverGames = syncResult.games;
-		syncToken = syncResult.syncToken;
-		
-		if (serverGames.length) {
-			
-			for( var i=0,c=serverGames.length; i<c; i++ ) {
-				var game = serverGames[i];
-				if (games[game.name]) {
-					games[game.name].update( game );
-				} else {
-					room.add( game );
-				}
-			}
-			room.save();
-		} else {
-			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
-		}
-		
-		var sharedGames_a = [], localGames_a = [];
+	updateList = function( syncResult ) {		
+		var sharedGames_a = [], localGames_a = [], sharedGameCount = 0;
 		for( var name in games ) {
-			if (games.hasOwnProperty(name)) {
+			if (games.hasOwnProperty(name) && games[name]) {
 				games[name].wake();
 				if (games[name].syncToken) {
+					sharedGameCount += 1;
 					sharedGames_a.push(games[name]);
 				} else {
 					localGames_a.push(games[name]);
 				}
 			}
+		}
+		if (sharedGameCount === 0) {
+			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
 		}
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
@@ -69,8 +70,8 @@ var PokerRoom = (function($) {
 				e.stopPropagation();
 			}, true);
 		});
-		sharedListEl.innerHTML = '';
 		if (sharedFrag.childNodes.length) {
+			sharedListEl.innerHTML = '';
 			sharedListEl.appendChild( sharedFrag );
 		}
 		
@@ -201,10 +202,10 @@ var PokerRoom = (function($) {
 			}
 		},
 		removeGame: function(name) {
-			console.log( 'removing '+name );
 			if (games[name]) {
+				//games[name] = null;
 				delete games[name];
-				if (name === currentGame || !games[currentGame]) {
+				if (!games[currentGame]) {
 					currentGame = null;
 					updateList();
 				}
