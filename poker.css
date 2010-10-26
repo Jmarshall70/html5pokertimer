@@ -3,53 +3,53 @@
 	padding: 0;
 }
 body {
-	margin: 0;
 	font-family: Helvetica, FreeSans, sans-serif;
+	max-width: 760px;
+	margin: 0 auto;
+	background-color: white;
 }
 p {
 	margin-top: 1em;
 }
 h1, h2 {
 	margin-top: 1em;
+	clear: both;
 }
 input {
 	font-size: 100%;
 }
 #start {
 	padding:  0;
-	max-width: 760px;
-	margin: auto;
-	background-color: white;
 	z-index: 20;
 	font-size: 120%;
 }
 fieldset {
 	padding: 0;
 }
-#start fieldset div.title {
+#start div.title {
 	padding: 2%;
 	border-bottom: 1px solid silver;
 	margin-bottom: 1em;
 }
-#start fieldset div.title #new_game {
+#start div.title #new_game {
 /* 	float: right; */
 }
-#start fieldset div.time {
+#start div.time {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
 }
-#start fieldset div.time input {
+#start div.time input {
 	font-size: 200%;
 	padding: 7px;
 	line-height: 1.2;
 }
-#start fieldset div.blinds {
+#start div.blinds {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
 }
-#start fieldset div.games {
+#start div.games {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
@@ -64,8 +64,11 @@ fieldset {
 	cursor: pointer;
 	list-style-type: none;
 }
-.game_list div.level:not(.current) {
+.game_list div.level {
 	display: none;
+}
+.game_list div.level.current {
+	display: inline;
 }
 .game_list div {
 	display: inline;
@@ -195,6 +198,7 @@ fieldset {
 	padding: 0.333em 0;
 	text-align: center;
 	background-color: #aaa;
+/* 	background-color: rgba(150,150,150,0.85); */
 	z-index: 100;
 	line-height: 1em;
 	border-bottom: 0.125em solid black;

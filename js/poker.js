@@ -4,7 +4,6 @@ $(document).ready(function() {
 	gamesInput = getElementById('games'),
 	
 	post_game = function(e) {
-		e.preventDefault();
 		
 		var newGame = {
 			'blindTime': blindTimeInput.value,
@@ -20,6 +19,8 @@ $(document).ready(function() {
 		var name = PokerRoom.add( newGame );
 		PokerRoom.save();
 		PokerRoom.showGame(name);
+		
+		return false;
 	},
 	lastGame;
 	
@@ -41,8 +42,8 @@ $(document).ready(function() {
 	
 	
 	$('#new_game_title').val( util.randomWord() );
-	$('#show_advanced').bind( 'click', function(){ $('form .advanced').show(); $('form .no-advanced').hide(); });
-	$('#hide_advanced').bind( 'click', function(){ $('form .advanced').hide(); $('form .no-advanced').show(); }).click();
+	$('#show_advanced').bind( 'click', function(){ $('.advanced').show(); $('.no-advanced').hide(); });
+	$('#hide_advanced').bind( 'click', function(){ $('.advanced').hide(); $('.no-advanced').show(); }).click();
 	
 	$('#restore_defaults').bind('click', function(){
 		blindTimeInput.value = blindTimeInput.defaultValue;
@@ -53,16 +54,16 @@ $(document).ready(function() {
 	
 	PokerRoom.start();
 	//$('#asdf').click( post_game );
-	$('form').bind( 'submit', post_game );
+	$('#new_game').bind( 'click', post_game );
 	
 	
 	
 });
 
 $(document).bind('click', function(e){
-	if (e.target.nodeName === 'A' && 
-		(e.target.href.length === e.target.baseURI.length || e.target.href.substr(e.target.baseURI.length) === '#') ) {
+	if (e.target.nodeName === 'A' && e.target.href.substr(e.target.href.length-1) === '#') {
 		e.preventDefault();
+		return false;
 	}
 });
 
