@@ -197,7 +197,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			})
 		
 		},
-		syncTimer = true,
+		syncTimer = false,
 		
 		sync = {
 			start: function() {
