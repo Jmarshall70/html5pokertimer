@@ -23,38 +23,35 @@ input {
 	z-index: 20;
 	font-size: 120%;
 }
-fieldset {
-	padding: 0;
-}
-#start div.title {
+#start_form div.title {
 	padding: 2%;
 	border-bottom: 1px solid silver;
 	margin-bottom: 1em;
 }
-#start div.title #new_game {
+#start_form div.title #new_game {
 /* 	float: right; */
 }
-#start div.time {
+#start_form div.time {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
 }
-#start div.time input {
+#start_form div.time input {
 	font-size: 200%;
 	padding: 7px;
 	line-height: 1.2;
 }
-#start div.blinds {
+#start_form div.blinds {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
 }
-#start div.games {
+#start_form div.games {
 	float: left;
 	width: 29%;
 	padding: 2% 2%
 }
-#start textarea {
+#start_form textarea {
 	width: 82%;	
 	font-size: 100%;
 	line-height: 1.2;
@@ -157,15 +154,19 @@ fieldset {
 	left: 0px;
 	right: 0px;
 	width: 100%;
-	background-color: rgba(0,0,0,0.7);
 	z-index: 10;
 }
 #panels > div.top.curtain {
 	top: 0px;
-	background-color: rgba(0,0,0,0.4);
+	background: black;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
 }
 #panels > div.bottom.curtain {
 	bottom: 0px;
+	background: black;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
 }
 #panels > div.curtain > a {
 	position: absolute;

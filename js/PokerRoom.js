@@ -236,7 +236,7 @@ var PokerRoom = (function($) {
 		showGame: function( name ) {
 			mute = false;
 			if( games[name] ) {
-				$('#start').hide();
+				$('#start').css({display: 'none'});
 				$(gameEl).show();
 				for( var game in games ) {
 					if (games.hasOwnProperty(game)) {
@@ -258,8 +258,9 @@ var PokerRoom = (function($) {
 			return room;
 		},
 		movePanels: function( place ) {
-			$(topPanel).css( 'bottom', place );
-			$(bottomPanel).css( 'place', place);
+			console.log(place);
+			$(topPanel).css( 'bottom', place);
+			$(bottomPanel).css( 'top', place);
 			return room;
 		}
 	};	
