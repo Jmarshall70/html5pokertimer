@@ -91,7 +91,6 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		update();
 	},
 	draw = function(){
-		console.log('drawing');
 		element.innerHTML = '';
 		currentLevelEl = null;
 		var template = $('#templates .level')[0];

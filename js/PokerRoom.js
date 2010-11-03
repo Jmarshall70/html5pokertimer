@@ -111,7 +111,6 @@ var PokerRoom = (function($) {
 		sharedListEl = getElementById('shared_games');
 		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
-		console.log(gameEl);
 		topPanel = $('#panels .top')[0];
 		bottomPanel = $('#panels .bottom')[0];		
 		
@@ -200,14 +199,8 @@ var PokerRoom = (function($) {
 			}
 		},
 		removeGame: function(name) {
-			if (games[name]) {
-				//games[name] = null;
-				delete games[name];
-				if (!games[currentGame]) {
-					currentGame = null;
-					updateList();
-				}
-			}
+			games[name] = null;
+			delete games[name];
 			room.save();
 			return room;
 		},
@@ -246,7 +239,7 @@ var PokerRoom = (function($) {
 							games[game].focus();
 							room.suspend();
 						} else if (games[game]) {
-							$(games[game]).remove();
+							//$(games[game]).remove();
 							games[game].sleep().blur();
 						}
 					}
@@ -258,7 +251,6 @@ var PokerRoom = (function($) {
 			return room;
 		},
 		movePanels: function( place ) {
-			console.log(place);
 			$(topPanel).css( 'bottom', place);
 			$(bottomPanel).css( 'top', place);
 			return room;
