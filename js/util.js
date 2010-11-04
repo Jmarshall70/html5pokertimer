@@ -162,7 +162,7 @@ var html = $('html')[0];
 
 
 if (!console) {
-	var console = {
+	window.console = {
 		log: function(){},
 		dir: function(){},
 		error: function(){}
