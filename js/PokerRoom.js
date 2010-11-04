@@ -1,20 +1,20 @@
 var PokerRoom = (function($) {
 	// hold games in localStorage
 	var games = {},
-		timeOffset = 0,
-		sharedListEl,
-		localListEl,
-		gameEl,
-		topPanel,
-		bottomPanel,
-		mute = true,
-		currentGame,
-		onBreak = false,
-		syncInProgress = false,
-		syncTimer = false,
-		syncSuspended = false,
-		curtain$,
-		syncToken = 0, //this is the syncToken for the game list
+	timeOffset = 0,
+	sharedListEl,
+	localListEl,
+	gameEl,
+	topPanel,
+	bottomPanel,
+	mute = true,
+	currentGame,
+	onBreak = false,
+	syncInProgress = false,
+	syncTimer = false,
+	syncSuspended = false,
+	curtain$,
+	syncToken = 0, //this is the syncToken for the game list
 		
 	sync = function() {
 		if (syncInProgress || syncSuspended) {
@@ -27,7 +27,6 @@ var PokerRoom = (function($) {
 			if(updates.syncToken) {
 				var serverGames = updates.games;
 				syncToken = updates.syncToken;
-				
 				if (serverGames.length) {
 					
 					for( var i=0,c=serverGames.length; i<c; i++ ) {
@@ -44,17 +43,17 @@ var PokerRoom = (function($) {
 			}
 			syncTimer = setTimeout( function(){ sync() }, 60000 );
 			syncInProgress = false;
-		})
+		});
 	},
 	updateList = function( syncResult ) {		
 		var sharedGames_a = [], localGames_a = [], sharedGameCount = 0;
 		for( var name in games ) {
 			if (games.hasOwnProperty(name) && games[name]) {
 				games[name].wake();
-				if (games[name].syncToken) {
+				if (games[name] && games[name].syncToken) {
 					sharedGameCount += 1;
 					sharedGames_a.push(games[name]);
-				} else {
+				} else if (games[name]) {
 					localGames_a.push(games[name]);
 				}
 			}
@@ -87,14 +86,6 @@ var PokerRoom = (function($) {
 		}
 		
 		room.resume();
-	},
-	updateGames = function( updates ) {
-		for( var name in updates ) {
-			var update = updates[name];
-			if (games[name]) {
-				games[name].update( update );
-			}
-		}
 	},
 	loadLocalGames = function() {
 		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
@@ -146,7 +137,7 @@ var PokerRoom = (function($) {
 			syncSuspended = false;
 			loadLocalGames();
 			sync();
-			room.save();
+			//room.save();
 			return room;
 		},
 		resume: function() {
@@ -190,6 +181,7 @@ var PokerRoom = (function($) {
 			if (!name) {
 				name = util.randomWord();
 			}
+			
 			var newGame = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
 			if (!newGame) {
 				return false;
@@ -199,9 +191,11 @@ var PokerRoom = (function($) {
 			}
 		},
 		removeGame: function(name) {
-			games[name] = null;
-			delete games[name];
-			room.save();
+			if (games[name]) {
+				games[name] = null;
+				delete games[name];
+				room.save();
+			}
 			return room;
 		},
 		save: function() {
@@ -211,8 +205,10 @@ var PokerRoom = (function($) {
 		},
 		toArray: function() {
 			var games_a = [];
-			for (name in games) {
-				games_a.push( games[name] );
+			for (var name in games) {
+				if (games.hasOwnProperty(name) && games[name]) {
+					games_a.push( games[name] );
+				}
 			}
 			return games_a
 		},
