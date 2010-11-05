@@ -18,6 +18,13 @@ h1, h2 {
 input {
 	font-size: 100%;
 }
+a {
+	color: black;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
 #start {
 	padding:  0;
 	z-index: 20;
@@ -190,13 +197,13 @@ input {
 #panels > div.bottom.curtain > a {
 	top: 0.15em;
 }
-#toolbar {
+#hud {
 	position: absolute;
 	top: 0;
 	right: 0;
 	left: 0;
 	width: 100%;
-	padding: 0.333em 0;
+	padding: 0.333em 0 0;
 	text-align: center;
 	background-color: #aaa;
 /* 	background-color: rgba(150,150,150,0.85); */
@@ -214,6 +221,9 @@ input {
 }
 a.button:active {
 	outline: none;
+}
+a.button:hover {
+	text-decoration: none;
 }
 .button {
 	background-image: url(images/button-background.png);
@@ -257,6 +267,27 @@ a.button:active {
 }
 .mute .button.bell span {
 	background-position: 100% -400%;
+}
+
+#info {
+	line-height: 1;
+	font-size: 0.5em;
+	float: right;
+}
+#info > div {
+	padding: 0.33em;
+	text-align: center;
+	white-space: nowrap;
+	float: left;
+	border-top:  0.1em solid #666;
+	border-left: 0.1em solid #666;
+}
+#hud .about {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	font-size: 0.25em;
+	margin-left: 1em;
 }
 #curtain {
 	position: fixed;

@@ -44,18 +44,35 @@ bell = (function() {
 	return bell;
 })();
 
-return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, syncToken) {
-	var game = this;
-	if ( !$.isArray(state) && typeof state === 'object') {
-		game.syncToken = syncToken = state.syncToken;
-		lastUpdate = state.lastUpdate;
-		breakLength = state.breakLength;
-		game.name = name = state.name;
-		state = state.state;
-	}
-	if( !$.isArray(state)) {
-		console.error( 'state is not an array!' );
+return function PokerGame (PokerRoom, info, state) {
+	if (!info.games) {
+		console.log('removed because there were no games.');
 		return false;
+	}
+	var game = this,
+	syncToken = info.syncToken,
+	lastUpdate = info.lastUpdate,
+	breakLength = info.breakLength,
+	name = info.name,
+	state = info.state,
+	blinds = info.blinds,
+	games = info.games,
+	blindTime = info.blindTime;
+	
+	game.syncToken = syncToken;
+	game.name = name;
+	
+	if ($.isArray(info.state)) {
+		state = info.state;
+	} else {
+		blinds = blinds.split(/\n+/g);
+		games = games.split(/\n+/g);
+		blindTime = util.stringToSeconds(blindTime);
+		
+		state = [];
+		for (var i=0,c=info.blinds.length; i<c; i++ ) {
+			state.push({ time:blindTime, blinds:blinds[i], game: games[i%games.length] });
+		}
 	}
 	if (!lastUpdate) {
 		lastUpdate = (new Date).getTime();
@@ -67,10 +84,11 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		game.name = name = util.randomWord();
 	}
 	if( !breakLength ) {
-		breakLength = state[state.length-1].time; 
+		breakLength = blindTime; 
 		// use the time from the last blind as the default break length
 		// if the game is already on the second level the first one will be zero.
 	}
+	
 	var countInterval,
 	element = createElement('div', 'poker-game'),
 	currentLevelEl = null,
@@ -81,7 +99,8 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	defaultLevelHeight,
 	onBreak = false,
 	curtain$,
-	toolbar;
+	toolbar,
+	hud;
 	
 	game.element = element;
 	
@@ -316,22 +335,20 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			clearInterval(controlsTimeout);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		} else {
-			$(toolbar).stop().animate({opacity:0.95}, 150);
+			$(hud).stop().animate({opacity:0.95}, 150);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		}
 	},
 	hideControls = function() {
 		clearTimeout(controlsTimeout);
 		controlsTimeout = null;
-		$(toolbar).stop().animate({opacity:0}, 'slow', function() {
+		$(hud).stop().animate({opacity:0}, 'slow', function() {
 			curtain$.show();
 		});
 	},
 	addTime = function(seconds) {
 		state[currentBlindIndex].time += seconds * 1000;
-		//lastUpdate = Date.now();
 		save();
-		//draw();
 		update();
 	};
 	
@@ -380,6 +397,7 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 	};
 	game.focus = function() {
 		toolbar = $('#toolbar')[0];
+		hud = $('#hud')[0];
 		
 		
 		curtain$ = $('#curtain').bind('click', function(e) {
@@ -443,7 +461,10 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 			breakLength: breakLength,
 			name: name,
 			state: state,
-			syncToken: syncToken
+			syncToken: syncToken,
+			games: games,
+			blindTime: blindTime,
+			
 		};
 	};
 	game.resize = function(animate) {
@@ -461,6 +482,22 @@ return function PokerGame (PokerRoom, state, name, breakLength, lastUpdate, sync
 		//game.__defineGetter__( 'name', function(){return name;} );
 		//game.__defineGetter__( 'hasFocus', function(){return hasFocus;} );
 	}
+	
+	/////////////////////////////////////////
+	// fill in game info
+	
+	var infoEl = $('#info')[0];
+	
+	$('.blinds', infoEl).html(util.secondsToString(blindTime)+' blinds');
+	$('.games', infoEl).html(games.join('<br>')).css({'font-size':(100/games.length)+'%'});
+	if (syncToken) {
+		$('.sync-state', infoEl).html('public');
+	} else {
+		$('.sync-state', infoEl).html('private');
+	}
+	$('.name', infoEl).html(name);
+	
+	
 	var stillGood = draw();
 	if (stillGood) {
 		return game;
