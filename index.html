@@ -15,27 +15,34 @@
 </head>
 <body>
 <div id="start">
-	<h1>Tournament Poker Timer</h1>
-	<h2>Make a New Game</h2>
-	<div id="start_form">
-		<div class="title simple">
-			Game Title: <input type="text" size="20" name="title" id="new_game_title" value="No Title">
-			<input type="submit" id="new_game" name="new_game" value="Start">
-			
-			<div class="no-advanced">
-				<a href="#" id="show_advanced">Show advanced controls</a>
-			</div>
-			<div class="advanced">
-				<a href="#" id="hide_advanced">Hide advanced controls</a>
-			</div>
+	<div class="start-section">
+		<h1>Poker Timer</h1>
+	</div>
+	
+	<div class="start-section">
+		<h2>Games In Progress</h2>
+		<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
+	</div>
+	<div id="start_form" class="start-section">
+		<h2>Make a New Game</h2>
+		<div class="time">
+			<label><input type="text" size="4" name="time" id="blind_time" value="10:00"> blinds</label>
+		</div>
+		<div class="games">
+			<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
+Omaha</textarea>
+		</div>
+		<div class="start">
+			<button id="new_game">Start</button><br>
+			<label>title: <input type="text" size="10" name="title" id="new_game_title" value="No Title"></label>
+		</div>
+		<hr>
+		<div class="show-hide-advanced">
+			<a href="#" id="show_advanced" class="no-advanced">Edit Blind Levels</a>
+			<a href="#" id="hide_advanced" class="advanced">Hide Blind Levels</a>
 		</div>
 		<div class="advanced">
-			<div class="restore">
-				<a href="#" id="restore_defaults">Restore Defaults</a><br/>
-				<a href="#" id="restore_last">Restore From Last Game</a>
-			</div>
 			<div class="blinds">
-				Blind Levels:<br>
 				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
 25/50
 50/100
@@ -53,22 +60,17 @@
 3000/6000
 4000/8000</textarea>
 			</div>
-			<div class="games">
-				Games:<br>
-				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
-Omaha</textarea>
-			</div>
-			<div class="time">
-				Time:<br>
-				<input type="text" size="4" name="time" id="blind_time" value="10:00">
-			</div>
+		</div>
+		<div class="restore">
+			<a href="#" id="restore_defaults">Restore Defaults</a><br>
+			<a href="#" id="restore_last">Restore From Last Game</a>
 		</div>
 	</div>
-	<h2 class="games">Watch A Game</h2>
-	<h3>Local Games</h3>
-	<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
-	<h3>Shared Games</h3>
-	<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
+	<div class="start-section">
+		<h2 class="games">Join a Game</h2>
+		<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
+	</div>
+
 </div>
 <div id="game">
 	<div id="panels">
