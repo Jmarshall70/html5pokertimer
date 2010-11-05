@@ -66,11 +66,12 @@ return function PokerGame (PokerRoom, info, state) {
 		state = info.state;
 	} else {
 		blinds = blinds.split(/\n+/g);
+		console.log(blinds);
 		games = games.split(/\n+/g);
 		blindTime = util.stringToSeconds(blindTime);
 		
 		state = [];
-		for (var i=0,c=info.blinds.length; i<c; i++ ) {
+		for (var i=0,c=blinds.length; i<c; i++ ) {
 			state.push({ time:blindTime, blinds:blinds[i], game: games[i%games.length] });
 		}
 	}
