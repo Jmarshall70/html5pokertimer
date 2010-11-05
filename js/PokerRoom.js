@@ -145,7 +145,8 @@ var PokerRoom = (function($) {
 			sync();
 			return room;
 		},
-		add: function (blindTime, blinds, p_games, name, breakLength, lastUpdate, p_syncToken) {
+		add: function (info) {
+			/*
 			if (typeof blindTime === 'object') {
 				//blind time is actually a game.
 				var o = blindTime;
@@ -180,14 +181,14 @@ var PokerRoom = (function($) {
 			
 			if (!name) {
 				name = util.randomWord();
-			}
+			}*/
 			
-			var newGame = new PokerGame( this, state, name, breakLength, lastUpdate, p_syncToken );
+			var newGame = new PokerGame( this, info );
 			if (!newGame) {
 				return false;
 			} else {
-				games[name] = newGame;
-				return name;
+				games[newGame.name] = newGame;
+				return newGame.name;
 			}
 		},
 		removeGame: function(name) {
@@ -242,7 +243,7 @@ var PokerRoom = (function($) {
 				}
 				room.suspend();
 			} else {
-				console.error('Tried to load a game that does not exist.');
+				console.error('Tried to load "'+name+'", which does not exist.');
 			}
 			return room;
 		},
