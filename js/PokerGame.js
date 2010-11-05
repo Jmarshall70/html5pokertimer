@@ -66,7 +66,6 @@ return function PokerGame (PokerRoom, info, state) {
 		state = info.state;
 	} else {
 		blinds = blinds.split(/\n+/g);
-		console.log(blinds);
 		games = games.split(/\n+/g);
 		blindTime = util.stringToSeconds(blindTime);
 		
@@ -349,8 +348,8 @@ return function PokerGame (PokerRoom, info, state) {
 	},
 	addTime = function(seconds) {
 		state[currentBlindIndex].time += seconds * 1000;
-		save();
 		update();
+		save();
 	};
 	
 	game.update = function( updateData ) {
