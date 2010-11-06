@@ -283,7 +283,7 @@ hr {
 #toolbar .button.bell span {
 	background-position: 0 -400%;
 }
-#toolbar .mute .button.bell span {
+.mute #toolbar .button.bell span {
 	background-position: 100% -400%;
 }
 
