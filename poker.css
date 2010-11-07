@@ -35,7 +35,7 @@ hr {
 	color: #666;
 }
 .tabs > * {
-	border: 1px solid #aaa;
+	border: 0.0625em solid #aaa;
 	border-bottom: none;
 	padding: 0.125em 0.5em;
 	border-radius: 0.25em 0.25em 0 0;
@@ -47,8 +47,9 @@ hr {
 }
 .tabs > *.selected {
 	background-color: white;
-	border-bottom: 1px solid white;
-	margin-bottom: -1px;
+/* 	border-bottom: 1px solid white; */
+	padding-bottom: 0.1875em;
+	margin-bottom: -0.0625em;
 }
 .tab-content > * {
 	background-color: white;
@@ -63,7 +64,7 @@ hr {
 }
 .tab-content {
 	padding: 0.5em;
-	border: 1px solid #aaa;
+	border: 0.0625em solid #aaa;
 	background-color: white;
 /*
 	border-radius: 1.5em;
