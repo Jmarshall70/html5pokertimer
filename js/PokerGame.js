@@ -61,7 +61,8 @@ return function PokerGame (PokerRoom, info, state) {
 	state = info.state,
 	blinds = info.blinds,
 	games = info.games,
-	blindTime = info.blindTime;
+	blindTime = info.blindTime,
+	infoEl;
 	
 	game.syncToken = syncToken;
 	game.name = name;
@@ -241,6 +242,7 @@ return function PokerGame (PokerRoom, info, state) {
 				PokerRoom.save();
 				$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
 					game.syncToken = syncToken = data;
+					$('.sync-state', infoEl).html('public');
 					PokerRoom.save();
 					run();
 				});
@@ -248,7 +250,8 @@ return function PokerGame (PokerRoom, info, state) {
 			stop: function() {
 				clearTimeout(syncTimer);
 				syncTimer = null;
-				syncToken = null;
+				game.syncToken = syncToken = null;
+				$('.sync-state', infoEl).html('private');
 			},
 			run: function() {
 				if (!syncTimer) {
@@ -403,6 +406,20 @@ return function PokerGame (PokerRoom, info, state) {
 		toolbar = $('#toolbar')[0];
 		hud = $('#hud')[0];
 		
+		/////////////////////////////////////////
+		// fill in game info
+		
+		infoEl = $('#info')[0];
+		
+		$('.blinds', infoEl).html(util.secondsToString(blindTime)+' blinds');
+		$('.games', infoEl).html(games.join('<br>')).css({'font-size':(100/games.length)+'%'});
+		console.log(syncToken);
+		if (syncToken) {
+			$('.sync-state', infoEl).html('public');
+		} else {
+			$('.sync-state', infoEl).html('private');
+		}
+		$('.name', infoEl).html(name);
 		
 		curtain$ = $('#curtain').bind('click', function(e) {
 			showControls();
@@ -411,6 +428,7 @@ return function PokerGame (PokerRoom, info, state) {
 		
 		$('a.break', toolbar).bind('click', function(e){
 			toggleBreak();
+			hideControls();
 		});
 		
 		$('a.sync', toolbar).bind('click', function(e) {
@@ -488,22 +506,7 @@ return function PokerGame (PokerRoom, info, state) {
 		//game.__defineGetter__( 'element', function(){return element;} );
 		//game.__defineGetter__( 'name', function(){return name;} );
 		//game.__defineGetter__( 'hasFocus', function(){return hasFocus;} );
-	}
-	
-	/////////////////////////////////////////
-	// fill in game info
-	
-	var infoEl = $('#info')[0];
-	
-	$('.blinds', infoEl).html(util.secondsToString(blindTime)+' blinds');
-	$('.games', infoEl).html(games.join('<br>')).css({'font-size':(100/games.length)+'%'});
-	if (syncToken) {
-		$('.sync-state', infoEl).html('public');
-	} else {
-		$('.sync-state', infoEl).html('private');
-	}
-	$('.name', infoEl).html(name);
-	
+	}	
 	
 	var stillGood = draw();
 	if (stillGood) {
