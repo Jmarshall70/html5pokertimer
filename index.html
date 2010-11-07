@@ -15,35 +15,39 @@
 </head>
 <body>
 <div id="start">
-	<div class="start-section">
-		<h1>Poker Timer</h1>
+	<h1>Poker Timer</h1>
+	
+	<div class="tabs">
+		<div class="local">Recent Games</div>
+		<div class="new-game">New Game</div>
+		<div class="public">Public Games</div>
 	</div>
 	
-	<div class="start-section">
-		<h2>Games In Progress</h2>
-		<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
-	</div>
-	<div id="start_form" class="start-section">
-		<h2>Make a New Game</h2>
-		<div class="time">
-			<label><input type="text" size="4" name="time" id="blind_time" value="10:00"> blinds</label>
+	<div class="tab-content">
+		<div class="local">
+			<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
 		</div>
-		<div class="games">
-			<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
-Omaha</textarea>
-		</div>
-		<div class="start">
-			<button id="new_game">Start</button><br>
-			<label>title: <input type="text" size="10" name="title" id="new_game_title" value="No Title"></label>
-		</div>
-		<hr>
-		<div class="show-hide-advanced">
-			<a href="#" id="show_advanced" class="no-advanced">Edit Blind Levels</a>
-			<a href="#" id="hide_advanced" class="advanced">Hide Blind Levels</a>
-		</div>
-		<div class="advanced">
-			<div class="blinds">
-				<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
+		
+		<div id="start_form" class="new-game">
+			<div class="time">
+				<label><input type="text" size="4" name="time" id="blind_time" value="10:00"> blinds</label>
+			</div>
+			<div class="games">
+				<textarea class="game" id="games" name="games" rows="4" cols="20">Hold 'Em
+	Omaha</textarea>
+			</div>
+			<div class="start">
+				<button id="new_game">Start</button><br>
+				<label>title: <input type="text" size="10" name="title" id="new_game_title" value="No Title"></label>
+			</div>
+			<hr>
+			<div class="show-hide-advanced">
+				<a href="#" id="show_advanced" class="no-advanced">Edit Blind Levels</a>
+				<a href="#" id="hide_advanced" class="advanced">Hide Blind Levels</a>
+			</div>
+			<div class="advanced">
+				<div class="blinds">
+					<textarea class="blinds" id="blinds" name="blinds" rows="20" cols="20">25/50
 25/50
 50/100
 75/150
@@ -59,18 +63,22 @@ Omaha</textarea>
 2000/4000
 3000/6000
 4000/8000</textarea>
+				</div>
+			</div>
+			<div class="restore">
+				<a href="#" id="restore_defaults">Restore Defaults</a><br>
+				<a href="#" id="restore_last">Restore From Last Game</a>
 			</div>
 		</div>
-		<div class="restore">
-			<a href="#" id="restore_defaults">Restore Defaults</a><br>
-			<a href="#" id="restore_last">Restore From Last Game</a>
+		<div class="public">
+			<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
 		</div>
 	</div>
-	<div class="start-section">
-		<h2 class="games">Join a Game</h2>
-		<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
-	</div>
+	<div class="copyright">
+		&copy; 2010 Stu Kabakoff
+		<a href="http://bitbucket.org/sakabako/pokertimer" target="_blank">Find us on BitBucket</a><br>
 
+	</div>
 </div>
 <div id="game">
 	<div id="panels">
