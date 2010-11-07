@@ -53,10 +53,7 @@ $(document).ready(function() {
 	
 	
 	PokerRoom.start();
-	//$('#asdf').click( post_game );
 	$('#new_game').bind( 'click', post_game );
-	
-	
 	
 });
 

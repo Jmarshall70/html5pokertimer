@@ -58,19 +58,23 @@ var PokerRoom = (function($) {
 				}
 			}
 		}
-		if (sharedGameCount === 0) {
-			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
-		}
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
-		var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
-			$(el).bind( 'click', function(e){
-				room.showGame(game.name)
+		
+		if (sharedGameCount === 0) {
+			$('.tabs .public').hide();
+			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
+		} else {
+			$('.tabs .public').show();
+			var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
+				$(el).bind( 'click', function(e){
+					room.showGame(game.name)
+				});
 			});
-		});
-		if (sharedFrag.childNodes.length) {
-			sharedListEl.innerHTML = '';
-			sharedListEl.appendChild( sharedFrag );
+			if (sharedFrag.childNodes.length) {
+				sharedListEl.innerHTML = '';
+				sharedListEl.appendChild( sharedFrag );
+			}
 		}
 		
 		var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
@@ -79,20 +83,32 @@ var PokerRoom = (function($) {
 			});
 		});
 		if (localFrag.childNodes.length) {
+			$('.tabs .local').show();
 			localListEl.innerHTML = '';
 			localListEl.appendChild( localFrag );
 		} else {
+			$('.tabs .local').hide();
 			localListEl.innerHTML = '<li>No games in progress.</li>';
 		}
 		
 		room.resume();
 	},
 	loadLocalGames = function() {
-		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' );
+		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' ),
+		foundOne = false;
 		for (var i=0,c=games_a.length; i < c; i++) {
 			if (games_a[i].state) {
-				room.add( games_a[i] );
+				foundOne = room.add( games_a[i] ).syncToken || foundOne;
 			}
+		}
+		if (foundOne) {
+			$('.tab-content .local').show();
+			$('.tabs > *').removeClass('selected')
+			$('.tabs .local').addClass('selected');
+		} else {
+			$('.tab-content .new-game').show();
+			$('.tabs > *').removeClass('selected')
+			$('.tabs .new-game').addClass('selected');
 		}
 		room.save();
 	}
@@ -103,7 +119,19 @@ var PokerRoom = (function($) {
 		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
 		topPanel = $('#panels .top')[0];
-		bottomPanel = $('#panels .bottom')[0];		
+		bottomPanel = $('#panels .bottom')[0];
+		
+		var tabs = $('.tabs')[0],
+		tabContent = $('.tab-content')[0];
+		
+		$(tabs.children).each(function(i, el) {
+			$(el).bind('click', function() {
+				$(tabContent.children).hide()
+				$(tabContent.children[i]).show()
+				$(tabs.children).removeClass('selected');
+				$(el).addClass('selected');
+			});
+		});
 		
 	});
 	$(window).bind('load', function() {
@@ -146,43 +174,7 @@ var PokerRoom = (function($) {
 			return room;
 		},
 		add: function (info) {
-			/*
-			if (typeof blindTime === 'object') {
-				//blind time is actually a game.
-				var o = blindTime;
-				if( o.state ) {
-					games[o.name] = new PokerGame( this, o );
-					return o.name;
-				}
-				blindTime = o.blindTime;
-				blinds = o.blinds;
-				p_games = o.games;
-				name = o.name;
-				lastUpdate = o.lastUpdate;
-				p_syncToken = o.syncToken;
-			}
-			if (typeof blindTime === 'string') {
-				blindTime = util.stringToSeconds(blindTime);
-			}
-			if (typeof blinds === 'string') {
-				blinds = blinds.split(/\n|\r|\t/);
-			}
-			if (typeof p_games === 'string') {
-				p_games = p_games.split(/\n|\r|\t/);
-			}
-			if (!breakLength) {
-				breakLength = blindTime;
-			}
-			var gamesLength = p_games.length;
-			var state = [];
-			for (var i=0,c=blinds.length; i<c; i++ ) {
-				state.push({ time:blindTime, blinds:blinds[i], game: p_games[i%gamesLength] });
-			}
-			
-			if (!name) {
-				name = util.randomWord();
-			}*/
-			
+
 			var newGame = new PokerGame( this, info );
 			if (!newGame) {
 				return false;

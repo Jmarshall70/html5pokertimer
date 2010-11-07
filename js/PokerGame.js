@@ -9,9 +9,13 @@ bell = (function() {
 	
 	$(document).ready(function() {
 		element = document.getElementById('bell');
-		toggleElement = $('#toolbar a.bell').bind('click', function() {
-			bell.toggle();
-		});
+		if (element.play) {
+			toggleElement = $('#toolbar a.bell').bind('click', function() {
+				bell.toggle();
+			});
+		} else {
+			$(document.body).addClass('mute');
+		}
 	});
 	
 	var bell = {
@@ -401,6 +405,7 @@ return function PokerGame (PokerRoom, info, state) {
 		
 		
 		curtain$ = $('#curtain').bind('click', function(e) {
+			showControls();
 			return false
 		});
 		
@@ -430,6 +435,8 @@ return function PokerGame (PokerRoom, info, state) {
 			$(document).bind('mousemove', showControls);
 			$(toolbar).bind('mouseover', function() { controlsFadeTime = 5000 });
 			$(toolbar).bind('mouseout', function() { controlsFadeTime = 1000 });
+		} else {
+			controlsFadeTime = 5000;
 		}
 		game.hasFocus = hasFocus = true;
 		game.wake();
