@@ -77,14 +77,14 @@ var PokerRoom = (function($) {
 			}
 		}
 		
-		var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
-			$(el).bind('click', function(e){
-				room.showGame(game.name)
-			});
-		});
-		if (localFrag.childNodes.length) {
+		if (localGames_a.length) {
 			$('.tabs .local').show();
 			localListEl.innerHTML = '';
+			var localFrag = util.template( template, bindings, localGames_a, function(el, game) {
+				$(el).bind('click', function(e){
+					room.showGame(game.name)
+				});
+			});
 			localListEl.appendChild( localFrag );
 		} else {
 			$('.tabs .local').hide();
@@ -134,6 +134,7 @@ var PokerRoom = (function($) {
 		});
 		
 	});
+	// onload to make sure nothing else is hogging the network (from this window, at least.)
 	$(window).bind('load', function() {
 		var rand = Math.random();
 		$.get('php/time.php', {rand:rand}, function(data) {
@@ -142,6 +143,7 @@ var PokerRoom = (function($) {
 			if (serverTime) {
 				room.timeOffset = timeOffset = serverTime - requestEndTime;
 			}
+			room.start();
 		});
 	});
 	

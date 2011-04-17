@@ -79,7 +79,9 @@ var util = (function($) { return {
 	stringToSeconds: function( time ) {
 		var time_a = time.split(':');
 		if (time_a.length > 1) {
-			return ((parseInt(time_a[0],10)*60) + parseInt(time_a[1],10)) * 1000;
+			var minutes = (parseInt(time_a[0],10) || 0) * 60;
+			var seconds = parseInt(time_a[1],10) || 0;
+			return (minutes + seconds) * 1000;
 		} else {
 			return parseInt(time,10) * 1000;
 		}

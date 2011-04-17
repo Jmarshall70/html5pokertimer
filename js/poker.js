@@ -52,7 +52,6 @@ $(document).ready(function() {
 	});
 	
 	
-	PokerRoom.start();
 	$('#new_game').bind( 'click', post_game );
 	
 });
