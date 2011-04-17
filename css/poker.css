@@ -181,6 +181,7 @@ hr {
 }
 #game .poker-game.tall .level.current {
 	font-size: 145%;
+	position: static;
 }
 #game .poker-game.tall .level.current .time {
 	position: static;
