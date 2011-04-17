@@ -257,61 +257,75 @@ hr {
 	line-height: 1em;
 	border-bottom: 0.125em solid black;
 }
-#toolbar a.button {
+#hud a.button {
 	display: inline-block;
 	vertical-align: bottom;
+	position: relative;
 	width: 11em;
 	height: 11em;
-	font-size: 25%;
-	position: relative;
 }
-#toolbar a.button:active {
+#toolbar a.button {
+	font-size: 25%;
+}
+#hud a.button.bell {
+	font-size: 20%;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+#hud a.button:active {
 	outline: none;
 }
-#toolbar a.button:hover {
+#hud a.button:hover {
 	text-decoration: none;
 }
-#toolbar .button {
+#hud .button {
 	background-image: url(images/button-background.png);
 	background-size: 200% 100%;
 	-moz-background-size: 200% 100%;
 	text-decoration: none;
 }
-#toolbar .button:hover {
+#hud .button:hover {
 	background-position: 100% 0;
 }
 
-#toolbar .button span {
+#hud .button span {
 	position: absolute;
 	left: 1em;
 	top: 1em;
 	right: 1em;
 	bottom: 1em;
 	color: transparent;
-	background-image: url(images/buttons-sprite.png);
+	background-image: url(images/buttons-sprite.png?3);
 	background-size: 200% 500%;
 	-moz-background-size: 200% 500%;
 }
 
-#toolbar .button.break span {
+#hud .button.break span {
 	background-position: 0 0;
 }
-#toolbar .onbreak .button.break span {
-	background-position: 100% 0;
+.onbreak #hud .button.break span {
+	background-position: -100% 0;
 }
-#toolbar .button.advance span {
-	background-position: 0 -200%;
-}
-#toolbar .button.goback span {
+#hud .button.break-next span {
 	background-position: 0 -300%;
 }
-#toolbar .button.sync span {
+#hud .button.advance span {
+	background-position: 0 -200%;
+}
+#hud .button.goback span {
+	background-position: -100% -200%;
+}
+#hud .button.sync span {
+	background-position: -100% -100%;
+}
+.syncing #hud .button.sync span {
 	background-position: 0 -100%;
 }
-#toolbar .button.bell span {
+#hud .button.bell span {
 	background-position: 0 -400%;
 }
-.mute #toolbar .button.bell span {
+.mute #hud .button.bell span {
 	background-position: 100% -400%;
 }
 

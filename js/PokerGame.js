@@ -10,7 +10,7 @@ bell = (function() {
 	$(document).ready(function() {
 		element = document.getElementById('bell');
 		if (element.play) {
-			toggleElement = $('#toolbar a.bell').bind('click', function() {
+			toggleElement = $('a.bell.button').bind('click', function() {
 				bell.toggle();
 			});
 		} else {
@@ -241,6 +241,7 @@ return function PokerGame (PokerRoom, info, state) {
 				PokerRoom.save();
 				$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
 					game.syncToken = data;
+					$(document.body).addClass('syncing');
 					$('.sync-state', infoEl).html('public');
 					PokerRoom.save();
 					run();
@@ -250,6 +251,7 @@ return function PokerGame (PokerRoom, info, state) {
 				clearTimeout(syncTimer);
 				syncTimer = null;
 				game.syncToken = null;
+				$(document.body).removeClass('syncing');
 				$('.sync-state', infoEl).html('private');
 			},
 			run: function() {
@@ -297,9 +299,17 @@ return function PokerGame (PokerRoom, info, state) {
 	function resizeCallback(){ 
 		resize();
 	}
-	function startBreak(){
-		state.splice(currentBlindIndex, 0, {blinds:local['break'], game:'', time:breakLength});
+	function addBreak(index) {
+		state.splice(index, 0, {blinds:local['break'], game:'', time:breakLength});
+	}
+	function startBreak() {
+		addBreak(currentBlindIndex);
 		onBreak = true;
+		draw();
+		save();
+	}
+	function breakNext() {
+		addBreak(currentBlindIndex+1);
 		draw();
 		save();
 	}
@@ -426,20 +436,24 @@ return function PokerGame (PokerRoom, info, state) {
 			return false
 		});
 		
-		$('a.break', toolbar).bind('click', function(e){
+		$('a.break.button', hud).bind('click', function(e){
 			toggleBreak();
 			hideControls();
 		});
+		$('a.break-next.button', hud).bind('click', function(e){
+			breakNext();
+			hideControls();
+		});
 		
-		$('a.sync', toolbar).bind('click', function(e) {
+		$('a.sync.button', hud).bind('click', function(e) {
 			e.preventDefault();
 			sync.run();
 		});
-		$('a.advance', toolbar).bind('click', function(e) {
+		$('a.advance.button', hud).bind('click', function(e) {
 			e.preventDefault();
 			addTime(30);
 		});
-		$('a.goback', toolbar).bind('click', function(e) {
+		$('a.goback.button', hud).bind('click', function(e) {
 			e.preventDefault();
 			addTime(-30);
 		});
@@ -450,7 +464,7 @@ return function PokerGame (PokerRoom, info, state) {
 		hideControls();
 		$(document).bind('keydown', keyControl);
 		if (!window.Touch) {
-			$(document).bind('mousemove', showControls);
+			$(document.body).bind('mousemove', showControls);
 			$(hud).bind('mouseover', function() { controlsFadeTime = 5000 });
 			$(hud).bind('mouseout', function() { controlsFadeTime = 1000 });
 		} else {
