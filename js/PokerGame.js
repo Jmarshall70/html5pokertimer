@@ -171,6 +171,7 @@ return function PokerGame (PokerRoom, info, state) {
 				blind = state[currentBlindIndex];
 			}
 			if (previousBlindIndex !== currentBlindIndex) {
+				_gaq.push(['_trackEvent', 'game', 'level', currentBlindIndex]);
 				if( currentLevelEl ) {
 					var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played');
 					previousDimmerTimer = setTimeout( function() {
@@ -303,10 +304,12 @@ return function PokerGame (PokerRoom, info, state) {
 		save();
 	}
 	function startBreak() {
+		_gaq.push(['_trackEvent', 'break', 'now']);
 		addBreak(currentBlindIndex);
 		onBreak = true;
 	}
 	function breakNext() {
+		_gaq.push(['_trackEvent', 'break', 'next']);
 		addBreak(currentBlindIndex+1);
 	}
 	function endBreak() {
@@ -360,6 +363,7 @@ return function PokerGame (PokerRoom, info, state) {
 		});
 	}
 	function addTime(seconds) {
+		_gaq.push(['_trackEvent', 'timechange', seconds]);
 		state[currentBlindIndex].time += seconds * 1000;
 		update();
 		save();
