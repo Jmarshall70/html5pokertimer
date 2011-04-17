@@ -73,7 +73,7 @@ var util = (function($) { return {
 		}
 	},
 	secondsToString: function( sec ) {
-		sec = Math.round( sec / 1000 );
+		sec = Math.floor( sec / 1000 );
 		return Math.floor(sec/60)+':'+util.pad(sec%60,2);
 	},
 	stringToSeconds: function( time ) {

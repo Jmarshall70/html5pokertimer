@@ -138,9 +138,6 @@ return function PokerGame (PokerRoom, info, state) {
 			setTimeout( function(){ count(); }, ((blindTimeRemaining-milliseconds) % 1000)  );
 		}
 		
-		if (milliseconds < 500 && currentLevelEl) {
-			return true;
-		}
 		lastUpdate = now;
 		
 		//count
@@ -213,10 +210,7 @@ return function PokerGame (PokerRoom, info, state) {
 	function save() {
 		PokerRoom.save();
 		if (game.syncToken) {
-			$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
-				game.syncToken = data;
-				PokerRoom.save();
-			});
+			sync.run();
 		}
 	}
 	
@@ -224,6 +218,7 @@ return function PokerGame (PokerRoom, info, state) {
 		var run = function() {
 			$.post('php/games.php', {method:'sync', games:JSON.stringify([{syncToken:game.syncToken, name:name}]), rand:Math.random()}, function(updates) {
 				if (syncTimer) {
+					clearTimeout(syncTimer);
 					updates = JSON.parse(updates);
 					if (updates[name]) {
 						game.update( updates[name] );
@@ -301,17 +296,15 @@ return function PokerGame (PokerRoom, info, state) {
 	}
 	function addBreak(index) {
 		state.splice(index, 0, {blinds:local['break'], game:'', time:breakLength});
+		draw();
+		save();
 	}
 	function startBreak() {
 		addBreak(currentBlindIndex);
 		onBreak = true;
-		draw();
-		save();
 	}
 	function breakNext() {
 		addBreak(currentBlindIndex+1);
-		draw();
-		save();
 	}
 	function endBreak() {
 		if (onBreak) {
