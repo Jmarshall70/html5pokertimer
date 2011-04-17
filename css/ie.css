@@ -1,0 +1,22 @@
+#hud a.button {
+	display: inline-block;
+	vertical-align: bottom;
+	position: relative;
+	width: 9em;
+	height: 3.4em;
+}
+#hud .button {
+	background-image: none;
+	line-height: 1.2;
+	text-align: center;
+	background-color: white;
+	border: 0.125em solid silver;
+	padding: 1em;
+}
+#hud .button span {
+	position: static;
+	background-image: none;
+	color: black;
+	font-size: 1.5em;
+	font-weight: bold;
+}
