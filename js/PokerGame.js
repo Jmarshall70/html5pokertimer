@@ -464,7 +464,14 @@ return function PokerGame (PokerRoom, info, state) {
 		hideControls();
 		$(document).bind('keydown', keyControl);
 		if (!window.Touch) {
-			$(document.body).bind('mousemove', showControls);
+			var lastX, lastY;
+			$(document.body).bind('mousemove', function(event) {
+				if (event.screenX !== lastX || event.screenY !== lastY) {
+					showControls();
+					lastX = event.screenX;
+					lastY = event.screenY;
+				}
+			});
 			$(hud).bind('mouseover', function() { controlsFadeTime = 5000 });
 			$(hud).bind('mouseout', function() { controlsFadeTime = 1000 });
 		} else {
@@ -495,16 +502,17 @@ return function PokerGame (PokerRoom, info, state) {
 		}
 	};
 	game.toJSON = function() {
-		return {
+		var o = {
 			lastUpdate: lastUpdate,
 			breakLength: breakLength,
 			name: game.name,
 			state: state,
 			syncToken: game.syncToken,
 			games: games,
-			blindTime: blindTime,
+			blindTime: blindTime
 			
 		};
+		return o;
 	};
 	game.resize = function(animate) {
 		resize(animate);
