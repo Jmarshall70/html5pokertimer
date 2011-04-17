@@ -98,7 +98,8 @@ var PokerRoom = (function($) {
 		foundOne = false;
 		for (var i=0,c=games_a.length; i < c; i++) {
 			if (games_a[i].state) {
-				foundOne = room.add( games_a[i] ) || foundOne;
+				var gameName = room.add( games_a[i] );
+				foundOne = !games[gameName].syncToken || foundOne;
 			}
 		}
 		if (foundOne) {
