@@ -210,18 +210,18 @@ return function PokerGame (PokerRoom, info, state) {
 	function save() {
 		PokerRoom.save();
 		if (game.syncToken) {
-			sync.run();
+			sync.save();
 		}
 	}
 	
 	var sync = (function() {
 		var run = function() {
-			$.post('php/games.php', {method:'sync', games:JSON.stringify([{syncToken:game.syncToken, name:name}]), rand:Math.random()}, function(updates) {
+			$.post('php/games.php', {method:'sync', games:JSON.stringify([{syncToken:game.syncToken, name:game.name}]), rand:Math.random()}, function(updates) {
 				if (syncTimer) {
 					clearTimeout(syncTimer);
 					updates = JSON.parse(updates);
-					if (updates[name]) {
-						game.update( updates[name] );
+					if (updates[game.name]) {
+						game.update( updates[game.name] );
 					}
 					syncTimer = setTimeout( function(){ run(); }, 30000 );
 				}
@@ -231,16 +231,19 @@ return function PokerGame (PokerRoom, info, state) {
 		syncTimer = false,
 		
 		sync = {
-			start: function() {
-				syncTimer = true;
-				PokerRoom.save();
+			save: function() {
 				$.post('php/games.php', {method:'save',game:game.toString()}, function(data){
 					game.syncToken = data;
 					$(document.body).addClass('syncing');
 					$('.sync-state', infoEl).html('public');
 					PokerRoom.save();
-					run();
 				});
+			},
+			start: function() {
+				syncTimer = true;
+				PokerRoom.save();
+				sync.save();
+				syncTimer = setTimeout( function(){ run(); }, 30000 );
 			},
 			stop: function() {
 				clearTimeout(syncTimer);
@@ -472,7 +475,7 @@ return function PokerGame (PokerRoom, info, state) {
 		if (game.syncToken) {
 			sync.start();
 		}
-		
+		window.theGame = game;
 		return game;
 	};
 	game.blur = function() {
