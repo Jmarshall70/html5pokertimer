@@ -226,6 +226,7 @@ var PokerRoom = (function($) {
 				for( var game in games ) {
 					if (games.hasOwnProperty(game)) {
 						if( game === name ) {
+							_gaq.push(['_trackEvent', 'game', 'start']);
 							currentGame = game
 							gameEl.appendChild( games[game].element );
 							games[game].focus();
