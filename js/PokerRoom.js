@@ -5,15 +5,12 @@ var PokerRoom = (function($) {
 	sharedListEl,
 	localListEl,
 	gameEl,
-	topPanel,
-	bottomPanel,
 	mute = true,
 	currentGame,
 	onBreak = false,
 	syncInProgress = false,
 	syncTimer = false,
 	syncSuspended = false,
-	curtain$,
 	syncToken = 0, //this is the syncToken for the game list
 		
 	sync = function() {
@@ -119,8 +116,6 @@ var PokerRoom = (function($) {
 		sharedListEl = getElementById('shared_games');
 		localListEl = getElementById('local_games');
 		gameEl = getElementById('game');
-		topPanel = $('#panels .top')[0];
-		bottomPanel = $('#panels .bottom')[0];
 		
 		var tabs = $('.tabs')[0],
 		tabContent = $('.tab-content')[0];
@@ -241,11 +236,6 @@ var PokerRoom = (function($) {
 			} else {
 				console.error('Tried to load "'+name+'", which does not exist.');
 			}
-			return room;
-		},
-		movePanels: function( place ) {
-			$(topPanel).css( 'bottom', place);
-			$(bottomPanel).css( 'top', place);
 			return room;
 		}
 	};	

@@ -269,7 +269,6 @@ return function PokerGame (PokerRoom, info, state) {
 			topOffset = Math.floor( (window.innerHeight || html.clientHeight)/2 - height/2),
 			levelTop = currentLevelEl.offsetTop,
 			newTop = topOffset-levelTop;
-			PokerRoom.movePanels( topOffset+height );
 			if( animate ) {
 				$(element).stop().animate({'top': newTop}, callback);
 			} else {
@@ -351,7 +350,7 @@ return function PokerGame (PokerRoom, info, state) {
 			clearInterval(controlsTimeout);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		} else {
-			$(hud).stop().animate({opacity:0.95}, 150);
+			$(hud).stop().animate({opacity:0.99}, 150);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		}
 	}
