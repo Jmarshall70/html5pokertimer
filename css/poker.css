@@ -6,14 +6,18 @@ body {
 	font-family: Helvetica, FreeSans, sans-serif;
 	max-width: 760px;
 	margin: 0 auto;
-	background-color: #ddd;
+	background-color: black;
+	background-image: url(../images/background.png);
+	 background-size: 50%;
+ 	-moz-background-size: 50%;
 }
 p {
 	margin-top: 1em;
 }
-h2 {
+h1 {
 	clear: both;
-	margin-bottom: 0.5em;
+	margin: 0.5em 0;
+	color: white;
 }
 input {
 	font-size: 100%;
@@ -44,6 +48,7 @@ hr {
 	margin-right: 0.125em;
 	display: inline-block;
 	cursor: pointer;
+	background-color: #999;
 }
 .tabs > *.selected {
 	background-color: white;
@@ -63,15 +68,11 @@ hr {
 	font-size: 120%;
 }
 .tab-content {
-	padding: 0.5em;
 	border: 0.0625em solid #aaa;
 	background-color: white;
-/*
-	border-radius: 1.5em;
-	-webkit-border-radius: 1.5em;
-	-moz-border-radius: 1.5em;
-*/
-	
+}
+#start_form {
+	padding: 1em;
 }
 #start_form div.start {
 	margin-bottom: 1em;
@@ -113,18 +114,35 @@ hr {
 .game_list > li {
 	cursor: pointer;
 	list-style-type: none;
+	border-bottom: 0.0625em solid silver;
+	padding: 0.5em 0.5em 0;
+	font-size: 150%;
+}
+.game_list li:hover {
+	background-color: #eee;
 }
 .game_list div.level {
 	display: none;
+	color: black;
 }
 .game_list div.level.current {
-	display: inline;
+	display: block;
 }
-.game_list div {
-	display: inline;
+.game_list div.name {
+	display: inline-block;
+	vertical-align: top;
+	width: 7em;
+	line-height: 2em;
+}
+.game_list div.state {
+	display: inline-block;
+	width: 15em;
+	height: 2.75em;
+	position: relative;
+	color: black;
+	vertical-align: top;
 }
 #game {
-	background-color: black;
 	font-size: 100px;
 	line-height: 1;
 	position: absolute;
@@ -135,49 +153,51 @@ hr {
 	display: none;
 	overflow: hidden;
 }
-#game .poker-game {
+.poker-game {
 	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
-}
-#game .poker-game .level .game, #game .poker-game .level .time {
-	font-size: 100%;
-}
-#game .poker-game .level {
-	position: relative;
-	text-align: left;
-	background-color: black;
 	color: white;
 }
-#game .poker-game .level.break {
+.poker-game .level .game,.poker-game .level .time {
+	font-size: 100%;
 }
-#game .poker-game .time {
+.poker-game .level {
+	position: relative;
+	text-align: left;
+}
+.poker-game .level.break {
+}
+.poker-game .time {
 	position: absolute;
 	left: .125em;
 	top: .125em;
 }
-#game .poker-game .blinds {
+.poker-game .blinds {
 	font-size: 220%;
 	height: 1em;
 	margin: 0;
 	text-align: right;
 }
-#game .poker-game .game {
+.poker-game .game {
 	position: absolute;
 	left: .125em;
-	bottom: .25em;
+	bottom: .125em;
 	white-space: nowrap;
+}
+#game .poker-game .level {
+	color: #333;
 }
 #game .poker-game .level.current {
 	color: white;
 }
 #game .poker-game .level.previous.played {
-	color: white;
+	color: #555;
 }
 #game .poker-game .level.played {
-	color: #777;
+	color: #333;
 }
 #game .poker-game.tall .level.current {
 	font-size: 145%;
@@ -200,49 +220,6 @@ hr {
 #game .poker-game.tall .level.current .blinds {
 	text-align: center;
 	clear: both;
-}
-
-
-#panels > div.curtain {
-	position: absolute;
-	left: 0px;
-	right: 0px;
-	width: 100%;
-	z-index: 10;
-}
-#panels > div.top.curtain {
-	top: 0px;
-	background: black;
-	opacity: 0.4;
-	filter: alpha(opacity=40);
-}
-#panels > div.bottom.curtain {
-	bottom: 0px;
-	background: black;
-	opacity: 0.7;
-	filter: alpha(opacity=70);
-}
-#panels > div.curtain > a {
-	position: absolute;
-	left: 3em;
-	right: 3em;
-	font-size: 1em;
-	line-height: 1;
-	text-align: center;
-	background-color: white;
-	padding: 0.5em;
-	opacity: 0.8;
-	text-decoration: none;
-	color: black;
-	-webkit-border-radius: 1em;
-	-moz-border-radius: 1em;
-	max-height: 50%;
-}
-#panels > div.top.curtain > a {
-	bottom: 0.15em;
-}
-#panels > div.bottom.curtain > a {
-	top: 0.15em;
 }
 #hud {
 	position: absolute;

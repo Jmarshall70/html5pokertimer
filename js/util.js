@@ -5,6 +5,13 @@ if (!window.console) {
 		error: function(){}
 	};
 }
+if (!window.localStorage) {
+	window.localStorage = {
+		setItem: function(){},
+		removeItem: function(){},
+		getItem: function(){}
+	};
+}
 
 var util = (function($) { return {
 	template: function(template, bindings, items, callback) {
