@@ -15,7 +15,7 @@ $(document).ready(function() {
 		localStorage.removeItem('lastGame');
 		localStorage.setItem('lastGame', JSON.stringify(newGame));
 		window.newGame = newGame;
-		
+		_gaq.push(['_trackEvent', 'game', 'new']);
 		var name = PokerRoom.add( newGame );
 		PokerRoom.save();
 		PokerRoom.showGame(name);
