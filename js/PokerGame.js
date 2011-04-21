@@ -265,10 +265,17 @@ return function PokerGame (PokerRoom, info, state) {
 	})();
 	function updateScroll( animate, callback ) {
 		if( hasFocus ) {
-			var height = currentLevelEl.offsetHeight,
-			topOffset = Math.floor( (window.innerHeight || html.clientHeight)/2 - height/2),
-			levelTop = currentLevelEl.offsetTop,
-			newTop = topOffset-levelTop;
+			
+			var height = currentLevelEl.offsetHeight;
+			var topOffset = Math.floor( (window.innerHeight || html.clientHeight)/2 - height/2);
+			var levelTop = currentLevelEl.offsetTop;
+			var newTop = topOffset-levelTop;
+			
+			// drop the current level just below the controls if they're showing.
+			if (controlsShowing && levelTop + element.offsetTop < hud.clientHeight) {
+				newTop -= (levelTop + element.offsetTop) - hud.clientHeight;
+			}
+			
 			if( animate ) {
 				$(element).stop().animate({'top': newTop}, callback);
 			} else {
@@ -344,12 +351,16 @@ return function PokerGame (PokerRoom, info, state) {
 	}
 	
 	var controlsTimeout = null;
+	var controlsShowing = false;;
 	function showControls() {
 		curtain$.hide();
+				
 		if (controlsTimeout) {
 			clearInterval(controlsTimeout);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		} else {
+			controlsShowing = true;
+			updateScroll(true);
 			$(hud).stop().animate({opacity:0.99}, 150);
 			controlsTimeout = setTimeout( hideControls, controlsFadeTime );
 		}
@@ -357,6 +368,8 @@ return function PokerGame (PokerRoom, info, state) {
 	function hideControls() {
 		clearTimeout(controlsTimeout);
 		controlsTimeout = null;
+		controlsShowing = false;
+		updateScroll(true);
 		$(hud).stop().animate({opacity:0}, 'slow', function() {
 			curtain$.show();
 		});
