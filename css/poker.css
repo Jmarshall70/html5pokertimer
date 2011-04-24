@@ -91,8 +91,14 @@ hr {
 	float: left;
 	width: 29%;
 }
+#start_form .games label {
+	font-size: 2em;
+}
+#start_form .show-hide-advanced {
+	clear: both;
+}
 #new_game {
-	background-color: #ddd;
+	background-color: #f7db66;
 	border: 2px solid black;
 	font-size: 2em;
 	padding: 0.25em 1em;
@@ -100,6 +106,7 @@ hr {
 	-webkit-border-radius: 1em;
 	-moz-border-radius: 1em;
 	margin-bottom: 0.25em;
+	margin-top: 1em;
 }
 #start_form div.games {
 	float: left;
@@ -110,6 +117,9 @@ hr {
 	font-size: 100%;
 	line-height: 1.2;
 	padding: 2px;
+}
+.restore a {
+	color: grey;
 }
 .local.panel {
 	padding: 0;

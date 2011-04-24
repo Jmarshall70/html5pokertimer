@@ -46,25 +46,11 @@ switch( $_REQUEST['method'] ) {
 				}
 			}
 			echo json_encode($updates);
-		} else {
-			// sync all games
-			$game_files = glob( 'games/*' );
-			$games = array();
-			$syncToken = time();
-			foreach( $game_files as $game_file ) {
-				if( filemtime( $game_file ) > $_POST['syncToken'] ) {
-					$game_data = evaluate_game( $game_file );
-					if( $game_data ) {
-						$games[] = $game_data;
-					}
-				}
-			}
-			echo json_encode( array( 'games' => $games, 'syncToken' => $syncToken ) );
 		}
 		break;
 	
 	default:
-		echo 'Please select a method. save, sync, get, list';
+		echo 'Please select a method. save, sync, get';
 }
 function evaluate_game( $file_name ) {
 	if( file_exists( $file_name ) ) {
