@@ -71,7 +71,7 @@ hr {
 	border: 0.0625em solid #aaa;
 	background-color: white;
 }
-#start_form {
+.panel {
 	padding: 1em;
 }
 #start_form div.start {
@@ -110,6 +110,9 @@ hr {
 	font-size: 100%;
 	line-height: 1.2;
 	padding: 2px;
+}
+.local.panel {
+	padding: 0;
 }
 .game_list > li {
 	cursor: pointer;
