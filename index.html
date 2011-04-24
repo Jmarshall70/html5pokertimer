@@ -23,7 +23,7 @@
 	<div class="tabs">
 		<div class="local">Recent Games</div>
 		<div class="new-game">New Game</div>
-		<div class="public">Public Games</div>
+		<div class="public">Join a Game</div>
 	</div>
 	
 	<div class="tab-content">
@@ -74,7 +74,9 @@ Omaha</textarea>
 			</div>
 		</div>
 		<div class="public">
-			<ul id="shared_games" class="game_list"><li>Checking for games...</li></ul>
+			<p>You can find the game name in the bottom right corner of the control bar.</p>
+			<label>Game name: <input type="text" id="public_game_name"/></label> <button id="join_public_game">Join</button>
+			<p id="public_feedback"></p>
 		</div>
 	</div>
 	<div class="copyright">
