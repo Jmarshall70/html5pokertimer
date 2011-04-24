@@ -53,6 +53,9 @@ $(document).ready(function() {
 	
 	
 	$('#new_game').bind( 'click', post_game );
+	$('#join_public_game').bind( 'click', function() {
+		PokerRoom.get($('#public_game_name').val());
+	});
 	
 });
 

@@ -8,72 +8,18 @@ var PokerRoom = (function($) {
 	mute = true,
 	currentGame,
 	onBreak = false,
-	syncInProgress = false,
-	syncTimer = false,
-	syncSuspended = false,
-	syncToken = 0, //this is the syncToken for the game list
 		
-	sync = function() {
-		if (syncInProgress || syncSuspended) {
-			return;
-		}
-		clearTimeout( syncTimer );
-		syncInProgress = true;
-		$.post('php/games.php', {method:'sync', syncToken:syncToken, rand:Math.random()}, function(updates) {
-			updates = JSON.parse(updates);
-			if(updates.syncToken) {
-				var serverGames = updates.games;
-				syncToken = updates.syncToken;
-				if (serverGames.length) {
-					
-					for( var i=0,c=serverGames.length; i<c; i++ ) {
-						var game = serverGames[i];
-						if (games[game.name]) {
-							games[game.name].update( game );
-						} else {
-							room.add( game );
-						}
-					}
-					room.save();
-				}
-				updateList();
-			}
-			syncTimer = setTimeout( function(){ sync() }, 60000 );
-			syncInProgress = false;
-		});
-	},
-	updateList = function( syncResult ) {		
-		var sharedGames_a = [], localGames_a = [], sharedGameCount = 0;
+	updateList = function( ) {		
+		var localGames_a = [];
 		for( var name in games ) {
 			if (games.hasOwnProperty(name) && games[name]) {
 				games[name].wake();
-				if (games[name] && games[name].syncToken) {
-					sharedGameCount += 1;
-					sharedGames_a.push(games[name]);
-				} else if (games[name]) {
-					localGames_a.push(games[name]);
-				}
+				localGames_a.push(games[name]);
 			}
 		}
 		var template = $('#templates li.game')[0];
 		var bindings = ['name', {key:'element',selector:'.state'}];
-		
-		if (sharedGameCount === 0) {
-			$('.tabs .public').hide();
-			sharedListEl.innerHTML ='<li>No shared games in progress.</li>';		
-		} else {
-			$('.tabs .public').show();
-			var sharedFrag = util.template( template, bindings, sharedGames_a, function(el, game) {
-				$(el).bind( 'click', function(e){
-					room.showGame(game.name)
-				});
-			});
-			if (sharedFrag.childNodes.length) {
-				sharedListEl.innerHTML = '';
-				sharedListEl.appendChild( sharedFrag );
-			}
-		}
-		
+				
 		if (localGames_a.length) {
 			$('.tabs .local').show();
 			localListEl.innerHTML = '';
@@ -87,8 +33,6 @@ var PokerRoom = (function($) {
 			$('.tabs .local').hide();
 			localListEl.innerHTML = '<li>No games in progress.</li>';
 		}
-		
-		room.resume();
 	},
 	loadLocalGames = function() {
 		var games_a = JSON.parse( localStorage.getItem( 'PokerGames' ) || '[]' ),
@@ -96,10 +40,11 @@ var PokerRoom = (function($) {
 		for (var i=0,c=games_a.length; i < c; i++) {
 			if (games_a[i].state) {
 				var gameName = room.add( games_a[i] );
-				foundOne = !games[gameName].syncToken || foundOne;
+				foundOne = !!gameName || foundOne;
 			}
 		}
 		if (foundOne) {
+			updateList();
 			$('.tab-content .local').show();
 			$('.tabs > *').removeClass('selected')
 			$('.tabs .local').addClass('selected');
@@ -129,6 +74,7 @@ var PokerRoom = (function($) {
 			});
 		});
 		
+		room.start();
 	});
 	// onload to make sure nothing else is hogging the network (from this window, at least.)
 	$(window).bind('load', function() {
@@ -139,7 +85,7 @@ var PokerRoom = (function($) {
 			if (serverTime) {
 				room.timeOffset = timeOffset = serverTime - requestEndTime;
 			}
-			room.start();
+			//room.start();
 		});
 	});
 	
@@ -148,32 +94,28 @@ var PokerRoom = (function($) {
 		update: function(game) {
 			if (game) {
 				games[game].update();
-			} else {
-				sync();
 			}
 			return room;
 		},
-		suspend: function() {
-			clearTimeout(syncTimer);
-			syncTimer = false;
-			syncSuspended = true;
-			return room;
-		},
 		start: function() {
-			syncSuspended = false;
 			loadLocalGames();
-			sync();
-			//room.save();
 			return room;
 		},
-		resume: function() {
-			syncSuspended = false;
-			sync();
-			return room;
+		get: function ( gameName ) {
+			$('#public_feedback').html('Loading...');
+			$.post('php/games.php', {method:'get', name: gameName}, function(data) {
+				data = JSON.parse(data);
+				data = room.add(data);
+				if (data) {
+					room.showGame(data);
+				} else {
+					$('#public_feedback').html('No game with that name.');
+				}
+			});
 		},
 		add: function (info) {
 
-			var newGame = new PokerGame( this, info );
+			var newGame = pokerGame( this, info );
 			if (!newGame) {
 				return false;
 			} else {
@@ -225,14 +167,12 @@ var PokerRoom = (function($) {
 							currentGame = game
 							gameEl.appendChild( games[game].element );
 							games[game].focus();
-							room.suspend();
 						} else if (games[game]) {
 							//$(games[game]).remove();
 							games[game].sleep().blur();
 						}
 					}
 				}
-				room.suspend();
 			} else {
 				console.error('Tried to load "'+name+'", which does not exist.');
 			}

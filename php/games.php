@@ -22,9 +22,9 @@ switch( $_REQUEST['method'] ) {
 	case 'get':
 		$game_data = evaluate_game( name_to_file($_POST['name']) );
 		if( $game_data ) {
-			echo $game_data;
+			echo json_encode($game_data);
 		} else {
-			echo 'game not found';
+			echo 'false';
 		}
 		break;
 		

@@ -1,4 +1,4 @@
-var PokerGame = (function($, util) { 
+var pokerGame = (function($, util) { 
 	
 var SIZE_CONSTANT = 16, //text size constant.
 controlsFadeTime = 1000, 
@@ -48,12 +48,12 @@ bell = (function() {
 	return bell;
 })();
 
-return function PokerGame (PokerRoom, info, state) {
+return function pokerGame (PokerRoom, info, state) {
 	if (!info.games) {
 		console.log('removed because there were no games.');
 		return false;
 	}
-	var game = this;
+	var game = {};
 	var lastUpdate = info.lastUpdate;
 	var breakLength = info.breakLength;
 	var state = info.state;
