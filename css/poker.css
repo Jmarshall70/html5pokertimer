@@ -240,12 +240,18 @@ hr {
 	right: 0;
 	left: 0;
 	width: 100%;
-	padding: 0.333em 0 0;
+	padding: 0;
 	text-align: center;
 	background-color: #aaa;
 /* 	background-color: rgba(150,150,150,0.85); */
 	z-index: 100;
 	border-bottom: 0.125em solid black;
+}
+#hud a.back-to-home {
+	font-size: 25%;
+	display: block;
+	text-align: left;
+	line-height: 1;
 }
 #hud a.button {
 	display: inline-block;
