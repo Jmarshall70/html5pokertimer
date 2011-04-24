@@ -27,11 +27,11 @@
 	</div>
 	
 	<div class="tab-content">
-		<div class="local">
+		<div class="local panel">
 			<ul id="local_games" class="game_list"><li>No games in progress.</li></ul>
 		</div>
 		
-		<div id="start_form" class="new-game">
+		<div id="start_form" class="new-game panel">
 			<div class="time">
 				<label><input type="text" size="4" name="time" id="blind_time" value="10:00"> blinds</label>
 			</div>
@@ -73,9 +73,11 @@ Omaha</textarea>
 				<a href="#" id="restore_last">Restore From Last Game</a>
 			</div>
 		</div>
-		<div class="public">
-			<p>You can find the game name in the bottom right corner of the control bar.</p>
-			<label>Game name: <input type="text" id="public_game_name"/></label> <button id="join_public_game">Join</button>
+		<div class="public panel">
+			<form id="join_public_game">
+				<label>Game name: <input type="text" id="public_game_name"/></label> <input type="submit" value="Join"/>
+			</form>
+			<small>The game name is in the bottom right corner of the control bar of a public game.</small>
 			<p id="public_feedback"></p>
 		</div>
 	</div>
