@@ -23,7 +23,7 @@ input {
 	font-size: 100%;
 }
 a {
-	color: black;
+	color: #333;
 	text-decoration: none;
 }
 a:hover {
