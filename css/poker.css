@@ -33,6 +33,9 @@ hr {
 	clear: both;
 	margin-top: 1em;
 }
+button {
+	cursor: pointer;
+}
 .copyright {
 	font-size: 50%;
 	margin: 0.5em;
