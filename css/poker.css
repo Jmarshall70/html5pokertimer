@@ -338,6 +338,12 @@ hr {
 	border-top:  0.1em solid #666;
 	border-left: 0.1em solid #666;
 }
+#info .name {
+	display: none;
+}
+.syncing #info .name {
+	display: block;
+}
 #hud .about {
 	position: absolute;
 	bottom: 0;
