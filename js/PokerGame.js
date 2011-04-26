@@ -88,8 +88,6 @@ return function pokerGame (PokerRoom, info, state) {
 	}
 	if( !breakLength ) {
 		breakLength = blindTime; 
-		// use the time from the last blind as the default break length
-		// if the game is already on the second level the first one will be zero.
 	}
 	
 	var countInterval;
@@ -171,7 +169,7 @@ return function pokerGame (PokerRoom, info, state) {
 				blind = state[currentBlindIndex];
 			}
 			if (previousBlindIndex !== currentBlindIndex) {
-				_gaq.push(['_trackEvent', 'game', 'level', currentBlindIndex]);
+				_gaq.push(['_trackEvent', 'level', currentBlindIndex]);
 				if( currentLevelEl ) {
 					var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played');
 					previousDimmerTimer = setTimeout( function() {
@@ -245,6 +243,7 @@ return function pokerGame (PokerRoom, info, state) {
 				PokerRoom.save();
 				sync.save();
 				syncTimer = setTimeout( function(){ run(); }, 30000 );
+				_gaq.push(['_trackEvent', 'share', currentBlindIndex]);
 			},
 			stop: function() {
 				clearTimeout(syncTimer);
@@ -501,11 +500,6 @@ return function pokerGame (PokerRoom, info, state) {
 		window.theGame = game;
 		return game;
 	};
-	game.blur = function() {
-		//game.hasFocus = hasFocus = false;
-		//$(window).unbind( 'resize', resizeCallback );
-		return game;
-	};
 	game.toString = function() {
 		if (game.toJSON) {
 			return JSON.stringify(game.toJSON());
@@ -526,24 +520,7 @@ return function pokerGame (PokerRoom, info, state) {
 		};
 		return o;
 	};
-	game.resize = function(animate) {
-		resize(animate);
-		return game;
-	};
-	game.redraw = function() {
-		draw();
-		return game;
-	};
-	
-	if (game.__defineGetter__) {
-		//game.__defineGetter__( 'syncToken', function(){return syncToken;} );
-		//game.__defineGetter__( 'element', function(){return element;} );
-		//game.__defineGetter__( 'name', function(){return name;} );
-		//game.__defineGetter__( 'hasFocus', function(){return hasFocus;} );
-	}	
-	
-	var stillGood = draw();
-	if (stillGood) {
+	if (draw()) {
 		return game;
 	} else {
 		return false;
