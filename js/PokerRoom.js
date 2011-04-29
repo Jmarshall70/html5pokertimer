@@ -103,15 +103,15 @@ var PokerRoom = (function($) {
 		},
 		get: function ( gameName ) {
 			$('#public_feedback').html('Loading...');
-			_gaq.push(['_trackEvent', 'sync', 'join-attempt', currentBlindIndex]);
+			_gaq.push(['_trackEvent', 'sync', 'join-attempt']);
 			$.post('php/games.php', {method:'get', name: gameName}, function(data) {
 				data = JSON.parse(data);
 				data = room.add(data);
 				if (data) {
-					_gaq.push(['_trackEvent', 'join', 'success', currentBlindIndex]);
+					_gaq.push(['_trackEvent', 'join', 'success']);
 					room.showGame(data);
 				} else {
-					_gaq.push(['_trackEvent', 'join', 'failure', currentBlindIndex]);
+					_gaq.push(['_trackEvent', 'join', 'failure']);
 					$('#public_feedback').html('No game with that name.');
 				}
 			});

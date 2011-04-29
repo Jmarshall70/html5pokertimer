@@ -92,7 +92,7 @@ var util = (function($) { return {
 		return Math.floor(sec/60)+':'+util.pad(sec%60,2);
 	},
 	stringToSeconds: function( time ) {
-		var time_a = time.split(':');
+		var time_a = time.toString().split(':');
 		if (time_a.length > 1) {
 			var minutes = (parseInt(time_a[0],10) || 0) * 60;
 			var seconds = parseInt(time_a[1],10) || 0;

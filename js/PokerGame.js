@@ -59,27 +59,12 @@ return function pokerGame (PokerRoom, info, state) {
 	var state = info.state;
 	var blinds = info.blinds;
 	var games = info.games;
-	var blindTime = info.blindTime || 600;
+	var blindTime = util.stringToSeconds(info.blindTime) || 600;
 	var infoEl;
 	
 	game.syncToken = info.syncToken;
 	game.name = info.name;
 	
-	if ($.isArray(info.state)) {
-		state = info.state;
-	} else {
-		blinds = blinds.split(/\n+/g);
-		games = games.split(/\n+/g);
-		blindTime = util.stringToSeconds(blindTime);
-		
-		state = [];
-		for (var i=0,c=blinds.length; i<c; i++ ) {
-			state.push({ time:blindTime, blinds:blinds[i], game: games[i%games.length] });
-		}
-	}
-	if (!lastUpdate) {
-		lastUpdate = (new Date).getTime();
-	}
 	if (!game.syncToken) {
 		game.syncToken = 0;
 	}
@@ -88,6 +73,29 @@ return function pokerGame (PokerRoom, info, state) {
 	}
 	if( !breakLength ) {
 		breakLength = blindTime; 
+	}
+	if ($.isArray(info.state)) {
+		state = info.state;
+	} else {
+		blinds = blinds.split(/\n+/g);
+		games = games.split(/\n+/g);
+		
+		state = [];
+		var levelsThatWerentBlinds = 0;
+		for (var i=0,c=blinds.length; i<c; i++ ) {
+			if (blinds[i] === '-') {
+				state.push(getBreakObject());
+			} else if (games[levelsThatWerentBlinds%games.length] === '-') {
+				state.push(getBreakObject());
+				levelsThatWerentBlinds += 1;
+			} else {
+				state.push({ time:breakLength, blinds:blinds[i], game: games[levelsThatWerentBlinds%games.length] });
+				levelsThatWerentBlinds += 1;
+			}
+		}
+	}
+	if (!lastUpdate) {
+		lastUpdate = (new Date).getTime();
 	}
 	
 	var countInterval;
@@ -102,6 +110,10 @@ return function pokerGame (PokerRoom, info, state) {
 	var curtain$;
 	var toolbar;
 	var hud;
+	
+	function getBreakObject() {
+		return {blinds:local['break'], game:'', time:breakLength};
+	}
 	
 	game.element = element;
 	
@@ -169,7 +181,7 @@ return function pokerGame (PokerRoom, info, state) {
 				blind = state[currentBlindIndex];
 			}
 			if (previousBlindIndex !== currentBlindIndex) {
-				_gaq.push(['_trackEvent', 'level', currentBlindIndex]);
+				_gaq.push(['_trackEvent', 'level', ''+currentBlindIndex]);
 				if( currentLevelEl ) {
 					var previousLevel$ = $(currentLevelEl).removeClass('current').addClass('previous played');
 					previousDimmerTimer = setTimeout( function() {
@@ -243,7 +255,7 @@ return function pokerGame (PokerRoom, info, state) {
 				PokerRoom.save();
 				sync.save();
 				syncTimer = setTimeout( function(){ run(); }, 30000 );
-				_gaq.push(['_trackEvent', 'share', currentBlindIndex]);
+				_gaq.push(['_trackEvent', 'share', ''+currentBlindIndex]);
 			},
 			stop: function() {
 				clearTimeout(syncTimer);
@@ -304,7 +316,7 @@ return function pokerGame (PokerRoom, info, state) {
 		resize();
 	}
 	function addBreak(index) {
-		state.splice(index, 0, {blinds:local['break'], game:'', time:breakLength});
+		state.splice(index, 0, getBreakLevel());
 		draw();
 		save();
 	}
@@ -374,7 +386,7 @@ return function pokerGame (PokerRoom, info, state) {
 		});
 	}
 	function addTime(seconds) {
-		_gaq.push(['_trackEvent', 'timechange', seconds]);
+		_gaq.push(['_trackEvent', 'timechange', ''+seconds]);
 		state[currentBlindIndex].time += seconds * 1000;
 		update();
 		save();
