@@ -1,7 +1,7 @@
 var pokerGame = (function($, util) { 
 	
 var SIZE_CONSTANT = 16, //text size constant.
-controlsFadeTime = 1000, 
+controlsFadeTime = 3000, 
 bell = (function() {
 	var mute = false,
 	element = null,
@@ -316,7 +316,7 @@ return function pokerGame (PokerRoom, info, state) {
 		resize();
 	}
 	function addBreak(index) {
-		state.splice(index, 0, getBreakLevel());
+		state.splice(index, 0, getBreakObject());
 		draw();
 		save();
 	}
@@ -495,8 +495,8 @@ return function pokerGame (PokerRoom, info, state) {
 					lastY = event.screenY;
 				}
 			});
-			$(hud).bind('mouseover', function() { controlsFadeTime = 5000 });
-			$(hud).bind('mouseout', function() { controlsFadeTime = 1000 });
+			$(hud).bind('mouseover', function() { controlsFadeTime = 6000 });
+			$(hud).bind('mouseout', function() { controlsFadeTime = 3000 });
 		} else {
 			controlsFadeTime = 5000;
 		}
@@ -522,12 +522,12 @@ return function pokerGame (PokerRoom, info, state) {
 	game.toJSON = function() {
 		var o = {
 			lastUpdate: lastUpdate,
-			breakLength: breakLength,
+			breakLength: breakLength/1000,
 			name: game.name,
 			state: state,
 			syncToken: game.syncToken,
 			games: games,
-			blindTime: blindTime
+			blindTime: blindTime/1000
 			
 		};
 		return o;
