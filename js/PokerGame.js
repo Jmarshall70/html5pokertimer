@@ -522,7 +522,7 @@ return function pokerGame (PokerRoom, info, state) {
 	game.toJSON = function() {
 		var o = {
 			lastUpdate: lastUpdate,
-			breakLength: breakLength/1000,
+			breakLength: breakLength,
 			name: game.name,
 			state: state,
 			syncToken: game.syncToken,
